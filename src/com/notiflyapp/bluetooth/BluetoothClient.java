@@ -30,6 +30,9 @@ public class BluetoothClient {
         this.server = server;
     }
 
+    /**
+     * Will disconnect client device from server
+     */
     public void close() {
         if(thread.isConnected()) {
             thread.close();
@@ -37,10 +40,24 @@ public class BluetoothClient {
         }
     }
 
-    private void setDataAuto(DeviceInfo di) {
+    /**
+     *Will take a DeviceInfo DataObject and extract the device's information
+     * from it.
+     *
+     * @param di DeviceInfo DataObject containing the device's Name, Mac Address, Type
+     */
+    private void setDeviceData(DeviceInfo di) {
         //TODO Pull all device info from initial info burst
     }
 
+
+    /**
+     * Handles the DataObjects received from the client device and
+     * will pass the extracted data, or whole DataObject, to the
+     * appropriate functions.
+     *
+     * @param msg DataObject received from client
+     */
     protected void receivedMsg(DataObject msg) {
         switch (msg.getType()) {
             case SMS:
@@ -55,19 +72,32 @@ public class BluetoothClient {
             case NOTIFICATION:
                 break;
             case DEVICEINFO:
-                setDataAuto((DeviceInfo) msg);
+                setDeviceData((DeviceInfo) msg);
                 break;
         }
         received.add(msg);
     }
 
+
+    /**
+     *
+     * @return Array of all DataObjects received from the client device
+     */
     public ArrayList<DataObject> getReceived() {
         return received;
     }
 
+
+    /**
+     * Sends a DataObject to client device and stores the sent object
+     * in the sent array.
+     *
+     * @param msg DataObject to be sent to client device
+     */
     public void sendMsg(DataObject msg) {
         try {
             thread.send(msg);
+            sent.add(msg);
         } catch (IOException e) {
             if(msg.getExtra() != null) {
                 serverOut("Failed to send message: " + msg.getType() + ": " + msg.getBody() + ": " + msg.getExtra().getPath());
@@ -78,12 +108,24 @@ public class BluetoothClient {
         }
     }
 
-    protected void serverOut(String out) {
-        server.serverOut("BluetoothClient: " + deviceName, out);
-    }
 
+    /**
+     *
+     * @return Array of all DataObjects sent to the client device
+     */
     public ArrayList<DataObject> getSent() {
         return sent;
+    }
+
+
+    /**
+     * Prints a string to the server log with identifying TAG of "BluetoothClient: 'deviceName'"
+     * and time at which it was sent.
+     *
+     * @param out String to print to log
+     */
+    protected void serverOut(String out) {
+        server.serverOut("BluetoothClient: " + deviceName, out);
     }
 
 }
