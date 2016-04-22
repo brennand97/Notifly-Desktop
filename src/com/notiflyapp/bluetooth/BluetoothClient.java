@@ -14,21 +14,28 @@ import java.util.ArrayList;
  */
 public class BluetoothClient {
 
-    private ClientThread thread;
-    private BluetoothServer server;
+    private ClientThread thread;    //Reference to ClientThread object that holds device's connection socket + in and out streams
+    private BluetoothServer server; //Reference to the server that stores and created this client
 
-    private ArrayList<DataObject> received = new ArrayList<>();
-    private ArrayList<DataObject> sent = new ArrayList<>();
+    private ArrayList<DataObject> received = new ArrayList<>(); //ArrayList of all DataObjects received from the device
+    private ArrayList<DataObject> sent = new ArrayList<>();     //ArrayList of all DataObjects sent to the device
 
-    private String deviceName;
-    private String deviceMac;
-    private String deviceType;
+    private String deviceName;  //Device's name obtained from received DataInfo DataObject on connect
+    private String deviceMac;   //Device's Mac Address obtained from received DataInfo DataObject on connect
+    private String deviceType;  //Device's Type obtained from received DataInfo DataObject on connect (Ex. Phone, Tablet, Laptop)
 
+
+    /**
+     *
+     * @param server    BluetoothServer that the device connected to
+     * @param conn      The uninitialized connection received by the server
+     */
     public BluetoothClient(BluetoothServer server, StreamConnection conn) {
         thread = new ClientThread(this, conn);
         thread.start();
         this.server = server;
     }
+
 
     /**
      * Will disconnect client device from server
@@ -39,6 +46,7 @@ public class BluetoothClient {
             serverOut("Client disconnected.");
         }
     }
+
 
     /**
      *Will take a DeviceInfo DataObject and extract the device's information
