@@ -40,7 +40,7 @@ public class BluetoothClient {
         //TODO Pull all device info from initial info burst
     }
 
-    public void recievedMsg(DataObject msg) {
+    protected void receivedMsg(DataObject msg) {
         switch (msg.getType()) {
             case SMS:
                 try {

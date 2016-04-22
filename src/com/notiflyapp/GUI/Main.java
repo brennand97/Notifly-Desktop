@@ -13,6 +13,8 @@ public class Main extends Application {
 
     private BluetoothServer btServer;
 
+    private boolean serverActive = false;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         Group root = new Group();
@@ -25,9 +27,17 @@ public class Main extends Application {
 
         Button btn = new Button("Start server");
         btn.setOnAction(event -> {
-            btServer = new BluetoothServer();
-            btServer.start();
-            status.setText("Server started");
+            if(!serverActive) {
+                btServer = new BluetoothServer();
+                btServer.start();
+                serverActive = true;
+                status.setText("Server started");
+            } else {
+                btServer.close();
+                serverActive = false;
+                status.setText("Server stopped");
+            }
+
         });
         btn.setLayoutX(0);
         btn.setLayoutX(50);

@@ -5,12 +5,7 @@ import com.data.Serial;
 
 import javax.microedition.io.StreamConnection;
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.util.Arrays.*;
 
 /**
  * Created by Brennan on 4/16/2016.
@@ -117,10 +112,10 @@ public class ClientThread extends Thread{
         client.serverOut(out);
     }
 
-    private void dataIn(byte[] data) throws EOFException, IOException, ClassNotFoundException {
+    private void dataIn(byte[] data) throws IOException, ClassNotFoundException {
         Object object = Serial.deserialize(data);
         if(object instanceof DataObject) {
-            client.recievedMsg((DataObject) object);
+            client.receivedMsg((DataObject) object);
         }
     }
 

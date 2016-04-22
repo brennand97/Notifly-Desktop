@@ -60,9 +60,9 @@ public class BluetoothServer extends Thread{
     }
 
     private void init() throws IOException {
-        //serverOut("Turning on Discovery");
-        //local = LocalDevice.getLocalDevice();
-        //local.setDiscoverable(DiscoveryAgent.GIAC);
+        serverOut("Turning on Discovery");
+        local = LocalDevice.getLocalDevice();
+        local.setDiscoverable(DiscoveryAgent.GIAC);
         serverOut("Advertising service");
         server = (StreamConnectionNotifier) Connector.open(url);
     }
