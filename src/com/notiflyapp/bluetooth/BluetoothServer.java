@@ -4,6 +4,7 @@ import javax.bluetooth.*;
 import javax.microedition.io.*;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +43,8 @@ public class BluetoothServer extends Thread{
                 conn = server.acceptAndOpen();
                 BluetoothClient bc = new BluetoothClient(this, conn);
                 currentClients.add(bc);
+            } catch (InterruptedIOException e1) {
+                //This is the server being forced to shut down
             } catch (IOException e) {
                 serverOut("Connection failed");
                 e.printStackTrace();
@@ -55,16 +58,47 @@ public class BluetoothServer extends Thread{
 
     public void close() {
         running = false;
+        try {
+            server.close();
+            this.join();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(local.getDiscoverable() != DiscoveryAgent.NOT_DISCOVERABLE) {
+            try {
+                local.setDiscoverable(DiscoveryAgent.NOT_DISCOVERABLE);
+                serverOut("Turned off Discovery");
+            } catch (BluetoothStateException e) {
+                e.printStackTrace();
+            }
+        }
         currentClients.forEach(BluetoothClient::close);
+        currentClients.clear();
+        try {
+            server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         serverOut("Server stopped.");
     }
 
     private void init() throws IOException {
-        serverOut("Turning on Discovery");
-        local = LocalDevice.getLocalDevice();
-        local.setDiscoverable(DiscoveryAgent.GIAC);
-        serverOut("Advertising service");
+        if(local == null) {
+            local = LocalDevice.getLocalDevice();
+            serverOut("Found local bluetooth");
+        }
+        if(local.getDiscoverable() == DiscoveryAgent.NOT_DISCOVERABLE) {
+            try {
+                local.setDiscoverable(DiscoveryAgent.GIAC);
+                serverOut("Turned on Discovery");
+            } catch (BluetoothStateException e) {
+                serverOut("Discovery could not be turned on");
+            }
+        }
         server = (StreamConnectionNotifier) Connector.open(url);
+        serverOut("Advertising service");
     }
 
     public void serverOut(String out) {

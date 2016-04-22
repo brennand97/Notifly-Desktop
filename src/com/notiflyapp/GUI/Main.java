@@ -28,16 +28,23 @@ public class Main extends Application {
         Button btn = new Button("Start server");
         btn.setOnAction(event -> {
             if(!serverActive) {
-                btServer = new BluetoothServer();
-                btServer.start();
-                serverActive = true;
+                Runnable runnable = () -> {
+                    btServer = new BluetoothServer();
+                    btServer.start();
+                    serverActive = true;
+                };
+                (new Thread(runnable)).start();
                 status.setText("Server started");
+                btn.setText("Stop server");
             } else {
-                btServer.close();
-                serverActive = false;
+                Runnable runnable = () -> {
+                    btServer.close();
+                    serverActive = false;
+                };
+                (new Thread(runnable)).start();
                 status.setText("Server stopped");
+                btn.setText("Start server");
             }
-
         });
         btn.setLayoutX(0);
         btn.setLayoutX(50);
@@ -61,7 +68,6 @@ public class Main extends Application {
 
         System.out.println("Stage is closing");
     }
-
 
     public static void main(String[] args) {
         launch(args);

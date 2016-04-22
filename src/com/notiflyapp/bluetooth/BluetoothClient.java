@@ -17,7 +17,7 @@ public class BluetoothClient {
     private ClientThread thread;
     private BluetoothServer server;
 
-    private ArrayList<DataObject> recieved = new ArrayList<>();
+    private ArrayList<DataObject> received = new ArrayList<>();
     private ArrayList<DataObject> sent = new ArrayList<>();
 
     private String deviceName;
@@ -31,9 +31,10 @@ public class BluetoothClient {
     }
 
     public void close() {
-        thread.close();
-        server.removeClient(this);
-        serverOut("Client disconnected.");
+        if(thread.isConnected()) {
+            thread.close();
+            serverOut("Client disconnected.");
+        }
     }
 
     private void setDataAuto(DeviceInfo di) {
@@ -57,11 +58,11 @@ public class BluetoothClient {
                 setDataAuto((DeviceInfo) msg);
                 break;
         }
-        recieved.add(msg);
+        received.add(msg);
     }
 
-    public ArrayList<DataObject> getRecieved() {
-        return recieved;
+    public ArrayList<DataObject> getReceived() {
+        return received;
     }
 
     public void sendMsg(DataObject msg) {

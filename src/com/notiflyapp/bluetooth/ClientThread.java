@@ -55,6 +55,8 @@ public class ClientThread extends Thread{
                 if (bytes > 0) {
                     handleData(buffer);
                 }
+            } catch (InterruptedIOException e1) {
+                //This is the client being forced to disconnect
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -98,11 +100,14 @@ public class ClientThread extends Thread{
     }
 
     public void close() {
+        connected = false;
         try {
-            conn = null;
+            conn.close();
             iStream.close();
             oStream.close();
-            connected = false;
+            this.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,6 +126,10 @@ public class ClientThread extends Thread{
 
     public void send(DataObject msg) throws IOException {
         oStream.write(msg.serialize());
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
 }
