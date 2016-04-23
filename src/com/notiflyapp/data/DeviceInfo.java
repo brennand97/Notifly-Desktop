@@ -22,26 +22,84 @@ public class DeviceInfo extends DataObject {
         type = Type.DEVICEINFO;
     }
 
-    public String getDeviceName() { return deviceName; } //Returns the stored deviceName
-
-    public void setDeviceName(String deviceName) { this.deviceName = deviceName; }   //Sets the device name to later be sent to other device
-
-    public String getDeviceMac() { return deviceMac; }  //Returns the stored deviceMac
-
-    public void setDeviceMac(String deviceMac) { this.deviceMac = deviceMac; }  //Sets the device mac address to later be sent to other device
-
-    public String getDeviceType() { return deviceType; }    //Returns teh stored deviceType
-
-    public void setDeviceType(String deviceType) { this.deviceType = deviceType; }  //Sets the device type to later be sent to other device
-
-    @Override   //Not needed for this DataObject as their are three separate pieces of information
+    /**
+     * @return The body of the DataObject as a String
+     */
+    @Deprecated
+    @Override
     public String getBody() {
         return null;
+        //Not needed for this instance
     }
 
-    @Override   //Not needed for this DataObject as their are three separate pieces of information
+
+    /**
+     *
+     * @return Stored device name
+     */
+    public String getDeviceName() { return deviceName; } //Returns the stored deviceName
+
+
+    /**
+     *
+     * @param deviceName Set device name to be stored
+     */
+    public void setDeviceName(String deviceName) { this.deviceName = deviceName; }   //Sets the device name to later be sent to other device
+
+
+    /**
+     *
+     * @return  Stored device mac address
+     */
+    public String getDeviceMac() { return deviceMac; }  //Returns the stored deviceMac
+
+
+    /**
+     *
+     * @param deviceMac Set device mac address to be stored
+     */
+    public void setDeviceMac(String deviceMac) { this.deviceMac = deviceMac; }  //Sets the device mac address to later be sent to other device
+
+
+    /**
+     *
+     * @return Stored device type (Phone, Tablet, Laptop, etc.)
+     */
+    public String getDeviceType() { return deviceType; }    //Returns the stored deviceType
+
+
+    /**
+     *
+     * @param deviceType Set device type to be stored
+     */
+    public void setDeviceType(String deviceType) { this.deviceType = deviceType; }  //Sets the device type to later be sent to other device
+
+    /**
+     * @param body The body of the message being sent as a String
+     */
+    @Deprecated
+    @Override
+    public void putBody(String body) {
+        //Not needed for this instance
+    }
+
+    /**
+     * @return Extra data stored in the message as a File
+     */
+    @Deprecated
+    @Override
     public File getExtra() {
         return null;
+        //Not need for this instance
+    }
+
+    /**
+     * @param file Extra data that goes along with the body as a File
+     */
+    @Deprecated
+    @Override
+    public void putExtra(File file) {
+        //Not needed for this instance
     }
 
 
