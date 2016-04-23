@@ -1,4 +1,4 @@
-package com.data;
+package com.notiflyapp.data;
 
 import java.io.File;
 

@@ -1,7 +1,7 @@
 package com.notiflyapp.bluetooth;
 
-import com.data.DataObject;
-import com.data.DeviceInfo;
+import com.notiflyapp.data.DataObject;
+import com.notiflyapp.data.DeviceInfo;
 
 import javax.microedition.io.StreamConnection;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * Holds connection thread for the bluetooth client and the information gathered on the client
  */
-class BluetoothClient {
+public class BluetoothClient {
 
     private ClientThread thread;    //Reference to ClientThread object that holds device's connection socket + in and out streams
     private BluetoothServer server; //Reference to the server that stores and created this client
@@ -58,7 +58,9 @@ class BluetoothClient {
      * @param di DeviceInfo DataObject containing the device's Name, Mac Address, Type
      */
     private void setDeviceData(DeviceInfo di) {
-        //TODO Pull all device info from initial info burst
+        deviceName = di.getDeviceName();    //Retrieves the device name provided by the device
+        deviceMac = di.getDeviceMac();      //Retrieves the device Mac Address provided by the device
+        deviceType = di.getDeviceType();    //Retrieves the device Type provided by the device
     }
 
 
@@ -139,4 +141,51 @@ class BluetoothClient {
         server.serverOut("BluetoothClient: " + deviceName, out);
     }
 
+
+    /**
+     * @return Connected bluetooth device's name
+     */
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+
+    /**
+     * @param deviceName Set the connected bluetooth device's name
+     */
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+
+    /**
+     * @return Connected bluetooth device's Mac Address
+     */
+    public String getDeviceMac() {
+        return deviceMac;
+    }
+
+
+    /**
+     * @param deviceMac Set the connected bluetooth device's name
+     */
+    public void setDeviceMac(String deviceMac) {
+        this.deviceMac = deviceMac;
+    }
+
+
+    /**
+     * @return Connected bluetooth device's Type
+     */
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+
+    /**
+     * @param deviceType Set the connected bluetooth device's Type
+     */
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
+    }
 }

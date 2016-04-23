@@ -1,17 +1,17 @@
-package com.data;
+package com.notiflyapp.data;
 
 import java.io.File;
 
 /**
  * Created by Brennan on 4/17/2016.
  */
-public class Notification extends DataObject{
+public class MMS extends DataObject{
 
-    private static final long serialVersionUID = 3349238414148539470L;
+    private static final long serialVersionUID = 3349238414148539468L;
 
-    public Notification() {
+    public  MMS() {
         super();
-        type = Type.NOTIFICATION;
+        type = Type.MMS;
     }
 
     @Override

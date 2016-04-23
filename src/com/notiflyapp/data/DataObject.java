@@ -1,4 +1,4 @@
-package com.data;
+package com.notiflyapp.data;
 
 import java.io.*;
 
@@ -26,7 +26,6 @@ public abstract class DataObject implements Serializable {
 
     public abstract String getBody();
     public abstract File getExtra();
-    public abstract byte[] getBytes();
 
     public byte[] serializeThis(Object obj) throws IOException {
         return this.serialize(this);

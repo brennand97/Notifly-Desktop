@@ -1,7 +1,7 @@
 package com.notiflyapp.bluetooth;
 
-import com.data.DataObject;
-import com.data.Serial;
+import com.notiflyapp.data.DataObject;
+import com.notiflyapp.data.Serial;
 
 import javax.microedition.io.StreamConnection;
 import java.io.*;
