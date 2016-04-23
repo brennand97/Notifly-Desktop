@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * Holds connection thread for the bluetooth client and the information gathered on the client
  */
-public class BluetoothClient {
+class BluetoothClient {
 
     private ClientThread thread;    //Reference to ClientThread object that holds device's connection socket + in and out streams
     private BluetoothServer server; //Reference to the server that stores and created this client
@@ -30,7 +30,7 @@ public class BluetoothClient {
      * @param server    BluetoothServer that the device connected to
      * @param conn      The uninitialized connection received by the server
      */
-    public BluetoothClient(BluetoothServer server, StreamConnection conn) {
+    BluetoothClient(BluetoothServer server, StreamConnection conn) {
         thread = new ClientThread(this, conn);
         thread.start();
         this.server = server;
@@ -38,12 +38,15 @@ public class BluetoothClient {
 
 
     /**
-     * Will disconnect client device from server
+     * Will disconnect client device from server and remove itself from connected devices list
      */
-    public void close() {
+    void close() {
         if(thread.isConnected()) {
-            thread.close();
+            thread.close();     //Called receiving threads close() method to disconnect it from device
             serverOut("Client disconnected.");
+        }
+        if(server.isRunning()) {    //Check to see if server is calling this close of if client is so there is no ConcurrentModificationExceptions
+            server.removeClient(this);  //Remove client from BluetoothServer's active clients list
         }
     }
 
