@@ -1,12 +1,11 @@
 package com.notiflyapp.bluetooth;
 
+import com.notiflyapp.debug.ServerLog;
+
 import javax.bluetooth.*;
 import javax.microedition.io.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,8 +26,8 @@ public class BluetoothServer extends Thread{
     private StreamConnectionNotifier serverConn = null;                         //Socket that is listened on to accept connections
     private ArrayList<BluetoothClient> currentClients = new ArrayList<>();      //List of current connected and active clients
 
-    private boolean running = false;                                                        //Server's main loop is active
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");         //Server's log time format
+    private boolean running = false;                    //Server's main loop is active
+    private ServerLog serverLog = new ServerLog();      //Server's server log
 
 
     /**
@@ -149,7 +148,6 @@ public class BluetoothServer extends Thread{
         serverOut("BluetoothServer", out);
     }
 
-
     /**
      * Prints the messages to the server log with a location, sender, ID TAG
      *
@@ -157,25 +155,7 @@ public class BluetoothServer extends Thread{
      * @param out   String to be displayed in server log
      */
     void serverOut(String location, String out) {
-        Date now = new Date();  //Gets current time message is being sent
-        String time = sdf.format(now);  //Formats current time according to predefined format
-        String stringOut = "[" + time + "] [" + location + "]    " + out;   //Format of time server log out
-        System.out.println(stringOut);  //Print to command line
-
-        /*
-        File fileOut = new File(".bluetooth-server-log");
-        try {
-            FileOutputStream fos = new FileOutputStream(fileOut);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-            bw.append(stringOut);
-            bw.newLine();
-            bw.close();
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
+        serverLog.out(location, out);   //Sends message to the ServerLog object to be written with timestamp to server log
     }
 
 }
