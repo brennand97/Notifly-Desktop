@@ -7,7 +7,7 @@ import java.io.File;
  *
  * Used for sending Short Message Service (SMS) messages between devices
  */
-public class SMS extends DataObject {
+public class SMS extends DataObject<String, File> {
 
     private static final long serialVersionUID = 3349238414148539467L;
 

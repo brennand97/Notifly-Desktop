@@ -43,18 +43,12 @@ public class ClientThread extends Thread{
                 byte[] buffer = new byte[BUFFER_SIZE];
                 int bytes;
                 bytes = iStream.read(buffer);
-                if ((new String(buffer)).toLowerCase().contains("exit")) {
-                    serverOut("Client quit session");
-                    client.close();
-                    break;
-                } else if (bytes == -1) {
+                if (bytes == -1) {
                     serverOut("Client session dropped");
                     client.close();
                     break;
                 }
-                if (bytes > 0) {
-                    handleData(buffer);
-                }
+                handleData(buffer);
             } catch (InterruptedIOException e1) {
                 //This is the client being forced to disconnect
             } catch (IOException e) {

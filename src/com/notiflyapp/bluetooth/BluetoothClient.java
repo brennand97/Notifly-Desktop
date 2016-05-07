@@ -24,7 +24,6 @@ public class BluetoothClient {
     private String deviceMac;   //Device's Mac Address obtained from received DataInfo DataObject on connect
     private String deviceType;  //Device's Type obtained from received DataInfo DataObject on connect (Ex. Phone, Tablet, Laptop)
 
-
     /**
      *
      * @param server    BluetoothServer that the device connected to

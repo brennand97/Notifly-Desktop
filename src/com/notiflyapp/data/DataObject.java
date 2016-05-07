@@ -7,7 +7,7 @@ import java.io.*;
  *
  * Abstract class for all data to be sent between devices.  Specific instances of data should extend this class.
  */
-public abstract class DataObject implements Serializable {
+public abstract class DataObject< A, B > implements Serializable {
 
     private static final long serialVersionUID = 3349238414148539466L;
 
@@ -56,25 +56,25 @@ public abstract class DataObject implements Serializable {
      *
      * @return The body of the DataObject as a String
      */
-    public abstract String getBody();
+    public abstract A getBody();
 
     /**
      *
      * @param body The body of the message being sent as a String
      */
-    public abstract void putBody(String body);
+    public abstract void putBody(A body);
 
     /**
      *
      * @return Extra data stored in the message as a File
      */
-    public abstract File getExtra();
+    public abstract B getExtra();
 
     /**
      *
      * @param file Extra data that goes along with the body as a File
      */
-    public abstract void putExtra(File file);
+    public abstract void putExtra(B file);
 
 
     /**

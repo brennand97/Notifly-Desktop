@@ -7,7 +7,7 @@ import java.io.File;
  *
  * Used for sending general notifications between devices.
  */
-public class Notification extends DataObject{
+public class Notification extends DataObject<String, File>{
 
     private static final long serialVersionUID = 3349238414148539470L;
 

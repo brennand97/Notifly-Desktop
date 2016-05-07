@@ -3,27 +3,15 @@ package com.notiflyapp.data;
 import java.io.File;
 
 /**
- * Created by Brennan on 4/17/2016.
- *
- * Used for sending Multimedia Messaging Service (MMS) messages between devices.
+ * Created by Brennan on 5/7/2016.
  */
-public class MMS extends DataObject<String, File>{
-
-    private static final long serialVersionUID = 3349238414148539468L;
-
-    /**
-     * Default constructor, defines DataObject.Type
-     */
-    public MMS() {
-        super();
-        type = Type.MMS;
-    }
+public class Request extends DataObject<Class, File> {
 
     /**
      * @return The body of the DataObject as a String
      */
     @Override
-    public String getBody() {
+    public Class getBody() {
         return null;
     }
 
@@ -31,7 +19,7 @@ public class MMS extends DataObject<String, File>{
      * @param body The body of the message being sent as a String
      */
     @Override
-    public void putBody(String body) {
+    public void putBody(Class body) {
 
     }
 

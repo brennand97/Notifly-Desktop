@@ -7,7 +7,7 @@ import java.io.File;
  *
  * Sent by BluetoothClient device to give the server information on the device like its name, mac address, and type (Ex. Phone, Tablet, Laptop)
  */
-public class DeviceInfo extends DataObject {
+public class DeviceInfo extends DataObject<String, File> {
 
     private static final long serialVersionUID = 3349238414148539469L;  //Defining UID so this object can be sent over bluetooth then be decoded again
 
