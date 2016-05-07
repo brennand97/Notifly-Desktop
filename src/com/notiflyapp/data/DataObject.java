@@ -15,7 +15,7 @@ public abstract class DataObject< A, B > implements Serializable {
     /**
      * Enum Type provides each possible instance's type of DataObject
      */
-    public enum Type { SMS, MMS, NOTIFICATION, DEVICEINFO }
+    public enum Type { SMS, MMS, NOTIFICATION, DEVICEINFO, REQUEST }
 
 
     /**

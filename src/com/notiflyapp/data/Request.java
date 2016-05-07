@@ -5,22 +5,29 @@ import java.io.File;
 /**
  * Created by Brennan on 5/7/2016.
  */
-public class Request extends DataObject<Class, File> {
+public class Request extends DataObject<Object, File> {
+
+    private Object requestObject;
+
+    public Request() {
+        super();
+        type = Type.REQUEST;
+    }
 
     /**
      * @return The body of the DataObject as a String
      */
     @Override
-    public Class getBody() {
-        return null;
+    public Object getBody() {
+        return requestObject;
     }
 
     /**
      * @param body The body of the message being sent as a String
      */
     @Override
-    public void putBody(Class body) {
-
+    public void putBody(Object body) {
+        requestObject = body;
     }
 
     /**
