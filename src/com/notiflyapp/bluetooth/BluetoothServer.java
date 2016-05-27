@@ -54,6 +54,7 @@ public class BluetoothServer extends Thread{
             try {
                 conn = serverConn.acceptAndOpen();  //Accepts the incoming connection with the specified UUID
                 BluetoothClient bc = new BluetoothClient(this, conn);   //Creates a new BluetoothClient passing in itself  and the uninitialized accepted connection
+                serverOut("Client connected");
                 currentClients.add(bc);     //Adds the create BluetoothClient to serverConn's list of active clients
             } catch (InterruptedIOException e1) {
                 serverOut("Connection closed");

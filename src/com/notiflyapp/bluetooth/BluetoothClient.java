@@ -74,7 +74,6 @@ public class BluetoothClient {
         deviceName = di.getDeviceName();    //Retrieves the device name provided by the device
         deviceMac = di.getDeviceMac();      //Retrieves the device Mac Address provided by the device
         deviceType = di.getDeviceType();    //Retrieves the device Type provided by the device
-        serverOut("Updated device information.");
     }
 
 

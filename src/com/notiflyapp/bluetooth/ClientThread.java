@@ -34,7 +34,6 @@ public class ClientThread extends Thread{
         try{
             iStream = new DataInputStream(conn.openInputStream());
             oStream = new DataOutputStream(conn.openOutputStream());
-            serverOut("Client connected");
         } catch (IOException e) {
             e.printStackTrace();
         }
