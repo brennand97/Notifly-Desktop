@@ -22,7 +22,21 @@ public class BluetoothClient {
 
     private String deviceName;  //Device's name obtained from received DataInfo DataObject on connect
     private String deviceMac;   //Device's Mac Address obtained from received DataInfo DataObject on connect
-    private String deviceType;  //Device's Type obtained from received DataInfo DataObject on connect (Ex. Phone, Tablet, Laptop)
+    private int deviceType;  //Device's Type obtained from received DataInfo DataObject on connect (Ex. Phone, Tablet, Laptop)
+
+    public static class Type {
+        public static final int MISC              = 0x0000;
+        public static final int COMPUTER          = 0x0100;
+        public static final int PHONE             = 0x0200;
+        public static final int NETWORKING        = 0x0300;
+        public static final int AUDIO_VIDEO       = 0x0400;
+        public static final int PERIPHERAL        = 0x0500;
+        public static final int IMAGING           = 0x0600;
+        public static final int WEARABLE          = 0x0700;
+        public static final int TOY               = 0x0800;
+        public static final int HEALTH            = 0x0900;
+        public static final int UNCATEGORIZED     = 0x1F00;
+    }
 
     /**
      *
@@ -60,6 +74,7 @@ public class BluetoothClient {
         deviceName = di.getDeviceName();    //Retrieves the device name provided by the device
         deviceMac = di.getDeviceMac();      //Retrieves the device Mac Address provided by the device
         deviceType = di.getDeviceType();    //Retrieves the device Type provided by the device
+        serverOut("Updated device information.");
     }
 
 
@@ -74,7 +89,7 @@ public class BluetoothClient {
         switch (msg.getType()) {
             case SMS:
                 try {
-                    serverOut("(" + msg.serialize().length + ") " + msg.getSender() + ": " + msg.getBody());
+                    serverOutNoLog("(" + msg.serialize().length + ") " + msg.getSender() + ": " + msg.getBody());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -112,7 +127,7 @@ public class BluetoothClient {
             sent.add(msg);
         } catch (IOException e) {
             if(msg.getExtra() != null) {
-                serverOut("Failed to send message: " + msg.getType() + ": " + msg.getBody() + ": " + msg.getExtra().getPath());
+                serverOut("Failed to send message: " + msg.getType() + ": " + msg.getBody() + ": ");
             } else {
                 serverOut("Failed to send message: " + msg.getType() + ": " + msg.getBody());
             }
@@ -137,8 +152,10 @@ public class BluetoothClient {
      * @param out String to print to log
      */
     protected void serverOut(String out) {
-        server.serverOut("BluetoothClient: " + deviceName, out);
+        server.serverOut("BluetoothClient: " + deviceName, out, true);
     }
+
+    protected void serverOutNoLog(String out) { server.serverOut("BluetoothClient: " + deviceName, out, false); }
 
 
     /**
@@ -176,7 +193,7 @@ public class BluetoothClient {
     /**
      * @return Connected bluetooth device's Type
      */
-    public String getDeviceType() {
+    public int getDeviceType() {
         return deviceType;
     }
 
@@ -184,7 +201,7 @@ public class BluetoothClient {
     /**
      * @param deviceType Set the connected bluetooth device's Type
      */
-    public void setDeviceType(String deviceType) {
+    public void setDeviceType(int deviceType) {
         this.deviceType = deviceType;
     }
 }

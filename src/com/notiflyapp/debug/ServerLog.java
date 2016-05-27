@@ -45,11 +45,13 @@ public class ServerLog {
      * @param location  String identifying where message is coming from
      * @param out   String to be displayed in server log
      */
-    public void out(String location, String out) {
+    public void out(String location, String out, boolean log) {
         Date now = new Date();  //Gets current time message is being sent
         String time = sdf.format(now);  //Formats current time according to predefined format
         String stringOut = "[" + time + "] [" + location + "]    " + out;   //Format of time server log out
-        logger.info(stringOut);  //Print to server log
+        if(log) {
+            logger.info(stringOut);  //Print to server log
+        }
         System.out.println(stringOut);  //Print to command line
     }
 

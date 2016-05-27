@@ -143,7 +143,7 @@ public class BluetoothServer extends Thread{
      * @param out String to be printed to server log with
      */
     private void serverOut(String out) {
-        serverOut("BluetoothServer", out);
+        serverOut("BluetoothServer", out, true);
     }
 
     /**
@@ -152,8 +152,8 @@ public class BluetoothServer extends Thread{
      * @param location  String identifying where message is coming from
      * @param out   String to be displayed in server log
      */
-    void serverOut(String location, String out) {
-        serverLog.out(location, out);   //Sends message to the ServerLog object to be written with timestamp to server log
+    void serverOut(String location, String out, boolean log) {
+        serverLog.out(location, out, log);   //Sends message to the ServerLog object to be written with timestamp to server log
     }
 
 }

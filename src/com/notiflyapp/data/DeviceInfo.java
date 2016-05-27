@@ -11,8 +11,9 @@ public class DeviceInfo extends DataObject<String, File> {
 
     private static final long serialVersionUID = 3349238414148539469L;  //Defining UID so this object can be sent over bluetooth then be decoded again
 
-    private String deviceName, deviceMac, deviceType;   //Holds the information as it is sent to the other device
-
+    private String deviceName, deviceMac;   //Holds the information as it is sent to the other device
+    private int deviceType;
+    private boolean connect, sms, notification;
 
     /**
      * Initializes a new DeviceInfo DataObject to be written to and sent to another device
@@ -20,6 +21,14 @@ public class DeviceInfo extends DataObject<String, File> {
     public DeviceInfo() {
         super();
         type = Type.DEVICEINFO;
+    }
+
+    public DeviceInfo(String deviceName, String deviceMac, int deviceType) {
+        super();
+        type = Type.DEVICEINFO;
+        this.deviceName = deviceName;
+        this.deviceMac = deviceMac;
+        this.deviceType = deviceType;
     }
 
     /**
@@ -44,7 +53,7 @@ public class DeviceInfo extends DataObject<String, File> {
      *
      * @param deviceName Set device name to be stored
      */
-    public void setDeviceName(String deviceName) { this.deviceName = deviceName; }   //Sets the device name to later be sent to other device
+    public DeviceInfo setDeviceName(String deviceName) { this.deviceName = deviceName; return this; }   //Sets the device name to later be sent to other device
 
 
     /**
@@ -58,21 +67,21 @@ public class DeviceInfo extends DataObject<String, File> {
      *
      * @param deviceMac Set device mac address to be stored
      */
-    public void setDeviceMac(String deviceMac) { this.deviceMac = deviceMac; }  //Sets the device mac address to later be sent to other device
+    public DeviceInfo setDeviceMac(String deviceMac) { this.deviceMac = deviceMac; return this; }  //Sets the device mac address to later be sent to other device
 
 
     /**
      *
      * @return Stored device type (Phone, Tablet, Laptop, etc.)
      */
-    public String getDeviceType() { return deviceType; }    //Returns the stored deviceType
+    public int getDeviceType() { return deviceType; }    //Returns the stored deviceType
 
 
     /**
      *
      * @param deviceType Set device type to be stored
      */
-    public void setDeviceType(String deviceType) { this.deviceType = deviceType; }  //Sets the device type to later be sent to other device
+    public DeviceInfo setDeviceType(int deviceType) { this.deviceType = deviceType; return this; }  //Sets the device type to later be sent to other device
 
     /**
      * @param body The body of the message being sent as a String
@@ -102,5 +111,13 @@ public class DeviceInfo extends DataObject<String, File> {
         //Not needed for this instance
     }
 
+    public boolean getOptionConnect() { return connect; }
+    public DeviceInfo setOptionConnect(boolean connect) { this.connect = connect; return this; }
+
+    public boolean getOptionSMS() { return sms; }
+    public DeviceInfo setOptionSMS(boolean sms) { this.sms = sms; return this; }
+
+    public boolean getOptionNotification() { return notification; }
+    public DeviceInfo setOptionNotification(boolean notification) { this.notification = notification; return this; }
 
 }

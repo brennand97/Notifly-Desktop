@@ -1,6 +1,7 @@
-package com.notiflyapp.GUI;
+package com.notiflyapp.ui.GUI;
 
 import com.notiflyapp.bluetooth.BluetoothServer;
+import com.notiflyapp.ui.commandline.Commands;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -11,9 +12,9 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private BluetoothServer btServer;
+    private static BluetoothServer btServer;
 
-    private boolean serverActive = false;
+    private static boolean serverActive = false;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -70,6 +71,30 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        boolean gui = true;
+        for(String arg: args) {
+            if(arg.equals(Commands.NO_GUI_LONG)) {
+                gui = false;
+                break;
+            }
+        }
+        if(gui) {
+            launch(args);
+        } else {
+            if(!serverActive) {
+                Runnable runnable = () -> {
+                    btServer = new BluetoothServer();
+                    btServer.start();
+                    serverActive = true;
+                };
+                (new Thread(runnable)).start();
+            } else {
+                Runnable runnable = () -> {
+                    btServer.close();
+                    serverActive = false;
+                };
+                (new Thread(runnable)).start();
+            }
+        }
     }
 }
