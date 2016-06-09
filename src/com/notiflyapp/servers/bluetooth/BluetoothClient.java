@@ -1,8 +1,11 @@
-package com.notiflyapp.bluetooth;
+package com.notiflyapp.servers.bluetooth;
 
 import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DeviceInfo;
+import com.notiflyapp.data.SMS;
+import com.notiflyapp.ui.Houston;
 
+import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +26,8 @@ public class BluetoothClient {
     private String deviceName;  //Device's name obtained from received DataInfo DataObject on connect
     private String deviceMac;   //Device's Mac Address obtained from received DataInfo DataObject on connect
     private int deviceType;  //Device's Type obtained from received DataInfo DataObject on connect (Ex. Phone, Tablet, Laptop)
+    private DeviceInfo deviceInfo;
+    private RemoteDevice remoteDevice;
 
     public static class Type {
         public static final int MISC              = 0x0000;
@@ -47,6 +52,12 @@ public class BluetoothClient {
         thread = new ClientThread(this, conn);
         thread.start();
         this.server = server;
+        try {
+            remoteDevice = RemoteDevice.getRemoteDevice(conn);
+            deviceMac = formatMac(remoteDevice.getBluetoothAddress());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -56,7 +67,6 @@ public class BluetoothClient {
     void close() {
         if(thread.isConnected()) {
             thread.close();     //Called receiving threads close() method to disconnect it from device
-            serverOut("Client disconnected.");
         }
         if(server.isRunning()) {    //Check to see if server is calling this close of if client is so there is no ConcurrentModificationExceptions
             server.removeClient(this);  //Remove client from BluetoothServer's active clients list
@@ -72,8 +82,12 @@ public class BluetoothClient {
      */
     private void setDeviceData(DeviceInfo di) {
         deviceName = di.getDeviceName();    //Retrieves the device name provided by the device
-        deviceMac = di.getDeviceMac();      //Retrieves the device Mac Address provided by the device
+        if(deviceMac == null) {
+            deviceMac = formatMac(di.getDeviceMac());
+        }
         deviceType = di.getDeviceType();    //Retrieves the device Type provided by the device
+        deviceInfo = di;
+        Houston.getHandler().send(() -> Houston.getInstance().updateDevice(this));
     }
 
 
@@ -88,7 +102,7 @@ public class BluetoothClient {
         switch (msg.getType()) {
             case SMS:
                 try {
-                    serverOutNoLog("(" + msg.serialize().length + ") " + msg.getSender() + ": " + msg.getBody());
+                    serverOutNoLog("(" + msg.serialize().length + ") " + ((SMS) msg).getOriginatingAddress() + ": " + msg.getBody());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -121,17 +135,9 @@ public class BluetoothClient {
      * @param msg DataObject to be sent to client device
      */
     public void sendMsg(DataObject msg) {
-        try {
-            thread.send(msg);
-            sent.add(msg);
-        } catch (IOException e) {
-            if(msg.getExtra() != null) {
-                serverOut("Failed to send message: " + msg.getType() + ": " + msg.getBody() + ": ");
-            } else {
-                serverOut("Failed to send message: " + msg.getType() + ": " + msg.getBody());
-            }
-            e.printStackTrace();
-        }
+        thread.send(msg);
+        sent.add(msg);
+        serverOutNoLog("Sent message to " + ((SMS) msg).getAddress()  + ":   " + msg.getBody());
     }
 
 
@@ -140,7 +146,7 @@ public class BluetoothClient {
      * @return Array of all DataObjects sent to the client device
      */
     public ArrayList<DataObject> getSent() {
-        return sent;
+            return sent;
     }
 
 
@@ -151,12 +157,24 @@ public class BluetoothClient {
      * @param out String to print to log
      */
     protected void serverOut(String out) {
-        server.serverOut("BluetoothClient: " + deviceName, out, true);
+        server.serverOut("BluetoothClient: " + (deviceName == null ? deviceMac : deviceName), out, true);
     }
 
     protected void serverOutNoLog(String out) { server.serverOut("BluetoothClient: " + deviceName, out, false); }
 
-
+    private String formatMac(String mac) {
+        if(mac.split(":").length != 6) {
+            StringBuilder newMac = new StringBuilder();
+            for(int i = 0; i < mac.length(); i+=2) {
+                newMac.append(mac.substring(i, i + 2));
+                if(i < mac.length() - 2) {
+                    newMac.append(":");
+                }
+            }
+            return newMac.toString();
+        }
+        return mac;
+    }
     /**
      * @return Connected bluetooth device's name
      */
@@ -202,5 +220,13 @@ public class BluetoothClient {
      */
     public void setDeviceType(int deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public DeviceInfo getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public RemoteDevice getRemoteDevice() {
+        return remoteDevice;
     }
 }

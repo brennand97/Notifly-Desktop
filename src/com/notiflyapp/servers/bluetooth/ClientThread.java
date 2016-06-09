@@ -1,4 +1,4 @@
-package com.notiflyapp.bluetooth;
+package com.notiflyapp.servers.bluetooth;
 
 import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.Serial;
@@ -6,24 +6,28 @@ import com.notiflyapp.data.Serial;
 import javax.microedition.io.StreamConnection;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by Brennan on 4/16/2016.
+ *
+ * Runs main bluetooth client loop to receive data when sent.  Also sends data to connected device when needed.
  */
-public class ClientThread extends Thread{
+class ClientThread extends Thread{
 
     private StreamConnection conn;
     private BluetoothClient client;
     private DataInputStream iStream;
     private DataOutputStream oStream;
+    private MessageHandler handler = new MessageHandler();
 
-    private int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 1024;
     private ArrayList<Byte> byteHolder = new ArrayList<>();
     private boolean multiBufferObject = false;
 
     private boolean connected = false;
 
-    public ClientThread(BluetoothClient client, StreamConnection conn) {
+    ClientThread(BluetoothClient client, StreamConnection conn) {
         this.conn = conn;
         this.client = client;
         connected = true;
@@ -37,6 +41,9 @@ public class ClientThread extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        handler.start();
+
         while(connected) {
             try {
                 byte[] buffer = new byte[BUFFER_SIZE];
@@ -65,9 +72,7 @@ public class ClientThread extends Thread{
                     byteHolder.add(b);
                 }
                 multiBufferObject = true;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
         } else {
@@ -84,24 +89,20 @@ public class ClientThread extends Thread{
                 multiBufferObject = false;
             } catch (EOFException e2) {
                 //Still isn't a complete object
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void close() {
+    void close() {
         connected = false;
         try {
             conn.close();
             iStream.close();
             oStream.close();
             this.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -117,12 +118,64 @@ public class ClientThread extends Thread{
         }
     }
 
-    public void send(DataObject msg) throws IOException {
-        oStream.write(msg.serialize());
+    void send(DataObject object){
+        if(object != null) {
+            handler.add(object);
+        }
     }
 
-    public boolean isConnected() {
+    boolean isConnected() {
         return connected;
+    }
+
+    protected class MessageHandler extends Thread {
+
+        private ArrayBlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1024);
+        private boolean running = false;
+
+        private final Object lock = new Object();
+
+        public MessageHandler() {
+        }
+
+        public void add(DataObject object) {
+            if(object != null) {
+                queue.add(object);
+                if(running) {
+                    try {
+                        synchronized (lock) {
+                            lock.notify();
+                        }
+                    } catch (IllegalMonitorStateException e) {}
+                }
+            }
+        }
+
+        public void run() {
+            serverOut("Bluetooth MessageHandler started");
+            running = true;
+            synchronized (lock) {
+                while (running) {
+                    if(queue.isEmpty()) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Object object = queue.poll();
+                        if(oStream != null) {
+                            try {
+                                oStream.write(Serial.serialize(object));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 }

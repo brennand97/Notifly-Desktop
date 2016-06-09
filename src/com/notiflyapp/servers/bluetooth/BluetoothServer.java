@@ -1,12 +1,13 @@
-package com.notiflyapp.bluetooth;
+package com.notiflyapp.servers.bluetooth;
 
-import com.notiflyapp.debug.ServerLog;
+import com.notiflyapp.data.DeviceInfo;
+import com.notiflyapp.data.SMS;
+import com.notiflyapp.servers.Server;
 
 import javax.bluetooth.*;
 import javax.microedition.io.*;
 
 import java.io.*;
-import java.util.ArrayList;
 
 /**
  * Created by Brennan on 4/16/2016.
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  * Initializes system Bluetooth and starts a thread that accepts incoming connections, passing them off to
  * BluetoothClients that are keep track of by serverConn.
  */
-public class BluetoothServer extends Thread{
+public class BluetoothServer extends Server<BluetoothClient>{
 
     private final UUID uuid = new UUID("8502318923c1410ca7c729a91f49f764", false);                                       //Service UUID for bluetooth discovery and connection
     private final String name = "SMS Server";                                                                            //Service name
@@ -22,10 +23,6 @@ public class BluetoothServer extends Thread{
 
     private LocalDevice local = null;                                           //Holds local bluetooth device that will accept connections
     private StreamConnectionNotifier serverConn = null;                         //Socket that is listened on to accept connections
-    private ArrayList<BluetoothClient> currentClients = new ArrayList<>();      //List of current connected and active clients
-
-    private boolean running = false;                    //Server's main loop is active
-    private ServerLog serverLog = new ServerLog();      //Server's server log
 
 
     /**
@@ -38,6 +35,23 @@ public class BluetoothServer extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean hasDevice(DeviceInfo deviceInfo) {
+        for(BluetoothClient client: connectedClients) {
+            if(client.getDeviceName().equals(deviceInfo.getDeviceName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void sendMessage(SMS smsMessage, DeviceInfo deviceInfo) {
+        connectedClients.stream().filter(client -> client.getDeviceName().equals(deviceInfo.getDeviceName())).forEach(client -> {
+            client.sendMsg(smsMessage);
+        });
     }
 
 
@@ -55,7 +69,7 @@ public class BluetoothServer extends Thread{
                 conn = serverConn.acceptAndOpen();  //Accepts the incoming connection with the specified UUID
                 BluetoothClient bc = new BluetoothClient(this, conn);   //Creates a new BluetoothClient passing in itself  and the uninitialized accepted connection
                 serverOut("Client connected");
-                currentClients.add(bc);     //Adds the create BluetoothClient to serverConn's list of active clients
+                connectedDevice(bc);     //Adds the create BluetoothClient to serverConn's list of active clients
             } catch (InterruptedIOException e1) {
                 serverOut("Connection closed");
                 //This is the 'conn' connection being closed, most likely do to the serverConn's close() method being called
@@ -72,7 +86,14 @@ public class BluetoothServer extends Thread{
      *
      * @param client BluetoothClient to be removed from the BluetoothServer active client list
      */
-    void removeClient(BluetoothClient client) { currentClients.remove(client); }
+    void removeClient(BluetoothClient client) {
+        connectedClients.remove(client);
+    }
+
+    public void dissconnectClient(BluetoothClient client) {
+        client.close();
+        removeClient(client);
+    }
 
 
     /**
@@ -87,16 +108,9 @@ public class BluetoothServer extends Thread{
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        if(local.getDiscoverable() != DiscoveryAgent.NOT_DISCOVERABLE) {    //Check to see if the local bluetooth device is still discoverable
-            try {
-                local.setDiscoverable(DiscoveryAgent.NOT_DISCOVERABLE);     //Set local bluetooth device to 'Not Discoverable'
-                serverOut("Turned off Discovery");  //Announce change to server log
-            } catch (BluetoothStateException e) {
-                e.printStackTrace();
-            }
-        }
-        currentClients.forEach(BluetoothClient::close); //Close all connected BluetoothClients by calling their respective close() method
-        currentClients.clear();     //Clear client least due to no active clients
+        stopDiscovery();
+        connectedClients.forEach(BluetoothClient::close); //Close all connected BluetoothClients by calling their respective close() method
+        connectedClients.clear();     //Clear client least due to no active clients
         serverOut("Server stopped.");   //Announce final BluetoothServer state to server log
     }
 
@@ -107,7 +121,7 @@ public class BluetoothServer extends Thread{
      *
      * @throws IOException
      */
-    private void init() throws IOException {
+    protected void init() throws IOException {
         if(local == null) {     //Checks to see if local bluetooth device already defined
             local = LocalDevice.getLocalDevice();   //Finds local bluetooth device
             if(local == null) { //Checks to make sure a device was found
@@ -117,6 +131,10 @@ public class BluetoothServer extends Thread{
                 serverOut("Found local bluetooth"); //Announces bluetooth discovery to server log
             }
         }
+        serverConn = (StreamConnectionNotifier) Connector.open(url);    //Opens the bluetooth socket being listened to with RFCOMM bluetooth URL
+    }
+
+    public void startDiscovery() throws IOException {
         if(local.getDiscoverable() == DiscoveryAgent.NOT_DISCOVERABLE) {    //Checks to make sure local bluetooth's discovery isn't already enabled
             try {
                 local.setDiscoverable(DiscoveryAgent.GIAC);     //Enables local device's bluetooth discovery
@@ -127,34 +145,29 @@ public class BluetoothServer extends Thread{
                 serverOut("Discovery could not be turned on");  //Announces failure to initialize bluetooth to server log
             }
         }
-        serverConn = (StreamConnectionNotifier) Connector.open(url);    //Opens the bluetooth socket being listened to with RFCOMM bluetooth URL
         serverOut("Advertising service");   //Announces server change to server log
+        serverOut("Started Discovering");
     }
 
-
-    /**
-     *
-     * @return if server's main loop is running, if it is active
-     */
-    public boolean isRunning() { return running; }
+    public void stopDiscovery() {
+        if(local.getDiscoverable() != DiscoveryAgent.NOT_DISCOVERABLE) {    //Check to see if the local bluetooth device is still discoverable
+            try {
+                local.setDiscoverable(DiscoveryAgent.NOT_DISCOVERABLE);     //Set local bluetooth device to 'Not Discoverable'
+                serverOut("Turned off Discovery");  //Announce change to server log
+            } catch (BluetoothStateException e) {
+                e.printStackTrace();
+            }
+        }
+        serverOut("Stopped Discovery");
+    }
 
     /**
      * Send message to server log
      *
      * @param out String to be printed to server log with
      */
-    private void serverOut(String out) {
+    protected void serverOut(String out) {
         serverOut("BluetoothServer", out, true);
-    }
-
-    /**
-     * Prints the messages to the server log with a location, sender, ID TAG
-     *
-     * @param location  String identifying where message is coming from
-     * @param out   String to be displayed in server log
-     */
-    void serverOut(String location, String out, boolean log) {
-        serverLog.out(location, out, log);   //Sends message to the ServerLog object to be written with timestamp to server log
     }
 
 }

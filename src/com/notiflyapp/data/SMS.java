@@ -11,7 +11,17 @@ public class SMS extends DataObject<String, File> {
 
     private static final long serialVersionUID = 3349238414148539467L;
 
+    private int id;
+    private String address;
+    private String originatingAddress;
     private String body;
+    private String creator;
+    private long date;
+    private long dateSent;
+    private String person;
+    private boolean read;
+    private long subscriptionId;
+    private int threadId;
 
     /**
      * Default constructor, degines DataObject.Type
@@ -24,13 +34,15 @@ public class SMS extends DataObject<String, File> {
     /**
      * Constructor that sets sender and body on creation.
      *
-     * @param sender The phone number of the sender of the SMS as a String.
+     * @param address The phone number of the sender of the SMS as a String.
+     * @param originatingAddress The phone number of the recipient of the message.
      * @param body The body of the SMS message as a string.
      */
-    public SMS(String sender, String body) {
+    public SMS(String address, String originatingAddress, String body) {
         super();
         type = Type.SMS;
-        this.sender = sender;
+        this.address = address;
+        this.originatingAddress = originatingAddress;
         this.body = body;
     }
 
@@ -64,6 +76,90 @@ public class SMS extends DataObject<String, File> {
     @Override
     public void putExtra(File file) {
 
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getOriginatingAddress() {
+        return originatingAddress;
+    }
+
+    public void setOriginatingAddress(String originatingAddress) {
+        this.originatingAddress = originatingAddress;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public long getDateSent() {
+        return dateSent;
+    }
+
+    public void setDateSent(long dateSent) {
+        this.dateSent = dateSent;
+    }
+
+    public String getPerson() {
+        return person;
+    }
+
+    public void setPerson(String person) {
+        this.person = person;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public long getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public void setSubscriptionId(long subscriptionId) {
+        this.subscriptionId = subscriptionId;
+    }
+
+    public int getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(int threadId) {
+        this.threadId = threadId;
     }
 
 }

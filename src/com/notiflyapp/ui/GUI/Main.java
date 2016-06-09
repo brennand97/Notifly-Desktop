@@ -1,23 +1,38 @@
 package com.notiflyapp.ui.GUI;
 
-import com.notiflyapp.bluetooth.BluetoothServer;
+import com.notiflyapp.controlcenter.ServerHandler;
+import com.notiflyapp.ui.Houston;
+import com.notiflyapp.servers.bluetooth.BluetoothServer;
 import com.notiflyapp.ui.commandline.Commands;
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class Main extends Application {
 
-    private static BluetoothServer btServer;
+    private static ServerHandler serverHandler = new ServerHandler();
 
     private static boolean serverActive = false;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws IOException {
+
+        Parent root = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/main.fxml"));
+        Scene scene = new Scene(root);
+        //scene.getStylesheets().add(getClass().getResource(Put Style sheet reference here));
+        primaryStage.setScene(scene);
+
+        Houston.initialize(primaryStage, scene);
+
+        primaryStage.show();
+
+        Houston.getInstance().startBluetoothServer();
+
+        /*
         Group root = new Group();
         primaryStage.setTitle("Hello World");
 
@@ -30,16 +45,17 @@ public class Main extends Application {
         btn.setOnAction(event -> {
             if(!serverActive) {
                 Runnable runnable = () -> {
-                    btServer = new BluetoothServer();
+                    BluetoothServer btServer = new BluetoothServer();
                     btServer.start();
                     serverActive = true;
+                    serverHandler.addServer(btServer);
                 };
                 (new Thread(runnable)).start();
                 status.setText("Server started");
                 btn.setText("Stop server");
             } else {
                 Runnable runnable = () -> {
-                    btServer.close();
+                    serverHandler.closeServers();
                     serverActive = false;
                 };
                 (new Thread(runnable)).start();
@@ -50,24 +66,42 @@ public class Main extends Application {
         btn.setLayoutX(0);
         btn.setLayoutX(50);
 
+        final TextField phoneNumber = new TextField("Phone Number");
+        phoneNumber.setLayoutX(0);
+        phoneNumber.setLayoutY(100);
+
+        final TextField message = new TextField("Message");
+        message.setLayoutX(0);
+        message.setLayoutY(150);
+
+        Button sendBtn = new Button("Send Message");
+        sendBtn.setOnAction(event -> {
+            String number = phoneNumber.getText().replace("-", "");
+            String smsMessage = message.getText();
+            message.setText("");
+            serverHandler.sendSMSMessage(new SMS(number, null, smsMessage), new DeviceInfo("G4", "00:00:00:00:00:20", BluetoothClient.Type.PHONE));
+        });
+
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(status, btn);
+        layout.getChildren().addAll(status, btn, phoneNumber, message, sendBtn);
         root.getChildren().add(layout);
 
         Scene scene = new Scene(root, 300, 275);
         primaryStage.setScene(scene);
         primaryStage.show();
+        */
+
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
 
-        if(btServer != null) {
-            btServer.close();
-        }
+        Houston.getInstance().close();
 
         System.out.println("Stage is closing");
+
+        System.exit(0);
     }
 
     public static void main(String[] args) {
@@ -83,14 +117,15 @@ public class Main extends Application {
         } else {
             if(!serverActive) {
                 Runnable runnable = () -> {
-                    btServer = new BluetoothServer();
+                    BluetoothServer btServer = new BluetoothServer();
                     btServer.start();
                     serverActive = true;
+                    serverHandler.addServer(btServer);
                 };
                 (new Thread(runnable)).start();
             } else {
                 Runnable runnable = () -> {
-                    btServer.close();
+                    serverHandler.closeServers();
                     serverActive = false;
                 };
                 (new Thread(runnable)).start();

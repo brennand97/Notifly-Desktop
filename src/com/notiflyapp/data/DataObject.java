@@ -10,6 +10,8 @@ import java.io.*;
 public abstract class DataObject< A, B > implements Serializable {
 
     private static final long serialVersionUID = 3349238414148539466L;
+    protected A body;
+    protected B extra;
 
 
     /**
