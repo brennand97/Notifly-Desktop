@@ -58,7 +58,10 @@ public class BDeviceTab extends TabHouse {
     }
 
     public void close() {
-        Houston.getHandler().send(() -> Houston.getInstance().closeBluetoothDevice(client));
+        Houston.getHandler().send(() -> {
+            Houston.getInstance().closeBluetoothDevice(client);
+            Houston.getInstance().removeTab(this);
+        });
     }
 
 }

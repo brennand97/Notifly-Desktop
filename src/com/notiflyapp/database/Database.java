@@ -8,7 +8,7 @@ import java.sql.*;
 public abstract class Database {
 
     private final static String DATABASE_NAME = "messages.db";
-    private static String DATABASE_PATH = "D:\\Users\\Brennan\\Desktop\\";
+    private static String DATABASE_PATH = "";
 
     public static final String ID = "id";
 

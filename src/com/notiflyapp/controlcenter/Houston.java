@@ -111,10 +111,18 @@ public class Houston {
 
     public void addDevice(Object object) {
         if(object instanceof BluetoothClient) {
-            DeviceInfo info = ((BluetoothClient) object).getDeviceInfo().setDeviceMac(((BluetoothClient) object).getDeviceMac());
             addBluetoothDevice((BluetoothClient) object);
+            DeviceInfo info;
             try {
-                DatabaseFactory.getDeviceDatabase().nonDuplicateInsert(info);
+                if(((BluetoothClient) object).getDeviceInfo() != null) {
+                    info = ((BluetoothClient) object).getDeviceInfo().setDeviceMac(((BluetoothClient) object).getDeviceMac());
+                    DatabaseFactory.getDeviceDatabase().nonDuplicateInsert(info);
+                } else {
+                    BluetoothClient client = (BluetoothClient) object;
+                    //This is temp until a DeviceInfo.getDefault(client); is created;
+                    info = new DeviceInfo().setDeviceMac(client.getDeviceMac()).setDeviceName(client.getDeviceName()).setDeviceType(client.getDeviceType()).setOptionConnect(true).setOptionSMS(true).setOptionNotification(true);
+                    DatabaseFactory.getDeviceDatabase().nonDuplicateInsert(info);
+                }
             } catch (SQLException | UnequalArraysException | NullResultSetException e) {
                 e.printStackTrace();
             }
