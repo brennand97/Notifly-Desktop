@@ -1,6 +1,5 @@
 package com.notiflyapp.ui.GUI.tabs;
 
-import com.notiflyapp.ui.Houston;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 

@@ -1,7 +1,7 @@
-package com.notiflyapp.ui.GUI;
+package com.notiflyapp.controlcenter;
 
 import com.notiflyapp.controlcenter.ServerHandler;
-import com.notiflyapp.ui.Houston;
+import com.notiflyapp.controlcenter.Houston;
 import com.notiflyapp.servers.bluetooth.BluetoothServer;
 import com.notiflyapp.ui.commandline.Commands;
 import javafx.application.Application;

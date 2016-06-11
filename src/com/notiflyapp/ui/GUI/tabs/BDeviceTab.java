@@ -2,9 +2,7 @@ package com.notiflyapp.ui.GUI.tabs;
 
 import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
-import com.notiflyapp.ui.Houston;
-import javafx.event.Event;
-import javafx.event.EventHandler;
+import com.notiflyapp.controlcenter.Houston;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 
@@ -18,13 +16,14 @@ public class BDeviceTab extends TabHouse {
     private BluetoothClient client;
     private DeviceInfo deviceInfo;
 
+    private static final long gracePeriod = 5000;
+    private static final String defaultName = "Bluetooth Device";
+
     public BDeviceTab(Tab tab, BluetoothClient client) {
-        super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? "Device 1" : client.getDeviceMac() : client.getDeviceName());
+        super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         this.client = client;
         deviceInfo = client.getDeviceInfo();
-        tab.setOnClosed(event -> {
-            close();
-        });
+        tab.setOnClosed(event -> close() );
 
         try {
             tab.setContent(FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/device_tab.fxml")));
@@ -35,7 +34,23 @@ public class BDeviceTab extends TabHouse {
 
     @Override
     public void refresh() {
-        setTitle(client.getDeviceName() == null ? client.getDeviceMac() == null ? "Device 1" : client.getDeviceMac() : client.getDeviceName());
+        setTitle(client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
+        if(!client.isConnected()) {
+            Houston.getHandler().send(() -> {
+                try {
+                    Thread.sleep(gracePeriod);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(!this.getBluetoothClient().isConnected()) {
+                    Houston.getInstance().removeTab(this);
+                }
+            });
+        }
+    }
+
+    public void setBluetoothClient(BluetoothClient client) {
+        this.client = client;
     }
 
     public BluetoothClient getBluetoothClient() {

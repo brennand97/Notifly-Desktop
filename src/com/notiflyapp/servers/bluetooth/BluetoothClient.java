@@ -3,7 +3,7 @@ package com.notiflyapp.servers.bluetooth;
 import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.data.SMS;
-import com.notiflyapp.ui.Houston;
+import com.notiflyapp.controlcenter.Houston;
 
 import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
@@ -29,20 +29,6 @@ public class BluetoothClient {
     private DeviceInfo deviceInfo;
     private RemoteDevice remoteDevice;
 
-    public static class Type {
-        public static final int MISC              = 0x0000;
-        public static final int COMPUTER          = 0x0100;
-        public static final int PHONE             = 0x0200;
-        public static final int NETWORKING        = 0x0300;
-        public static final int AUDIO_VIDEO       = 0x0400;
-        public static final int PERIPHERAL        = 0x0500;
-        public static final int IMAGING           = 0x0600;
-        public static final int WEARABLE          = 0x0700;
-        public static final int TOY               = 0x0800;
-        public static final int HEALTH            = 0x0900;
-        public static final int UNCATEGORIZED     = 0x1F00;
-    }
-
     /**
      *
      * @param server    BluetoothServer that the device connected to
@@ -65,6 +51,7 @@ public class BluetoothClient {
      * Will disconnect client device from server and remove itself from connected devices list
      */
     void close() {
+        Houston.getHandler().send(() -> Houston.getInstance().updateDevice(this));
         if(thread.isConnected()) {
             thread.close();     //Called receiving threads close() method to disconnect it from device
         }
@@ -87,6 +74,9 @@ public class BluetoothClient {
         }
         deviceType = di.getDeviceType();    //Retrieves the device Type provided by the device
         deviceInfo = di;
+        if(deviceInfo.getDeviceMac() == null || deviceInfo.getDeviceMac().equals("00:00:00:00:00:20")) {
+            deviceInfo.setDeviceMac(deviceMac);
+        }
         Houston.getHandler().send(() -> Houston.getInstance().updateDevice(this));
     }
 
@@ -103,6 +93,7 @@ public class BluetoothClient {
             case SMS:
                 try {
                     serverOutNoLog("(" + msg.serialize().length + ") " + ((SMS) msg).getOriginatingAddress() + ": " + msg.getBody());
+                    Houston.getHandler().send(() -> Houston.getInstance().incomingMessage(this, msg));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -175,6 +166,7 @@ public class BluetoothClient {
         }
         return mac;
     }
+
     /**
      * @return Connected bluetooth device's name
      */
@@ -228,5 +220,9 @@ public class BluetoothClient {
 
     public RemoteDevice getRemoteDevice() {
         return remoteDevice;
+    }
+
+    public boolean isConnected() {
+        return thread.isConnected();
     }
 }

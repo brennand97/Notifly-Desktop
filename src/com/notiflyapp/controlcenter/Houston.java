@@ -1,9 +1,9 @@
-package com.notiflyapp.ui;
+package com.notiflyapp.controlcenter;
 
-import com.notiflyapp.controlcenter.ServerHandler;
-import com.notiflyapp.data.DataObject;
-import com.notiflyapp.data.DeviceInfo;
-import com.notiflyapp.data.Serial;
+import com.notiflyapp.data.*;
+import com.notiflyapp.database.DatabaseFactory;
+import com.notiflyapp.database.NullResultSetException;
+import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.servers.bluetooth.BluetoothServer;
 import com.notiflyapp.ui.GUI.controller.HomeTabController;
@@ -12,14 +12,13 @@ import com.notiflyapp.ui.GUI.tabs.BDeviceTab;
 import com.notiflyapp.ui.GUI.tabs.HomeTab;
 import com.notiflyapp.ui.GUI.tabs.TabHouse;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -112,7 +111,13 @@ public class Houston {
 
     public void addDevice(Object object) {
         if(object instanceof BluetoothClient) {
+            DeviceInfo info = ((BluetoothClient) object).getDeviceInfo().setDeviceMac(((BluetoothClient) object).getDeviceMac());
             addBluetoothDevice((BluetoothClient) object);
+            try {
+                DatabaseFactory.getDeviceDatabase().nonDuplicateInsert(info);
+            } catch (SQLException | UnequalArraysException | NullResultSetException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -124,6 +129,16 @@ public class Houston {
 
     private void addBluetoothDevice(BluetoothClient client) {
         if(GUI) {
+            for(TabHouse tabHouse: tabs) {
+                if(tabHouse instanceof BDeviceTab) {
+                    if(((BDeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
+                        if(!((BDeviceTab) tabHouse).getBluetoothClient().isConnected()) {
+                            ((BDeviceTab) tabHouse).setBluetoothClient(client);
+                        }
+                        return;
+                    }
+                }
+            }
             Tab tab = new Tab();
             tabPane.getTabs().add(tab);
             BDeviceTab bdt = new BDeviceTab(tab, client);
@@ -134,7 +149,7 @@ public class Houston {
     private void updateBluetoothDevice(BluetoothClient client) {
         for(TabHouse tabHouse: tabs) {
             if(tabHouse instanceof BDeviceTab) {
-                if(((BDeviceTab) tabHouse).getBluetoothClient().equals(client)) {
+                if(((BDeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
                     tabHouse.refresh();
                 }
             }
@@ -143,6 +158,23 @@ public class Houston {
 
     public void closeBluetoothDevice(BluetoothClient client) {
         btServer.dissconnectClient(client);
+    }
+
+    public void incomingMessage(BluetoothClient client, DataObject object) {
+        if(object instanceof SMS) {
+            try {
+                DatabaseFactory.getMessageDatabase(client.getDeviceInfo()).insert((SMS) object);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else if(object instanceof MMS) {
+
+        }
+    }
+
+    public void removeTab(TabHouse tab) {
+        tabs.remove(tab);
+        tabPane.getTabs().remove(tab.getTab());
     }
 
     public class UIHandler extends Thread {

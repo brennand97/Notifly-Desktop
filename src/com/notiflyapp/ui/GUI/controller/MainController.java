@@ -1,6 +1,6 @@
 package com.notiflyapp.ui.GUI.controller;
 
-import com.notiflyapp.ui.Houston;
+import com.notiflyapp.controlcenter.Houston;
 import javafx.fxml.FXML;
 
 public class MainController {

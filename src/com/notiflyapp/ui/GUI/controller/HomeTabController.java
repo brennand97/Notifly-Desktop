@@ -1,6 +1,6 @@
 package com.notiflyapp.ui.GUI.controller;
 
-import com.notiflyapp.ui.Houston;
+import com.notiflyapp.controlcenter.Houston;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
