@@ -16,8 +16,8 @@ public class MessageDatabase extends Database {
     private final static String TABLE_NAME_PREFIX = "messages_";
     private String macAddress;
 
-    private String TABLE_NAME;
-    private String CREATE_TABLE;
+    protected String TABLE_NAME;
+    protected String CREATE_TABLE;
 
     private static final String ADDRESS = "address";
     private static final String ORIGINATING_ADDRESS = "originating_address";
@@ -34,23 +34,19 @@ public class MessageDatabase extends Database {
     private static final String TYPE_SMS = "sms";
     private static final String TYPE_MMS = "mms";
 
-    public MessageDatabase(String mac) throws NullPointerException {
+    public MessageDatabase(String mac) {
         macAddress = formatMac(mac);
-        if(macAddress == null) {
-            throw new NullPointerException();
-        }
-        TABLE_NAME = TABLE_NAME_PREFIX + formatMac(macAddress);
-        CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(" + ID + "INTEGER PRIMARY KEY, " +
+        this.TABLE_NAME = TABLE_NAME_PREFIX + formatMac(macAddress);
+        this.CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY, " +
                 ADDRESS + " TEXT, " + ORIGINATING_ADDRESS + " TEXT, " + BODY + " TEXT, " + CREATOR + " TEXT, " +
                 DATE + " INTEGER, " + DATE_SENT + " INTEGER, " + PERSON + " TEXT, " + READ + " INTEGER, " + SUBSCRIPTION_ID + " INTEGER, " +
-                THREAD_ID + "INTEGER, " + TYPE + "STRING);";
-        initialize();
+                THREAD_ID + " INTEGER, " + TYPE + " STRING);";
+        super.initialize();
     }
 
     @Override
-    protected void createTable() throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate(CREATE_TABLE);
+    protected String getCreateTableString() {
+        return CREATE_TABLE;
     }
 
     public void insert(SMS sms) throws SQLException {
@@ -68,9 +64,36 @@ public class MessageDatabase extends Database {
         call.append(sms.isRead() ? 1 : 0).append(", ");
         call.append(sms.getSubscriptionId()).append(", ");
         call.append(sms.getThreadId()).append(", ");
-        call.append(TYPE_SMS).append(");");
-        Statement stmt = connection.createStatement();
+        call.append("\"").append(TYPE_SMS).append("\"").append(");");
         stmt.executeUpdate(call.toString());
+    }
+
+    public void update(SMS sms) throws UnequalArraysException, SQLException {
+        StringBuilder call = new StringBuilder();
+        call.append("INSERT OR REPLACE INTO ").append(TABLE_NAME).append("(").append(ID).append(", ").append(ADDRESS).append(", ").append(ORIGINATING_ADDRESS).append(", ")
+                .append(BODY).append(", ").append(CREATOR).append(", ").append(DATE).append(", ").append(DATE_SENT).append(", ").append(PERSON).append(", ")
+                .append(READ).append(", ").append(SUBSCRIPTION_ID).append(", ").append(THREAD_ID).append(", ").append(TYPE).append(") VALUES(");
+        call.append(getId(sms)).append(", ");
+        call.append("\"").append(sms.getAddress()).append("\"").append(", ");
+        call.append("\"").append(sms.getOriginatingAddress()).append("\"").append(", ");
+        call.append("\"").append(sms.getBody()).append("\"").append(", ");
+        call.append("\"").append(sms.getCreator()).append("\"").append(", ");
+        call.append(sms.getDate()).append(", ");
+        call.append(sms.getDateSent()).append(", ");
+        call.append("\"").append(sms.getPerson()).append("\"").append(", ");
+        call.append(sms.isRead() ? 1 : 0).append(", ");
+        call.append(sms.getSubscriptionId()).append(", ");
+        call.append(sms.getThreadId()).append(", ");
+        call.append("\"").append(TYPE_SMS).append("\"").append(");");
+        stmt.executeUpdate(call.toString());
+    }
+
+    public void nonDuplicateInsert(SMS sms) throws UnequalArraysException, NullResultSetException, SQLException {
+        if(has(sms)) {
+            update(sms);
+        } else {
+            insert(sms);
+        }
     }
 
     public SMS[] querySms(String[] column, String[] value) throws UnequalArraysException, SQLException, NullResultSetException {
@@ -107,6 +130,26 @@ public class MessageDatabase extends Database {
         }
     }
 
+    public int getId(SMS sms) throws SQLException, UnequalArraysException {
+        ResultSet rs = query(TABLE_NAME, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()});
+        if(rs != null) {
+            rs.next();
+            int id = rs.getInt(ID);
+            rs.close();
+            return id;
+        }
+        rs.close();
+        return -1;
+    }
+
+    public boolean has(SMS sms) throws UnequalArraysException, NullResultSetException, SQLException {
+        SMS[] smses = querySms(new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()});
+        if(smses.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
     private SMS makeSms(ResultSet rs) throws SQLException {
         SMS sms = new SMS();
         sms.setAddress(rs.getString(ADDRESS));
@@ -123,17 +166,15 @@ public class MessageDatabase extends Database {
     }
 
     String formatMac(String mac) {
-        if(mac.split(":").length != 6) {
+        String[] split = mac.split(":");
+        if(split.length == 6) {
             StringBuilder newMac = new StringBuilder();
-            for(int i = 0; i < mac.length(); i+=2) {
-                newMac.append(mac.substring(i, i + 2));
-                if(i < mac.length() - 2) {
-                    newMac.append(":");
-                }
+            for(String part: split) {
+                newMac.append(part);
             }
-            return newMac.toString();
+            return newMac.toString().toUpperCase();
         }
-        return mac;
+        return mac.toUpperCase();
     }
 
     public String getMacAddress() {

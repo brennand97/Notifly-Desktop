@@ -15,27 +15,25 @@ public abstract class Database {
     protected static Connection connection;
     protected static Statement stmt;
 
-    public Database() {
-        initialize();
-    }
-
     public void initialize() {
         try {
             createDatabase();
-            createTable();
+            stmt.execute(getCreateTableString());
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void createDatabase() throws ClassNotFoundException, SQLException {
-        connection = DriverManager.getConnection("jdbc:sqlite:" + DATABASE_PATH + DATABASE_NAME);
-        stmt = connection.createStatement();
-        stmt.setQueryTimeout(30);
-        System.out.println("Opened " + DATABASE_NAME + " database successfully");
+        if(connection == null) {
+            connection = DriverManager.getConnection("jdbc:sqlite:" + DATABASE_PATH + DATABASE_NAME);
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);
+            System.out.println("Opened " + DATABASE_NAME + " database successfully");
+        }
     }
 
-    protected abstract void createTable() throws SQLException;
+    protected abstract String getCreateTableString();
 
     public ResultSet getAll(String table) throws SQLException {
         ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + ";");

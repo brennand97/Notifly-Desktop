@@ -24,9 +24,13 @@ public class DeviceDatabase extends Database {
     protected static String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             MAC + " CHARACTER(17), " + NAME + " TEXT, " + TYPE + " INTEGER, " + CONNECT + " INTEGER, " + SMS + " INTEGER, " + NOTIFICATION + " INTEGER);";
 
+    public DeviceDatabase() {
+        initialize();
+    }
+
     @Override
-    protected void createTable() throws SQLException {
-        stmt.executeUpdate(CREATE_TABLE);
+    protected String getCreateTableString() {
+        return CREATE_TABLE;
     }
 
     public void insert(DeviceInfo di) throws SQLException {

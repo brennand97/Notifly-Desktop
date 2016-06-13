@@ -1,10 +1,14 @@
 package com.notiflyapp.ui.GUI.tabs;
 
 import com.notiflyapp.data.DeviceInfo;
+import com.notiflyapp.data.SMS;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
@@ -16,17 +20,23 @@ public class BDeviceTab extends TabHouse {
     private BluetoothClient client;
     private DeviceInfo deviceInfo;
 
+    private Tab tab;
+    private ListView threadView;
+
     private static final long gracePeriod = 5000;
     private static final String defaultName = "Bluetooth Device";
 
     public BDeviceTab(Tab tab, BluetoothClient client) {
         super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
+        this.tab = tab;
         this.client = client;
         deviceInfo = client.getDeviceInfo();
         tab.setOnClosed(event -> close() );
 
         try {
-            tab.setContent(FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/device_tab.fxml")));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/notiflyapp/ui/GUI/view/device_tab.fxml"));
+            Node node = loader.load();
+            tab.setContent(node);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -34,6 +44,9 @@ public class BDeviceTab extends TabHouse {
 
     @Override
     public void refresh() {
+        threadView = (ListView) tab.getContent().lookup("#device_tab_pane").lookup("#split_pane_1").lookup("#thread_anchor_pane").lookup("#thread_list_view");
+        System.out.println(threadView == null);
+        threadView.getItems().add("It worked");
         setTitle(client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         if(!client.isConnected()) {
             Houston.getHandler().send(() -> {
@@ -62,6 +75,10 @@ public class BDeviceTab extends TabHouse {
             Houston.getInstance().closeBluetoothDevice(client);
             Houston.getInstance().removeTab(this);
         });
+    }
+
+    public void newMessage(SMS sms) {
+
     }
 
 }

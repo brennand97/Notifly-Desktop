@@ -12,7 +12,7 @@ public class DatabaseFactory {
     private static DatabaseFactory instance;
 
     private final DeviceDatabase device;
-    private final ArrayList<MessageDatabase> messages;
+    private ArrayList<MessageDatabase> messages;
 
     private DatabaseFactory() {
         device = new DeviceDatabase();
@@ -30,7 +30,10 @@ public class DatabaseFactory {
         return getInstance().device;
     }
 
-    public static MessageDatabase getMessageDatabase(String mac) {
+    public static MessageDatabase getMessageDatabase(String mac) throws NullPointerException {
+        if(mac == null) {
+            throw new NullPointerException();
+        }
         for(MessageDatabase md: getInstance().messages) {
             if(md.formatMac(md.getMacAddress()).equals(md.formatMac(mac))) {
                 return md;
@@ -41,8 +44,11 @@ public class DatabaseFactory {
         return md;
     }
 
-    public static MessageDatabase getMessageDatabase(DeviceInfo di) {
+    public static MessageDatabase getMessageDatabase(DeviceInfo di) throws NullPointerException {
         String mac = di.getDeviceMac();
+        if(mac == null) {
+            throw new NullPointerException();
+        }
         for(MessageDatabase md: getInstance().messages) {
             if(md.formatMac(md.getMacAddress()).equals(md.formatMac(mac))) {
                 return md;

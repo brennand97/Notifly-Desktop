@@ -8,7 +8,11 @@ import com.notiflyapp.controlcenter.Houston;
 import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Brennan on 4/17/2016.
@@ -92,7 +96,8 @@ public class BluetoothClient {
         switch (msg.getType()) {
             case SMS:
                 try {
-                    serverOutNoLog("(" + msg.serialize().length + ") " + ((SMS) msg).getOriginatingAddress() + ": " + msg.getBody());
+                    DateFormat df = DateFormat.getDateTimeInstance();
+                    serverOutNoLog("(" + msg.serialize().length + ") " + ((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
                     Houston.getHandler().send(() -> Houston.getInstance().incomingMessage(this, msg));
                 } catch (IOException e) {
                     e.printStackTrace();
