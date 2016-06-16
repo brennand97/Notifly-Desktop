@@ -128,15 +128,14 @@ class ClientThread extends Thread{
         return connected;
     }
 
-    protected class MessageHandler extends Thread {
+    private class MessageHandler extends Thread {
 
         private ArrayBlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1024);
         private boolean running = false;
 
         private final Object lock = new Object();
 
-        public MessageHandler() {
-        }
+        MessageHandler() {}
 
         public void add(DataObject object) {
             if(object != null) {

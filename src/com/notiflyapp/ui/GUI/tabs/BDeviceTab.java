@@ -4,6 +4,7 @@ import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.data.SMS;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
+import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
@@ -37,6 +38,25 @@ public class BDeviceTab extends TabHouse {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/notiflyapp/ui/GUI/view/device_tab.fxml"));
             Node node = loader.load();
             tab.setContent(node);
+
+            Application.invokeLater(() -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                initialize();
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initialize() {
+        threadView = (ListView) tab.getContent().lookup("#thread_list_view");
+        System.out.println(threadView == null);
+        try {
+            threadView.getItems().add(FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/thread_cell.fxml")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,9 +64,6 @@ public class BDeviceTab extends TabHouse {
 
     @Override
     public void refresh() {
-        threadView = (ListView) tab.getContent().lookup("#device_tab_pane").lookup("#split_pane_1").lookup("#thread_anchor_pane").lookup("#thread_list_view");
-        System.out.println(threadView == null);
-        threadView.getItems().add("It worked");
         setTitle(client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         if(!client.isConnected()) {
             Houston.getHandler().send(() -> {

@@ -11,9 +11,9 @@
    <children>
       <SplitPane id="split_pane_1" dividerPositions="0.18896321070234115" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane id="thread_anchor_pane" minHeight="0.0" minWidth="100.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
+          <AnchorPane id="thread_anchor_pane" maxWidth="-Infinity" minHeight="0.0" minWidth="-Infinity" prefHeight="160.0" prefWidth="220.0" SplitPane.resizableWithParent="false">
                <children>
-                  <ListView id="thread_list_view" prefHeight="398.0" prefWidth="175.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ListView id="thread_list_view" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="220.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
             <AnchorPane minWidth="200.0" prefHeight="398.0" prefWidth="163.0">
