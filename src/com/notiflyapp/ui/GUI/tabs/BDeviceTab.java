@@ -4,14 +4,15 @@ import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.data.SMS;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
+import com.notiflyapp.ui.GUI.ThreadCell;
 import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
-import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -22,7 +23,8 @@ public class BDeviceTab extends TabHouse {
     private DeviceInfo deviceInfo;
 
     private Tab tab;
-    private ListView threadView;
+    private ListView<Node> threadView;
+    private ArrayList<ThreadCell> threadCells = new ArrayList<>();
 
     private static final long gracePeriod = 5000;
     private static final String defaultName = "Bluetooth Device";
@@ -53,13 +55,22 @@ public class BDeviceTab extends TabHouse {
     }
 
     public void initialize() {
-        threadView = (ListView) tab.getContent().lookup("#thread_list_view");
+        threadView = (ListView<Node>) tab.getContent().lookup("#thread_list_view");
         System.out.println(threadView == null);
-        try {
-            threadView.getItems().add(FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/thread_cell.fxml")));
-        } catch (IOException e) {
-            e.printStackTrace();
+        for(int i = 0; i < 25; i++) {
+            addThreadCell(i);
         }
+    }
+
+    public void addThreadCell(int threadId) {
+        for(ThreadCell cell: threadCells) {
+            if(cell.getThreadId() == threadId) {
+                return;
+            }
+        }
+        ThreadCell cell = new ThreadCell(threadId);
+        threadCells.add(cell);
+        threadView.getItems().add(cell.getNode());
     }
 
     @Override
