@@ -29,7 +29,7 @@
                           <items>
                               <AnchorPane id="active_conversation_message_pane">
                                  <children>
-                                    <ListView id="active_conversation_message_list_view" fx:id="conversationView" layoutX="7.0" prefHeight="372.0" prefWidth="444.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="-7.0" AnchorPane.topAnchor="0.0" />
+                                    <ListView id="active_conversation_message_list_view" fx:id="conversationView" layoutX="7.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane maxHeight="200.0" minHeight="50.0" prefHeight="50.0">

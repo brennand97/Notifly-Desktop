@@ -1,6 +1,8 @@
 package com.notiflyapp.database;
 
+import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DeviceInfo;
+import com.notiflyapp.data.MMS;
 import com.notiflyapp.data.SMS;
 
 import java.sql.ResultSet;
@@ -88,6 +90,10 @@ public class MessageDatabase extends Database {
         stmt.executeUpdate(call.toString());
     }
 
+    public ResultSet query(String[] columns, String[] values) throws UnequalArraysException, SQLException {
+        return query(TABLE_NAME, columns, values);
+    }
+
     public void nonDuplicateInsert(SMS sms) throws UnequalArraysException, NullResultSetException, SQLException {
         if(has(sms)) {
             update(sms);
@@ -113,18 +119,60 @@ public class MessageDatabase extends Database {
         }
     }
 
-    public SMS[] getAllSms() throws SQLException, NullResultSetException {
+    public DataObject[] getAllMessages() throws SQLException, NullResultSetException {
         ResultSet rs = getAll(TABLE_NAME);
         if(rs != null) {
-            ArrayList<SMS> smsArray = new ArrayList<>();
+            ArrayList<DataObject> msgArray = new ArrayList<>();
             while (rs.next()) {
-                smsArray.add(makeSms(rs));
+                if(rs.getString(TYPE).equals(TYPE_SMS)) {
+                    msgArray.add(makeSms(rs));
+                } else if(rs.getString(TYPE).equals(TYPE_MMS)) {
+                    msgArray.add(makeMms(rs));
+                }
             }
-            SMS[] smses = new SMS[smsArray.size()];
-            for(int i =  0; i < smsArray.size(); i++) {
-                smses[i] = smsArray.get(i);
+            DataObject[] msgs = new DataObject[msgArray.size()];
+            for(int i =  0; i < msgArray.size(); i++) {
+                msgs[i] = msgArray.get(i);
             }
-            return smses;
+            return msgs;
+        } else {
+            throw NullResultSetException.makeException(TABLE_NAME);
+        }
+    }
+
+    public DataObject[] getMessages(int threadId) throws SQLException, NullResultSetException, UnequalArraysException {
+        ResultSet rs = query(TABLE_NAME, new String[]{ THREAD_ID }, new String[]{ String.valueOf(threadId) });
+        if(rs != null) {
+            ArrayList<DataObject> msgArray = new ArrayList<>();
+            while (rs.next()) {
+                if(rs.getString(TYPE).equals(TYPE_SMS)) {
+                    msgArray.add(makeSms(rs));
+                } else if(rs.getString(TYPE).equals(TYPE_MMS)) {
+                    msgArray.add(makeMms(rs));
+                }
+            }
+            DataObject[] msgs = new DataObject[msgArray.size()];
+            for(int i =  0; i < msgArray.size(); i++) {
+                msgs[i] = msgArray.get(i);
+            }
+            return msgs;
+        } else {
+            throw NullResultSetException.makeException(TABLE_NAME);
+        }
+    }
+
+    public int[] getThreadIds() throws SQLException, NullResultSetException {
+        ResultSet rs = stmt.executeQuery("SELECT DISTINCT " + THREAD_ID + " FROM " + TABLE_NAME + " ORDER BY " + DATE + ";");
+        if(rs != null) {
+            ArrayList<Integer> tmpId = new ArrayList<>();
+            while (rs.next()) {
+                tmpId.add(rs.getInt(THREAD_ID));
+            }
+            int[] ids = new int[tmpId.size()];
+            for(int i = 0; i < ids.length; i++) {
+                ids[i] = tmpId.get(i);
+            }
+            return ids;
         } else {
             throw NullResultSetException.makeException(TABLE_NAME);
         }
@@ -163,6 +211,10 @@ public class MessageDatabase extends Database {
         sms.setSubscriptionId(rs.getLong(SUBSCRIPTION_ID));
         sms.setThreadId(rs.getInt(THREAD_ID));
         return sms;
+    }
+
+    private MMS makeMms(ResultSet rs) throws SQLException {
+        return null;
     }
 
     String formatMac(String mac) {

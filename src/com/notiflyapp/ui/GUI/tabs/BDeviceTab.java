@@ -1,17 +1,25 @@
 package com.notiflyapp.ui.GUI.tabs;
 
+import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DeviceInfo;
+import com.notiflyapp.data.MMS;
 import com.notiflyapp.data.SMS;
+import com.notiflyapp.database.DatabaseFactory;
+import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
 import com.notiflyapp.ui.GUI.ThreadCell;
 import com.sun.glass.ui.Application;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.AccessibleAttribute;
 import javafx.scene.Node;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -25,6 +33,11 @@ public class BDeviceTab extends TabHouse {
     private Tab tab;
     private ListView<Node> threadView;
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
+    private ListView<Node> messageView;
+    private Label nameLabel;
+
+    private ThreadCell current;
+    private double smsMaxWidth;
 
     private static final long gracePeriod = 5000;
     private static final String defaultName = "Bluetooth Device";
@@ -33,7 +46,6 @@ public class BDeviceTab extends TabHouse {
         super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         this.tab = tab;
         this.client = client;
-        deviceInfo = client.getDeviceInfo();
         tab.setOnClosed(event -> close() );
 
         try {
@@ -54,27 +66,77 @@ public class BDeviceTab extends TabHouse {
         }
     }
 
-    public void initialize() {
+    private void initialize() {
         threadView = (ListView<Node>) tab.getContent().lookup("#thread_list_view");
-        System.out.println(threadView == null);
-        for(int i = 0; i < 25; i++) {
-            addThreadCell(i);
+        threadView.setOnMouseClicked(event -> selectThread(threadView.getSelectionModel().getSelectedIndex()));
+        messageView = (ListView<Node>) tab.getContent().lookup("#active_conversation_message_list_view");
+        smsMaxWidth = (messageView.getWidth() * 0.75);
+        System.out.println("smsMaxWidth : " + smsMaxWidth);
+        messageView.setOnMouseClicked(event -> {
+            double tmpSmsMaxWidth = (messageView.getWidth() * 0.75);
+            if(tmpSmsMaxWidth != smsMaxWidth) {
+                smsMaxWidth = tmpSmsMaxWidth;
+                System.out.println("smsMaxWidth : " + smsMaxWidth);
+                for(Node node: messageView.getItems()) {
+                    //TODO correct for double sided conversation with "gravity"
+                    node.prefWidth(smsMaxWidth);
+                    node.lookup("#message_text").prefWidth(smsMaxWidth);
+                }
+            }
+        });
+        nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
+        try {
+            int[] threadIds = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getThreadIds();
+            for(int i: threadIds) {
+                addThreadCell(i);
+            }
+            if(threadIds.length > 0) {
+                selectThread(threadIds[0]);
+            }
+        } catch (SQLException | NullResultSetException | NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
-    public void addThreadCell(int threadId) {
+    private void addThreadCell(int threadId) {
         for(ThreadCell cell: threadCells) {
             if(cell.getThreadId() == threadId) {
                 return;
             }
         }
-        ThreadCell cell = new ThreadCell(threadId);
+        ThreadCell cell = new ThreadCell(deviceInfo.getDeviceMac(), threadId);
         threadCells.add(cell);
         threadView.getItems().add(cell.getNode());
     }
 
+    private void selectThread(int index) {
+        //TODO change threadCells to a RearrangeableArrayList (Needs to be created) so that the index list always makes that of the listView
+        ThreadCell tmpCurrent = threadCells.get(index);
+        if(!tmpCurrent.equals(current)) {
+            current = tmpCurrent;
+            clearMessageListView();
+            nameLabel.setText(current.getName());
+            DataObject[] messages = current.getMessages();
+            for(DataObject msg: messages) {
+                switch (msg.getType()) {
+                    case SMS:
+                        newMessage((SMS) msg);
+                        break;
+                    case MMS:
+                        newMessage((MMS) msg);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void clearMessageListView() {
+        messageView.getItems().clear();
+    }
+
     @Override
     public void refresh() {
+        deviceInfo = client.getDeviceInfo();
         setTitle(client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         if(!client.isConnected()) {
             Houston.getHandler().send(() -> {
@@ -105,7 +167,37 @@ public class BDeviceTab extends TabHouse {
         });
     }
 
+    public void handleNewMessage(DataObject object) {
+        switch (object.getType()) {
+            case SMS:
+                SMS sms = (SMS) object;
+                if(sms.getThreadId() == current.getThreadId()) {
+                    newMessage(sms);
+                }
+                break;
+            case MMS:
+
+                break;
+        }
+    }
+
     public void newMessage(SMS sms) {
+        try {
+            Node node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/sms_cell.fxml"));
+            node.prefWidth(smsMaxWidth);
+            Label label = (Label) node.lookup("#message_text");
+            label.prefWidth(smsMaxWidth);
+            label.setText(sms.getBody());
+            label.setWrapText(true);
+            label.setTextAlignment(TextAlignment.LEFT);
+            messageView.getItems().add(node);
+            messageView.scrollTo(node);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void newMessage(MMS mms) {
 
     }
 

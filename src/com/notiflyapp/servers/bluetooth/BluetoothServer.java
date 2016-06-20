@@ -90,7 +90,7 @@ public class BluetoothServer extends Server<BluetoothClient>{
         connectedClients.remove(client);
     }
 
-    public void dissconnectClient(BluetoothClient client) {
+    public void disconnectClient(BluetoothClient client) {
         client.close();
         removeClient(client);
     }

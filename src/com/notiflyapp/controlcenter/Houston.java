@@ -165,7 +165,7 @@ public class Houston {
     }
 
     public void closeBluetoothDevice(BluetoothClient client) {
-        btServer.dissconnectClient(client);
+        btServer.disconnectClient(client);
     }
 
     private BDeviceTab getBDeviceTab(BluetoothClient client) throws NullPointerException {
@@ -184,7 +184,7 @@ public class Houston {
             try {
                 DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
                 BDeviceTab bDeviceTab = getBDeviceTab(client);
-                bDeviceTab.newMessage((SMS) object);
+                bDeviceTab.handleNewMessage(object);
             } catch (SQLException | UnequalArraysException | NullResultSetException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {

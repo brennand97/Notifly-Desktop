@@ -40,7 +40,7 @@ public abstract class Database {
         return rs;
     }
 
-    public ResultSet query(String table, String[] columns, String[] values) throws UnequalArraysException, SQLException {
+    protected ResultSet query(String table, String[] columns, String[] values) throws UnequalArraysException, SQLException {
         if(columns.length != values.length) {
             throw UnequalArraysException.makeException();
         }
