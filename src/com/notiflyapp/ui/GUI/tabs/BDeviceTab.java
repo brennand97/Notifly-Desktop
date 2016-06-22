@@ -17,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -72,6 +73,7 @@ public class BDeviceTab extends TabHouse {
         messageView = (ListView<Node>) tab.getContent().lookup("#active_conversation_message_list_view");
         smsMaxWidth = (messageView.getWidth() * 0.75);
         System.out.println("smsMaxWidth : " + smsMaxWidth);
+        /*
         messageView.setOnMouseClicked(event -> {
             double tmpSmsMaxWidth = (messageView.getWidth() * 0.75);
             if(tmpSmsMaxWidth != smsMaxWidth) {
@@ -84,6 +86,7 @@ public class BDeviceTab extends TabHouse {
                 }
             }
         });
+        */
         nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
         try {
             int[] threadIds = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getThreadIds();
@@ -91,7 +94,7 @@ public class BDeviceTab extends TabHouse {
                 addThreadCell(i);
             }
             if(threadIds.length > 0) {
-                selectThread(threadIds[0]);
+                selectThread(0);
             }
         } catch (SQLException | NullResultSetException | NullPointerException e) {
             e.printStackTrace();
@@ -173,6 +176,9 @@ public class BDeviceTab extends TabHouse {
                 SMS sms = (SMS) object;
                 if(sms.getThreadId() == current.getThreadId()) {
                     newMessage(sms);
+                } else {
+                    addThreadCell(sms.getThreadId());
+                    //TODO check to see if newest message and then send thread_cell to top of the list
                 }
                 break;
             case MMS:
@@ -185,11 +191,14 @@ public class BDeviceTab extends TabHouse {
         try {
             Node node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/sms_cell.fxml"));
             node.prefWidth(smsMaxWidth);
-            Label label = (Label) node.lookup("#message_text");
-            label.prefWidth(smsMaxWidth);
-            label.setText(sms.getBody());
-            label.setWrapText(true);
-            label.setTextAlignment(TextAlignment.LEFT);
+            TextFlow textFlow = (TextFlow) node.lookup("#message_text");
+            textFlow.prefWidthProperty().set(smsMaxWidth);
+            textFlow.setTextAlignment(TextAlignment.LEFT);
+            Text text = new Text();
+            text.prefWidth(smsMaxWidth);
+            text.setText(sms.getBody());
+            text.setTextAlignment(TextAlignment.LEFT);
+            textFlow.getChildren().add(text);
             messageView.getItems().add(node);
             messageView.scrollTo(node);
         } catch (IOException e) {
