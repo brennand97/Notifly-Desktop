@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -196,6 +197,7 @@ public class BDeviceTab extends TabHouse {
             textFlow.setTextAlignment(TextAlignment.LEFT);
             Text text = new Text();
             text.prefWidth(smsMaxWidth);
+            text.setFont(new Font(16));
             text.setText(sms.getBody());
             text.setTextAlignment(TextAlignment.LEFT);
             textFlow.getChildren().add(text);
