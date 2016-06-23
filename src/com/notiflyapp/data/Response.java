@@ -5,14 +5,14 @@ import java.io.File;
 /**
  * Created by Brennan on 5/7/2016.
  */
-public class Request extends DataObject<String, String> {
+public class Response extends DataObject<String, String> {
 
-    private static final long serialVersionUID = 3349238414148539471L;
+    private static final long serialVersionUID = 3349238414148539472L;
 
     private String requestString;
     private String UUID;
 
-    public Request() {
+    public Response() {
         super();
         type = Type.REQUEST;
     }
