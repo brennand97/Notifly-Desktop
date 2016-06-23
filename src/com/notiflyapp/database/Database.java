@@ -40,6 +40,7 @@ public abstract class Database {
         return rs;
     }
 
+    /*      Old method, replaced with more robust one (Brennan Douglas - 6/23/2016)
     protected ResultSet query(String table, String[] columns, String[] values) throws UnequalArraysException, SQLException {
         if(columns.length != values.length) {
             throw UnequalArraysException.makeException();
@@ -55,6 +56,59 @@ public abstract class Database {
         }
         ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + " WHERE " + selection.toString() + ";");
         return rs;
+    }
+    */
+
+    protected ResultSet query(String table, String[] columns, String[] selection, String[] selectionValues, String order, String direction) throws UnequalArraysException, SQLException {
+        if(selection != null) {
+            if(selectionValues != null) {
+                if(selection.length != selectionValues.length) {
+                    throw UnequalArraysException.makeException();
+                }
+            } else {
+                throw UnequalArraysException.makeException();
+            }
+        }
+
+        StringBuilder command = new StringBuilder("SELECT ");
+        if(columns == null || columns.length == 0) {
+            command.append("* ");
+        } else {
+            for(int i = 0; i < columns.length; i++) {
+                command.append("\"");
+                command.append(columns[i]);
+                command.append("\" ");
+                if(i < columns.length - 1) {
+                    command.append("AND ");
+                }
+            }
+        }
+        command.append("FROM ").append(table);
+        if(selection == null || selection.length == 0) {} else {
+            command.append(" WHERE ");
+            for(int i = 0; i < selection.length; i++) {
+                command.append("\"");
+                command.append(selection[i]);
+                command.append("\"=\"");
+                command.append(selectionValues[i]);
+                command.append("\"");
+                if(i < selection.length - 1) {
+                    command.append(" AND ");
+                }
+            }
+        }
+
+        if(order == null) {
+            command.append(";");
+        } else {
+            command.append(" ");
+            command.append(order);
+            command.append(" ");
+            command.append(direction);
+            command.append(";");
+        }
+
+        return stmt.executeQuery(command.toString());
     }
 
     public void delete(String table, int id) throws SQLException {

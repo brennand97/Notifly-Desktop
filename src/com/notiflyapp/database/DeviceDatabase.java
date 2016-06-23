@@ -72,8 +72,8 @@ public class DeviceDatabase extends Database {
         }
     }
 
-    public DeviceInfo[] queryDeviceInfo(String[] column, String[] value) throws SQLException, NullResultSetException, UnequalArraysException {
-        ResultSet rs = query(TABLE_NAME, column, value);
+    public DeviceInfo[] queryDeviceInfo(String[] selection, String[] value) throws SQLException, NullResultSetException, UnequalArraysException {
+        ResultSet rs = query(TABLE_NAME, null, selection, value, null, null);
         if(rs != null) {
             ArrayList<DeviceInfo> infoArray = new ArrayList<>();
             while (rs.next()) {
@@ -111,7 +111,7 @@ public class DeviceDatabase extends Database {
     }
 
     public int getId(DeviceInfo info) throws SQLException, UnequalArraysException {
-        ResultSet rs = query(TABLE_NAME, new String[]{MAC}, new String[]{info.getDeviceMac()});
+        ResultSet rs = query(TABLE_NAME, null, new String[]{MAC}, new String[]{info.getDeviceMac()}, null, null);
         if(rs != null) {
             rs.next();
             int id = rs.getInt(ID);

@@ -90,10 +90,6 @@ public class MessageDatabase extends Database {
         stmt.executeUpdate(call.toString());
     }
 
-    public ResultSet query(String[] columns, String[] values) throws UnequalArraysException, SQLException {
-        return query(TABLE_NAME, columns, values);
-    }
-
     public void nonDuplicateInsert(SMS sms) throws UnequalArraysException, NullResultSetException, SQLException {
         if(has(sms)) {
             update(sms);
@@ -102,8 +98,8 @@ public class MessageDatabase extends Database {
         }
     }
 
-    public SMS[] querySms(String[] column, String[] value) throws UnequalArraysException, SQLException, NullResultSetException {
-        ResultSet rs = query(TABLE_NAME, column, value);
+    public SMS[] querySms(String[] selection, String[] value) throws UnequalArraysException, SQLException, NullResultSetException {
+        ResultSet rs = query(TABLE_NAME, null, selection, value, null, null);
         if(rs != null) {
             ArrayList<SMS> smsArray = new ArrayList<>();
             while (rs.next()) {
@@ -141,7 +137,7 @@ public class MessageDatabase extends Database {
     }
 
     public DataObject[] getMessages(int threadId) throws SQLException, NullResultSetException, UnequalArraysException {
-        ResultSet rs = query(TABLE_NAME, new String[]{ THREAD_ID }, new String[]{ String.valueOf(threadId) });
+        ResultSet rs = query(TABLE_NAME, null, new String[]{ THREAD_ID }, new String[]{ String.valueOf(threadId) }, null, null);
         if(rs != null) {
             ArrayList<DataObject> msgArray = new ArrayList<>();
             while (rs.next()) {
@@ -179,7 +175,7 @@ public class MessageDatabase extends Database {
     }
 
     public int getId(SMS sms) throws SQLException, UnequalArraysException {
-        ResultSet rs = query(TABLE_NAME, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()});
+        ResultSet rs = query(TABLE_NAME, null, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()}, null, null);
         if(rs != null) {
             rs.next();
             int id = rs.getInt(ID);
