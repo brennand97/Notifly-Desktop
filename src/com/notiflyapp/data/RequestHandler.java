@@ -28,6 +28,14 @@ public class RequestHandler {
 
     }
 
+    public void handleResponse(Response response) {
+
+    }
+
+    public void sendRequest(Request request) {
+        //not sure if this one will be used or not
+    }
+
     public void sendResponse(Response response) {
 
     }
