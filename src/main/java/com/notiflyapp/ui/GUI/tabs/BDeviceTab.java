@@ -123,10 +123,10 @@ public class BDeviceTab extends TabHouse {
             DataObject[] messages = current.getMessages();
             for(DataObject msg: messages) {
                 switch (msg.getType()) {
-                    case SMS:
+                    case DataObject.Type.SMS:
                         newMessage((SMS) msg);
                         break;
-                    case MMS:
+                    case DataObject.Type.MMS:
                         newMessage((MMS) msg);
                         break;
                 }
@@ -173,7 +173,7 @@ public class BDeviceTab extends TabHouse {
 
     public void handleNewMessage(DataObject object) {
         switch (object.getType()) {
-            case SMS:
+            case DataObject.Type.SMS:
                 SMS sms = (SMS) object;
                 if(sms.getThreadId() == current.getThreadId()) {
                     newMessage(sms);
@@ -182,7 +182,7 @@ public class BDeviceTab extends TabHouse {
                     //TODO check to see if newest message and then send thread_cell to top of the list
                 }
                 break;
-            case MMS:
+            case DataObject.Type.MMS:
 
                 break;
         }

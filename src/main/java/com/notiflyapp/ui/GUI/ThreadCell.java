@@ -34,6 +34,7 @@ public class ThreadCell {
         this.client = client;
         this.threadId = threadId;
         try {
+            retrieveContact();
             createNode();
         } catch (IOException e) {
             e.printStackTrace();

@@ -19,7 +19,7 @@ public class Response extends DataObject<String , UUID> {
 
     private Response() {
         super();
-        type = Type.REQUEST;
+        type = Type.RESPONSE;
     }
 
     public static Response makeResponse(Request request) {

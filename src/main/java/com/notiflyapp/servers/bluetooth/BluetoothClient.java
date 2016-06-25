@@ -4,6 +4,9 @@ import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.data.SMS;
 import com.notiflyapp.controlcenter.Houston;
+import com.notiflyapp.data.requestframework.Request;
+import com.notiflyapp.data.requestframework.RequestHandler;
+import com.notiflyapp.data.requestframework.Response;
 
 import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
@@ -94,7 +97,7 @@ public class BluetoothClient {
      */
     protected void receivedMsg(DataObject msg) {
         switch (msg.getType()) {
-            case SMS:
+            case DataObject.Type.SMS:
                 try {
                     DateFormat df = DateFormat.getDateTimeInstance();
                     serverOutNoLog("(" + msg.serialize().length + ") " + ((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
@@ -103,12 +106,18 @@ public class BluetoothClient {
                     e.printStackTrace();
                 }
                 break;
-            case MMS:
+            case DataObject.Type.MMS:
                 break;
-            case NOTIFICATION:
+            case DataObject.Type.NOTIFICATION:
                 break;
-            case DEVICEINFO:
+            case DataObject.Type.DEVICE_INFO:
                 setDeviceData((DeviceInfo) msg);
+                break;
+            case DataObject.Type.REQUEST:
+                RequestHandler.getInstance().handleRequest(this, (Request) msg);
+                break;
+            case DataObject.Type.RESPONSE:
+                RequestHandler.getInstance().handleResponse((Response) msg);
                 break;
         }
         received.add(msg);
