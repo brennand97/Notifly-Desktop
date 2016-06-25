@@ -1,10 +1,10 @@
 package com.notiflyapp.ui.GUI;
 
-import com.notiflyapp.data.DataObject;
-import com.notiflyapp.data.SMS;
+import com.notiflyapp.data.*;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
+import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  * Created by Brennan on 6/17/2016.
@@ -22,12 +23,12 @@ public class ThreadCell {
     private Label label;
     private ImageView imageView;
 
-    private String mac;
+    private BluetoothClient client;
     private int threadId;
     private String name;
 
-    public ThreadCell(String mac, int threadId) {
-        this.mac = mac;
+    public ThreadCell(BluetoothClient client, int threadId) {
+        this.client = client;
         this.threadId = threadId;
         try {
             createNode();
@@ -46,7 +47,7 @@ public class ThreadCell {
 
     public DataObject[] getMessages() {
         try {
-            return DatabaseFactory.getMessageDatabase(mac).getMessages(threadId);
+            return DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
         } catch (SQLException | NullResultSetException | UnequalArraysException e) {
             e.printStackTrace();
         }
@@ -66,9 +67,23 @@ public class ThreadCell {
         return threadId;
     }
 
-    public String getName() {
+    private void retrieveContact() {
         //TODO retrieve name from future threadId database received from device
-        return String.valueOf(threadId);
+        Request request = new Request();
+        request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
+        request.putExtra(UUID.randomUUID());
+        RequestHandler.RequestCallback callback = response -> {
+
+        };
+        RequestHandler.getInstance().sendRequest(client, request, callback);
+    }
+
+    public String getName() {
+        if (name == null) {
+            return String.valueOf(threadId);
+        } else {
+            return name;
+        }
     }
 
 }

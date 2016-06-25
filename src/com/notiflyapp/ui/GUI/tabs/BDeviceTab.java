@@ -108,7 +108,7 @@ public class BDeviceTab extends TabHouse {
                 return;
             }
         }
-        ThreadCell cell = new ThreadCell(deviceInfo.getDeviceMac(), threadId);
+        ThreadCell cell = new ThreadCell(client, threadId);
         threadCells.add(cell);
         threadView.getItems().add(cell.getNode());
     }

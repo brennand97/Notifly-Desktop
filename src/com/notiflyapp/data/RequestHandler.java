@@ -1,5 +1,7 @@
 package com.notiflyapp.data;
 
+import com.notiflyapp.servers.bluetooth.BluetoothClient;
+
 /**
  * Created by Brennan on 6/23/2016.
  */
@@ -11,13 +13,13 @@ public class RequestHandler {
 
     }
 
-    private RequestHandler handler;
+    private static RequestHandler handler;
 
     private RequestHandler() {
 
     }
 
-    public RequestHandler getInstance() {
+    public static RequestHandler getInstance() {
         if(handler == null) {
             handler = new RequestHandler();
         }
@@ -32,8 +34,12 @@ public class RequestHandler {
 
     }
 
-    public void sendRequest(Request request) {
-        //not sure if this one will be used or not
+    public void sendRequest(BluetoothClient client, Request request, RequestCallback callback) {
+        //TODO handle tracking and sending of message
+    }
+
+    public interface RequestCallback {
+        void responseReceived(Response response);
     }
 
     public void sendResponse(Response response) {

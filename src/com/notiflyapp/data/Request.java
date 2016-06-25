@@ -1,16 +1,17 @@
 package com.notiflyapp.data;
 
 import java.io.File;
+import java.util.UUID;
 
 /**
  * Created by Brennan on 5/7/2016.
  */
-public class Request extends DataObject<String, String> {
+public class Request extends DataObject<String, UUID> {
 
     private static final long serialVersionUID = 3349238414148539471L;
 
-    private String requestString;
-    private String UUID;
+    //Body id the request string
+    //Extra is UUID of specific message
 
     public Request() {
         super();
@@ -22,7 +23,7 @@ public class Request extends DataObject<String, String> {
      */
     @Override
     public String getBody() {
-        return requestString;
+        return body;
     }
 
     /**
@@ -30,23 +31,23 @@ public class Request extends DataObject<String, String> {
      */
     @Override
     public void putBody(String body) {
-        requestString = body;
+        this.body = body;
     }
 
     /**
      * @return Extra data stored in the message as a File
      */
     @Override
-    public String getExtra() {
-        return UUID;
+    public UUID getExtra() {
+        return extra;
     }
 
     /**
      * @param extra Extra data that goes along with the body as a File
      */
     @Override
-    public void putExtra(String extra) {
-        UUID = extra;
+    public void putExtra(UUID extra) {
+        this.extra = extra;
     }
 
 }
