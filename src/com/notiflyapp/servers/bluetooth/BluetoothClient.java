@@ -133,7 +133,7 @@ public class BluetoothClient {
     public void sendMsg(DataObject msg) {
         thread.send(msg);
         sent.add(msg);
-        serverOutNoLog("Sent message to " + ((SMS) msg).getAddress()  + ":   " + msg.getBody());
+        serverOutNoLog("Sent message to device: " + getDeviceMac()  + ":   " + msg.getBody());
     }
 
 

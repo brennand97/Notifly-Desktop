@@ -1,4 +1,6 @@
-package com.notiflyapp.data;
+package com.notiflyapp.data.requestframework;
+
+import com.notiflyapp.data.DataObject;
 
 import java.io.File;
 import java.util.UUID;
@@ -12,10 +14,29 @@ public class Request extends DataObject<String, UUID> {
 
     //Body id the request string
     //Extra is UUID of specific message
+    private String requestValue;
 
     public Request() {
         super();
         type = Type.REQUEST;
+    }
+
+    /**
+     * Returns the value associated with the requestKey (found in body)
+     *
+     * @return the value corresponding to requested data
+     */
+    public String getRequestValue() {
+        return requestValue;
+    }
+
+    /**
+     * Sets the value that is associated with requestKey (found in body)
+     *
+     * @param requestValue that corresponds to the requested data
+     */
+    public void putRequestValue(String requestValue) {
+        this.requestValue = requestValue;
     }
 
     /**

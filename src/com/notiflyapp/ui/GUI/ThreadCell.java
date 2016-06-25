@@ -1,6 +1,8 @@
 package com.notiflyapp.ui.GUI;
 
 import com.notiflyapp.data.*;
+import com.notiflyapp.data.requestframework.Request;
+import com.notiflyapp.data.requestframework.RequestHandler;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
