@@ -14,6 +14,11 @@ public class RequestHandler {
         public final static String CONTACT_BY_THREAD_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.CONTACT_BY_THREAD_ID";
             /**
              * @type String[]
+             * This is a String array that will contain the contact ids of all contacts associated with given thread id
+             */
+            public final static String EXTRA_CONTACT_BY_THREAD_ID_CONTACT_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_CONTACT_ID";
+            /**
+             * @type String[]
              * This is a String array that will contain the names of all contacts associated with given thread id
              */
             public final static String EXTRA_CONTACT_BY_THREAD_ID_NAME = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME";
@@ -30,8 +35,9 @@ public class RequestHandler {
 
     }
 
-    private HashMap<String, Request> requestHashMap = new HashMap<>();  //String is the UUID of the request in string form and the Request object is the request itself
-    private HashMap<String, ResponseCallback> callbackHashMap = new HashMap<>();  //String is the UUID of the request in string form and the ResponseCallback is the callback assigned with the request
+    private HashMap<String, Request> requestHashMap = new HashMap<>();              //String is the UUID of the request in string form and the Request object is the request itself
+    private HashMap<String, BluetoothClient> clientHashMap = new HashMap<>();       //String is the UUID of the request in string form and the BluetoothClient is the client related to the request
+    private HashMap<String, ResponseCallback> callbackHashMap = new HashMap<>();    //String is the UUID of the request in string form and the ResponseCallback is the callback assigned with the request
 
     private static RequestHandler handler;
 
@@ -50,11 +56,13 @@ public class RequestHandler {
         return handler;
     }
 
-    public void handleRequest(Request request) {
+    public void handleRequest(BluetoothClient client, Request request) {
+        clientHashMap.put(request.getExtra().toString(), client);
         Response response = Response.makeResponse(request);
         switch (request.getBody()) {
             case RequestCode.CONTACT_BY_THREAD_ID:
                 //Not relevant to current client, so null values will be sent
+                response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_CONTACT_ID, null);
                 response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME, null);
                 response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_PHONE_NUMBER, null);
                 response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_IMAGE, null);
@@ -66,10 +74,12 @@ public class RequestHandler {
     }
 
     public void handleResponse(Response response) {
-        if(requestHashMap.containsKey(response.getExtra().toString())) {
+        if(callbackHashMap.containsKey(response.getExtra().toString()) && requestHashMap.containsKey(response.getExtra().toString())) {
             //TODO handle the incoming of a requested response
             String uuid = response.getExtra().toString();
             callbackHashMap.get(uuid).responseReceived(requestHashMap.get(uuid), response);
+            callbackHashMap.remove(response.getExtra().toString());
+            requestHashMap.remove(response.getExtra().toString());
         } else {
             //The response doesn't have a matching request so for now just drop
         }
@@ -82,12 +92,13 @@ public class RequestHandler {
         client.sendMsg(request);
     }
 
-    public void sendRequest(String requestCode) {
-
-    }
-
     public void sendResponse(Response response) {
-
+        String uuid = response.getExtra().toString();
+        if(clientHashMap.containsKey(uuid)) {
+            BluetoothClient client = clientHashMap.get(uuid);
+            client.sendMsg(response);
+            clientHashMap.remove(uuid);
+        }
     }
 
 }
