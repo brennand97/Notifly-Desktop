@@ -3,6 +3,7 @@ package com.notiflyapp.ui.GUI;
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
+import com.notiflyapp.data.requestframework.Response;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
@@ -74,8 +75,8 @@ public class ThreadCell {
         Request request = new Request();
         request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
         request.putExtra(UUID.randomUUID());
-        RequestHandler.RequestCallback callback = response -> {
-
+        RequestHandler.ResponseCallback callback = (request1, response) -> {
+            System.out.println("Contact name : " + (RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME));
         };
         RequestHandler.getInstance().sendRequest(client, request, callback);
     }
