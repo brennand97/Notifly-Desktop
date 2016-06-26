@@ -10,7 +10,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../Java_External-Jars/bluecove-2.1.1-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/bluecove-2.1.1-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +19,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../Java_External-Jars/bluecove-bluez-2.1.1-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/bluecove-bluez-2.1.1-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +28,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../Java_External-Jars/bluecove-emu-2.1.1-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/bluecove-emu-2.1.1-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -37,7 +37,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../Java_External-Jars/bluecove-gpl-2.1.1-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/bluecove-gpl-2.1.1-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -46,12 +46,21 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../Java_External-Jars/sqlite-jdbc-3.8.11.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/sqlite-jdbc-3.8.11.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../Java_External-Jars/sqlite-jdbc-3.8.11.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/sqlite-jdbc-3.8.11.2.jar!/" />
         </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/gson-parent-2.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

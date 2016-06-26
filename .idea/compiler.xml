@@ -18,6 +18,10 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Notifly-Desktop_main" target="1.8" />
+      <module name="Notifly-Desktop_package" target="1.8" />
+      <module name="Notifly-Desktop_test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
-
