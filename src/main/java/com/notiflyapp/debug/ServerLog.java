@@ -14,7 +14,7 @@ public class ServerLog {
 
     private static Logger logger;
 
-    private static final String logLocation = ".server-log";
+    private static final String logLocation = "server.log";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");         //Server's log time format
 
     public ServerLog() {

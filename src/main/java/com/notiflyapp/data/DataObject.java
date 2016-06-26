@@ -24,6 +24,7 @@ public abstract class DataObject< A, B > implements Serializable {
         public final static String DEVICE_INFO = "device_info";
         public final static String REQUEST = "request";
         public final static String RESPONSE = "response";
+        public final static String STATUS = "status";
     }
 
 

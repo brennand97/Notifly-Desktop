@@ -1,5 +1,6 @@
 package com.notiflyapp.servers.bluetooth;
 
+import com.google.gson.Gson;
 import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.data.SMS;
@@ -81,7 +82,7 @@ public class BluetoothClient {
         }
         deviceType = di.getDeviceType();    //Retrieves the device Type provided by the device
         deviceInfo = di;
-        if(deviceInfo.getDeviceMac() == null || deviceInfo.getDeviceMac().equals("00:00:00:00:00:20")) {
+        if(deviceInfo.getDeviceMac() == null || deviceInfo.getDeviceMac().equals("00:00:00:00:00:20") || deviceInfo.getDeviceMac().equals("02:00:00:00:00:00")) {
             deviceInfo.setDeviceMac(deviceMac);
         }
         Houston.getHandler().send(() -> Houston.getInstance().updateDevice(this));
@@ -96,6 +97,9 @@ public class BluetoothClient {
      * @param msg DataObject received from client
      */
     protected void receivedMsg(DataObject msg) {
+        if(msg == null) {
+            return;
+        }
         switch (msg.getType()) {
             case DataObject.Type.SMS:
                 try {
@@ -115,9 +119,11 @@ public class BluetoothClient {
                 break;
             case DataObject.Type.REQUEST:
                 RequestHandler.getInstance().handleRequest(this, (Request) msg);
+                serverOut("Received Request : " + msg.getExtra().toString() + " by device : " + getDeviceMac() + " containing : " + msg.getBody());
                 break;
             case DataObject.Type.RESPONSE:
                 RequestHandler.getInstance().handleResponse((Response) msg);
+                serverOut("Received Response : " + msg.getExtra().toString() + " by device : " + getDeviceMac() + " containing : " + msg.getBody());
                 break;
         }
         received.add(msg);
@@ -142,7 +148,11 @@ public class BluetoothClient {
     public void sendMsg(DataObject msg) {
         thread.send(msg);
         sent.add(msg);
-        serverOutNoLog("Sent message to device: " + getDeviceMac()  + ":   " + msg.getBody());
+        if(!(msg instanceof Request) && !(msg instanceof Response)) {
+            serverOutNoLog("Sent message to device : " + getDeviceMac()  + " :   " + msg.getBody());
+        } else {
+            serverOut("Sending " + msg.getType() + " : " + msg.getExtra().toString() + " from device : " + getDeviceMac() + " containing : " + msg.getBody());
+        }
     }
 
 
