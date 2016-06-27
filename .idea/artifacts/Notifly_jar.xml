@@ -3,11 +3,10 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Notifly_jar</output-path>
     <root id="archive" name="Notifly.jar">
       <element id="module-output" name="Notifly" />
-      <element id="library" level="project" name="Gradle: net.sf.bluecove:bluecove-emu:2.1.1-SNAPSHOT" />
-      <element id="library" level="project" name="Gradle: net.sf.bluecove:bluecove-bluez:2.1.1-SNAPSHOT" />
-      <element id="library" level="project" name="Gradle: net.sf.bluecove:bluecove-gpl:2.1.1-SNAPSHOT" />
-      <element id="library" level="project" name="Gradle: net.sf.bluecove:bluecove:2.1.1-SNAPSHOT" />
-      <element id="library" level="project" name="Gradle: org.xerial:sqlite-jdbc:3.8.11.2" />
+      <element id="file-copy" path="$PROJECT_DIR$/libs/sqlite-jdbc-3.8.11.2.jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/libs/gson-parent-2.7.jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/libs/bluecove-2.1.1-SNAPSHOT.jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/libs/bluecove-bluez-2.1.1-SNAPSHOT.jar" />
     </root>
   </artifact>
 </component>
