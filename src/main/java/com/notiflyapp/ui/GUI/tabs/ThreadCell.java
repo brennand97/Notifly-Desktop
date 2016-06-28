@@ -91,13 +91,21 @@ public class ThreadCell {
             if(contacts.length > 1) {
                 StringBuilder b = new StringBuilder();
                 for(int i = 0; i < contacts.length; i++) {
-                    b.append(contacts[i].getBody());
+                    if(contacts[i].getBody() == null) {
+                        b.append(contacts[i].getExtra());
+                    } else {
+                        b.append(contacts[i].getBody());
+                    }
                     if(i < contacts.length - 1) {
                         b.append(", ");
                     }
                 }
             } else {
-                name = contacts[0].getBody();
+                if(contacts[0].getBody() == null) {
+                    name = contacts[0].getExtra();
+                } else {
+                    name = contacts[0].getBody();
+                }
             }
             Application.invokeLater(() -> house.updateName(this));
         };

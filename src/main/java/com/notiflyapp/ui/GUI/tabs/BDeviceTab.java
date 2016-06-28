@@ -153,16 +153,17 @@ public class BDeviceTab extends TabHouse {
         deviceInfo = client.getDeviceInfo();
         setTitle(client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         if(!client.isConnected()) {
-            Houston.getHandler().send(() -> {
+            Runnable runnable = () -> {
                 try {
                     Thread.sleep(gracePeriod);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 if(!this.getBluetoothClient().isConnected()) {
-                    Houston.getInstance().removeTab(this);
+                    Houston.getHandler().send(() -> Houston.getInstance().removeTab(this));
                 }
-            });
+            };
+            (new Thread(runnable)).start();
         }
     }
 
