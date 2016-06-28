@@ -1,5 +1,6 @@
 package com.notiflyapp.data.requestframework;
 
+import com.notiflyapp.data.ConversationThread;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 
 import java.util.HashMap;
@@ -12,26 +13,7 @@ public class RequestHandler {
     public final static class RequestCode {
 
         public final static String CONTACT_BY_THREAD_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.CONTACT_BY_THREAD_ID";
-            /**
-             * @type String[]
-             * This is a String array that will contain the contact ids of all contacts associated with given thread id
-             */
-            public final static String EXTRA_CONTACT_BY_THREAD_ID_CONTACT_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_CONTACT_ID";
-            /**
-             * @type String[]
-             * This is a String array that will contain the names of all contacts associated with given thread id
-             */
-            public final static String EXTRA_CONTACT_BY_THREAD_ID_NAME = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME";
-            /**
-             * @type String[]
-             * This is a String array that will contain the phone numbers of all contacts associated with given thread id
-             */
-            public final static String EXTRA_CONTACT_BY_THREAD_ID_PHONE_NUMBER = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_PHONE_NUMBER";
-            /**
-             * @type Byte[][]
-             * This is a 2-dimensional byte array that will contain the the images (int byte[] form) of all contacts associated with given thread id
-             */
-            public final static String EXTRA_CONTACT_BY_THREAD_ID_IMAGE = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_IMAGE";
+            public final static String EXTRA_CONTACT_BY_THREAD_ID_THREAD = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD";
 
     }
 
@@ -58,14 +40,12 @@ public class RequestHandler {
 
     public void handleRequest(BluetoothClient client, Request request) {
         clientHashMap.put(request.getExtra().toString(), client);
-        Response response = Response.makeResponse(request);
+        Response response;
         switch (request.getBody()) {
             case RequestCode.CONTACT_BY_THREAD_ID:
                 //Not relevant to current client, so null values will be sent
-                response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_CONTACT_ID, null);
-                response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME, null);
-                response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_PHONE_NUMBER, null);
-                response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_IMAGE, null);
+                response = Response.makeResponse(request, ConversationThread.class);
+                response.setData(null);
                 break;
             default:
                 //TODO handle if the given key does not match any of the defined request codes

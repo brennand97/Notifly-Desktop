@@ -1,9 +1,8 @@
-package com.notiflyapp.ui.GUI;
+package com.notiflyapp.ui.GUI.tabs;
 
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
-import com.notiflyapp.data.requestframework.Response;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
@@ -27,11 +26,14 @@ public class ThreadCell {
     private ImageView imageView;
 
     private BluetoothClient client;
+    private BDeviceTab house;
     private int threadId;
     private String name;
+    private ConversationThread thread;
 
-    public ThreadCell(BluetoothClient client, int threadId) {
+    public ThreadCell(BluetoothClient client, BDeviceTab house, int threadId) {
         this.client = client;
+        this.house = house;
         this.threadId = threadId;
         try {
             retrieveContact();
@@ -78,7 +80,23 @@ public class ThreadCell {
         request.putExtra(UUID.randomUUID());
         request.putRequestValue(String.valueOf(threadId));
         RequestHandler.ResponseCallback callback = (request1, response) -> {
-            //System.out.println("Contact name : " + response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME));
+            System.out.println(response.getData());
+            /*
+            thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
+            Contact[] contacts = thread.getContacts();
+            if(contacts.length > 1) {
+                StringBuilder b = new StringBuilder();
+                for(int i = 0; i < contacts.length; i++) {
+                    b.append(contacts[i].getBody());
+                    if(i < contacts.length - 1) {
+                        b.append(", ");
+                    }
+                }
+            } else {
+                name = contacts[0].getBody();
+            }
+            house.updateName(this);
+            */
         };
         RequestHandler.getInstance().sendRequest(client, request, callback);
     }

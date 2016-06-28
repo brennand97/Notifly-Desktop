@@ -3,10 +3,12 @@ package com.notiflyapp.servers.bluetooth;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.MalformedJsonException;
+import com.notiflyapp.data.ConversationThread;
 import com.notiflyapp.data.DataObject;
-import com.notiflyapp.data.Serial;
-import com.notiflyapp.data.Status;
+import com.notiflyapp.data.requestframework.Response;
+import com.notiflyapp.data.requestframework.RequestHandler;
 
 import javax.microedition.io.StreamConnection;
 import java.io.*;
@@ -138,6 +140,16 @@ class ClientThread extends Thread{
                 break;
             case DataObject.Type.RESPONSE:
                 obj = gson.fromJson(json, com.notiflyapp.data.requestframework.Response.class);
+                break;
+            case DataObject.Type.CONTACT:
+                switch (json.get("body").toString().replace("\"", "")) {
+                    case RequestHandler.RequestCode.CONTACT_BY_THREAD_ID:
+                        obj = gson.fromJson(json, new TypeToken<Response<ConversationThread>>(){}.getType());
+                        break;
+                }
+                break;
+            case DataObject.Type.CONVERSATIONTHREAD:
+                obj = gson.fromJson(json, com.notiflyapp.data.ConversationThread.class);
                 break;
         }
         client.receivedMsg(obj);

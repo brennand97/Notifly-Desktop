@@ -8,11 +8,8 @@ import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
-import com.notiflyapp.ui.GUI.ThreadCell;
 import com.sun.glass.ui.Application;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.AccessibleAttribute;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
@@ -108,7 +105,7 @@ public class BDeviceTab extends TabHouse {
                 return;
             }
         }
-        ThreadCell cell = new ThreadCell(client, threadId);
+        ThreadCell cell = new ThreadCell(client, this, threadId);
         threadCells.add(cell);
         threadView.getItems().add(cell.getNode());
     }
@@ -130,6 +127,18 @@ public class BDeviceTab extends TabHouse {
                         newMessage((MMS) msg);
                         break;
                 }
+            }
+        }
+    }
+
+    protected void updateName(ThreadCell cell) {
+        if(current.equals(cell)) {
+            nameLabel.setText(cell.getName());
+        }
+        for(int i = 0; i < threadCells.size(); i++) {
+            if(threadCells.get(i).equals(cell)) {
+                threadView.getItems().remove(i);
+                threadView.getItems().add(i, cell.getNode());
             }
         }
     }
