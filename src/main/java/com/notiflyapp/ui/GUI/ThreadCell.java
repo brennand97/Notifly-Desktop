@@ -76,6 +76,7 @@ public class ThreadCell {
         Request request = new Request();
         request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
         request.putExtra(UUID.randomUUID());
+        request.putRequestValue(String.valueOf(threadId));
         RequestHandler.ResponseCallback callback = (request1, response) -> {
             //System.out.println("Contact name : " + response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_NAME));
         };
