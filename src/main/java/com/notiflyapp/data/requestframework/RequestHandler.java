@@ -40,12 +40,11 @@ public class RequestHandler {
 
     public void handleRequest(BluetoothClient client, Request request) {
         clientHashMap.put(request.getExtra().toString(), client);
-        Response response;
+        Response response = Response.makeResponse(request);
         switch (request.getBody()) {
             case RequestCode.CONTACT_BY_THREAD_ID:
                 //Not relevant to current client, so null values will be sent
-                response = Response.makeResponse(request, ConversationThread.class);
-                response.setData(null);
+                response.putItem(RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD, null);
                 break;
             default:
                 //TODO handle if the given key does not match any of the defined request codes

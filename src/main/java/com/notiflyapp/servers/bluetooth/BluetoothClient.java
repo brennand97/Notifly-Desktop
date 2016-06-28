@@ -102,13 +102,9 @@ public class BluetoothClient {
         }
         switch (msg.getType()) {
             case DataObject.Type.SMS:
-                try {
-                    DateFormat df = DateFormat.getDateTimeInstance();
-                    serverOutNoLog("(" + msg.serialize().length + ") " + ((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
-                    Houston.getHandler().send(() -> Houston.getInstance().incomingMessage(this, msg));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                DateFormat df = DateFormat.getDateTimeInstance();
+                serverOutNoLog(((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
+                Houston.getHandler().send(() -> Houston.getInstance().incomingMessage(this, msg));
                 break;
             case DataObject.Type.MMS:
                 break;

@@ -1,20 +1,22 @@
 package com.notiflyapp.servers.bluetooth;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.MalformedJsonException;
 import com.notiflyapp.data.ConversationThread;
 import com.notiflyapp.data.DataObject;
+import com.notiflyapp.data.DataObjectDeserializer;
 import com.notiflyapp.data.requestframework.Response;
 import com.notiflyapp.data.requestframework.RequestHandler;
+import com.notiflyapp.data.requestframework.ResponseDeserializer;
 
 import javax.microedition.io.StreamConnection;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.StringJoiner;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
@@ -118,11 +120,14 @@ class ClientThread extends Thread{
 
     private void dataIn(byte[] data) throws MalformedJsonException, JsonSyntaxException {
         String str = new String(data);
-        Gson gson = new Gson();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Response.class, new ResponseDeserializer());
+        gsonBuilder.registerTypeAdapter(DataObject.class, new DataObjectDeserializer());
+        Gson gson = gsonBuilder.create();
         //serverOut(str);
         JsonObject json = gson.fromJson(str, JsonObject.class);
         DataObject obj = null;
-        switch (json.get("type").toString().replace("\"","")) {
+        switch (json.get("type").getAsString()) {
             case DataObject.Type.SMS:
                 obj = gson.fromJson(json, com.notiflyapp.data.SMS.class);
                 break;
@@ -142,13 +147,9 @@ class ClientThread extends Thread{
                 obj = gson.fromJson(json, com.notiflyapp.data.requestframework.Response.class);
                 break;
             case DataObject.Type.CONTACT:
-                switch (json.get("body").toString().replace("\"", "")) {
-                    case RequestHandler.RequestCode.CONTACT_BY_THREAD_ID:
-                        obj = gson.fromJson(json, new TypeToken<Response<ConversationThread>>(){}.getType());
-                        break;
-                }
+                obj = gson.fromJson(json, com.notiflyapp.data.Contact.class);
                 break;
-            case DataObject.Type.CONVERSATIONTHREAD:
+            case DataObject.Type.CONVERSATION_THREAD:
                 obj = gson.fromJson(json, com.notiflyapp.data.ConversationThread.class);
                 break;
         }

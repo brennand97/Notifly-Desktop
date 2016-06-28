@@ -7,6 +7,7 @@ import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
+import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -80,8 +81,6 @@ public class ThreadCell {
         request.putExtra(UUID.randomUUID());
         request.putRequestValue(String.valueOf(threadId));
         RequestHandler.ResponseCallback callback = (request1, response) -> {
-            System.out.println(response.getData());
-            /*
             thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
             Contact[] contacts = thread.getContacts();
             if(contacts.length > 1) {
@@ -95,8 +94,7 @@ public class ThreadCell {
             } else {
                 name = contacts[0].getBody();
             }
-            house.updateName(this);
-            */
+            Application.invokeLater(() -> house.updateName(this));
         };
         RequestHandler.getInstance().sendRequest(client, request, callback);
     }
