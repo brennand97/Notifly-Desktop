@@ -66,6 +66,8 @@ class ClientThread extends Thread{
                 //serverOut(String.valueOf(headerValue));
                 byte[] buffer = new byte[headerValue];
                 bytes = iStream.read(buffer);
+                //****************************************************************
+                //Crucial for successful packet retrieval
                 while(bytes < headerValue) {
                     byte[] newBuffer = new byte[headerValue - bytes];
                     bytes += iStream.read(newBuffer);
@@ -73,6 +75,7 @@ class ClientThread extends Thread{
                         buffer[headerValue - newBuffer.length + i] = newBuffer[i];
                     }
                 }
+                //***************************************************************
                 //serverOut(String.valueOf(bytes));
                 if (bytes == -1) {
                     serverOut("Client session dropped");
