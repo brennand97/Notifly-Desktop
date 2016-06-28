@@ -136,9 +136,10 @@ public class BDeviceTab extends TabHouse {
             nameLabel.setText(cell.getName());
         }
         for(int i = 0; i < threadCells.size(); i++) {
-            if(threadCells.get(i).equals(cell)) {
+            if(threadCells.get(i).getThreadId() == cell.getThreadId()) {
                 threadView.getItems().remove(i);
                 threadView.getItems().add(i, cell.getNode());
+
             }
         }
     }

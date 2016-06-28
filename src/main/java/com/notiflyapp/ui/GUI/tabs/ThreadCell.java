@@ -62,6 +62,11 @@ public class ThreadCell {
     }
 
     public Node getNode() {
+        try {
+            createNode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return node;
     }
 
