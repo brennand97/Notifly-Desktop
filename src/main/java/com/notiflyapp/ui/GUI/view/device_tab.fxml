@@ -22,7 +22,7 @@
                      <children>
                         <AnchorPane id="active_conversation_title_bar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="441.0">
                            <children>
-                              <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" text="Label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" text="Start Conversation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <font>
                                     <Font size="24.0" />
                                  </font></Label>

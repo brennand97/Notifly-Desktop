@@ -200,6 +200,19 @@ public class Houston {
         tabPane.getTabs().remove(tab.getTab());
     }
 
+    public void clearMessages() {
+        try {
+            DatabaseFactory.getInstance().dropMessageTables();
+            for(TabHouse tabHouse: tabs) {
+                if(tabHouse instanceof BDeviceTab) {
+                    ((BDeviceTab) tabHouse).clearMessages();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public class UIHandler extends Thread {
 
         private ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1024);

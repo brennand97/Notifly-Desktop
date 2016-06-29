@@ -2,6 +2,7 @@ package com.notiflyapp.database;
 
 import com.notiflyapp.data.DeviceInfo;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -57,6 +58,13 @@ public class DatabaseFactory {
         MessageDatabase md = new MessageDatabase(mac);
         getInstance().messages.add(md);
         return md;
+    }
+
+    public void dropMessageTables() throws SQLException {
+        for(MessageDatabase d: messages) {
+            d.drop(d.TABLE_NAME);
+        }
+        messages.clear();
     }
 
 }

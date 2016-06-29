@@ -115,7 +115,7 @@ public abstract class Database {
         stmt.executeUpdate("DELETE FROM " + table + " WHERE " + ID + "=" + id + ";");
     }
 
-    public void clear(String table) throws SQLException {
+    public void drop(String table) throws SQLException {
         stmt.executeUpdate("DROP TABLE IF EXISTS " + table + ";");
     }
 

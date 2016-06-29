@@ -148,6 +148,14 @@ public class BDeviceTab extends TabHouse {
         messageView.getItems().clear();
     }
 
+    private void clearThreadListView() { threadView.getItems().clear(); }
+
+    public void clearMessages() {
+        clearMessageListView();
+        clearThreadListView();
+        nameLabel.setText("Start Conversation");
+    }
+
     @Override
     public void refresh() {
         deviceInfo = client.getDeviceInfo();
