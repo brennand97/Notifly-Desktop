@@ -165,7 +165,7 @@ public class ContactDatabase extends MacDatabase {
      * @param s any unformatted incoming phone number.
      * @return formatted phone number.
      */
-    private static String formatPhoneNumber(String s) {
+    static String formatPhoneNumber(String s) {
         String raw = s.replace(" ", "").replace("(", "").replace(")", "").replace("+", "").replace("-", "");
         if(raw.substring(0, 1).equals("1") && raw.length() == 11 && s.contains("+")) {
             raw = raw.substring(1);

@@ -33,6 +33,7 @@ public class BDeviceTab extends TabHouse {
     private ListView<Node> threadView;
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private ListView<Node> messageView;
+    private ArrayList<DataObject> messages = new ArrayList<>();
     private Label nameLabel;
 
     private ThreadCell current;
@@ -145,6 +146,7 @@ public class BDeviceTab extends TabHouse {
     }
 
     private void clearMessageListView() {
+        messages.clear();
         messageView.getItems().clear();
     }
 
@@ -195,6 +197,11 @@ public class BDeviceTab extends TabHouse {
             case DataObject.Type.SMS:
                 SMS sms = (SMS) object;
                 if(sms.getThreadId() == current.getThreadId()) {
+                    for(DataObject s: messages) {
+                        if(s.equals(sms)) {
+                            break;
+                        }
+                    }
                     newMessage(sms);
                 } else {
                     addThreadCell(sms.getThreadId());
@@ -221,6 +228,7 @@ public class BDeviceTab extends TabHouse {
             text.setTextAlignment(TextAlignment.LEFT);
             textFlow.getChildren().add(text);
             messageView.getItems().add(node);
+            messages.add(sms);
             messageView.scrollTo(node);
         } catch (IOException e) {
             e.printStackTrace();

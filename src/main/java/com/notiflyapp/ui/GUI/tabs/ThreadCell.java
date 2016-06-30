@@ -36,17 +36,7 @@ public class ThreadCell {
         this.client = client;
         this.house = house;
         this.threadId = threadId;
-        try {
-            thread = DatabaseFactory.getThreadDatabase(client.getDeviceMac()).queryThread(threadId);
-            if( thread != null ) {
-                handleContact(thread);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if(thread == null) {
-            retrieveContact();
-        }
+        retrieveContact();
         try {
             createNode();
         } catch (IOException e) {
@@ -91,18 +81,30 @@ public class ThreadCell {
 
     private void retrieveContact() {
         //TODO retrieve name from future threadId database received from device
-        Request request = new Request();
-        request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
-        request.putExtra(UUID.randomUUID());
-        request.putRequestValue(String.valueOf(threadId));
-        RequestHandler.ResponseCallback callback = (request1, response) -> {
-            try {
-                handleContact((ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD));
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            thread = DatabaseFactory.getThreadDatabase(client.getDeviceMac()).queryThread(threadId);
+            if(thread != null) {
+                handleContact(thread);
             }
-        };
-        RequestHandler.getInstance().sendRequest(client, request, callback);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(thread == null) {
+            Request request = new Request();
+            request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
+            request.putExtra(UUID.randomUUID());
+            request.putRequestValue(String.valueOf(threadId));
+            RequestHandler.ResponseCallback callback = (request1, response) -> {
+                thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
+                try {
+                    handleContact(thread);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            };
+            RequestHandler.getInstance().sendRequest(client, request, callback);
+        }
+
     }
 
     private void handleContact(ConversationThread thread) throws SQLException {
@@ -112,7 +114,10 @@ public class ThreadCell {
         if(contacts.length > 1) {
             StringBuilder b = new StringBuilder();
             for(int i = 0; i < contacts.length; i++) {
-                DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[i]);
+                if(contacts[i].getBody() != null) {
+                    //TODO only insert if has actual contactId;
+                    DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[i]);
+                }
                 if(contacts[i].getBody() == null) {
                     b.append(contacts[i].getExtra());
                 } else {
@@ -123,7 +128,10 @@ public class ThreadCell {
                 }
             }
         } else if(contacts.length != 0){
-            DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[0]);
+            if(contacts[0].getBody() != null) {
+                //TODO only insert if has actual contactId;
+                DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[0]);
+            }
             if(contacts[0].getBody() == null) {
                 name = contacts[0].getExtra();
             } else {
