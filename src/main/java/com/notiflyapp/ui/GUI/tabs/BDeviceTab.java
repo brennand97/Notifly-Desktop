@@ -68,24 +68,14 @@ public class BDeviceTab extends TabHouse {
 
     private void initialize() {
         threadView = (ListView<Node>) tab.getContent().lookup("#thread_list_view");
-        threadView.setOnMouseClicked(event -> selectThread(threadView.getSelectionModel().getSelectedIndex()));
-        messageView = (ListView<Node>) tab.getContent().lookup("#active_conversation_message_list_view");
-        smsMaxWidth = (messageView.getWidth() * 0.75);
-        System.out.println("smsMaxWidth : " + smsMaxWidth);
-        /*
-        messageView.setOnMouseClicked(event -> {
-            double tmpSmsMaxWidth = (messageView.getWidth() * 0.75);
-            if(tmpSmsMaxWidth != smsMaxWidth) {
-                smsMaxWidth = tmpSmsMaxWidth;
-                System.out.println("smsMaxWidth : " + smsMaxWidth);
-                for(Node node: messageView.getItems()) {
-                    //TODO correct for double sided conversation with "gravity"
-                    node.prefWidth(smsMaxWidth);
-                    node.lookup("#message_text").prefWidth(smsMaxWidth);
-                }
+        threadView.setOnMouseClicked(event ->  {
+            int index = threadView.getSelectionModel().getSelectedIndex();
+            if(index != -1) {
+                selectThread(threadView.getSelectionModel().getSelectedIndex());
             }
         });
-        */
+        messageView = (ListView<Node>) tab.getContent().lookup("#active_conversation_message_list_view");
+        smsMaxWidth = (messageView.getWidth() * 0.75);
         nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
         try {
             int[] threadIds = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getThreadIds();
@@ -97,6 +87,18 @@ public class BDeviceTab extends TabHouse {
             }
         } catch (SQLException | NullResultSetException | NullPointerException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void handleResize(double newSceneWidth) {
+        double tmpSmsMaxWidth = (messageView.getWidth() * 0.75);
+        if(tmpSmsMaxWidth != smsMaxWidth) {
+            smsMaxWidth = tmpSmsMaxWidth;
+            for(Node node: messageView.getItems()) {
+                //TODO correct for double sided conversation with "gravity"
+                ((TextFlow) node.lookup("#message_text")).prefWidthProperty().set(smsMaxWidth);
+            }
         }
     }
 

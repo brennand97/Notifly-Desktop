@@ -12,6 +12,8 @@ import com.notiflyapp.ui.GUI.tabs.BDeviceTab;
 import com.notiflyapp.ui.GUI.tabs.HomeTab;
 import com.notiflyapp.ui.GUI.tabs.TabHouse;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -65,6 +67,12 @@ public class Houston {
         houston.tabPane.getTabs().add(homeTab);
         HomeTab home = new HomeTab(homeTab, "Home");
         houston.tabs.add(home);
+
+        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+            for(TabHouse tab: houston.tabs) {
+                tab.handleResize(newSceneWidth.doubleValue());
+            }
+        });
     }
 
     public static Houston getInstance() {

@@ -18,6 +18,8 @@ public abstract class TabHouse {
 
     public abstract void refresh();
 
+    public abstract void handleResize(double newSceneWidth);
+
     public String getTitle() {
         return title;
     }

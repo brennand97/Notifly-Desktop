@@ -25,4 +25,9 @@ public class HomeTab extends TabHouse {
         //Maybe do something at a latter date
     }
 
+    @Override
+    public void handleResize(double newSceneWidth) {
+
+    }
+
 }
