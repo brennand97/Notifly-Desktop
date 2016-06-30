@@ -15,10 +15,10 @@ public class ConversationThread extends DataObject<ArrayList<Contact>, Integer> 
     private boolean archived = false;
     private String date;
 
-
     public ConversationThread() {
         super();
         this.type = Type.CONVERSATION_THREAD;
+        body = new ArrayList<>();
     }
 
     public void setArchived(boolean archived) {

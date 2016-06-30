@@ -72,7 +72,7 @@ public class ContactDatabase extends MacDatabase {
             e.printStackTrace();
         }
         if(rs != null) {
-            if(rs.first()) {
+            if(rs.next()) {
                 Contact c = makeContact(rs);
                 rs.close();
                 return c;
@@ -121,7 +121,7 @@ public class ContactDatabase extends MacDatabase {
             e.printStackTrace();
         }
         if(rs != null) {
-            if(rs.first()) {
+            if(rs.next()) {
                 int id = rs.getInt(ID);
                 rs.close();
                 return id;

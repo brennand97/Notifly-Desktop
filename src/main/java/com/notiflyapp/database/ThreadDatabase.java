@@ -18,6 +18,7 @@ public class ThreadDatabase extends MacDatabase {
     public final static String THREAD_ID = "thread_id";
     public final static String ARCHIVED = "archived";
     public final static String DATE = "date";
+    public final static String ADDRESS = "address";
     public final static String CONTACT_IDS = "contact_ids";
 
     public ThreadDatabase(String mac) {
@@ -28,7 +29,7 @@ public class ThreadDatabase extends MacDatabase {
     protected String getCreateTableString() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY, " +
                 THREAD_ID + " INTEGER, " + ARCHIVED + " INTEGER, " + DATE + " TEXT, " +
-                CONTACT_IDS + " TEXT);";
+                ADDRESS + " TEXT, " + CONTACT_IDS + " TEXT);";
     }
 
     @Override
@@ -39,10 +40,11 @@ public class ThreadDatabase extends MacDatabase {
     public void insert(ConversationThread thread) throws SQLException {
         StringBuilder call = new StringBuilder();
         call.append("INSERT INTO ").append(TABLE_NAME).append(" (").append(THREAD_ID).append(", ").append(ARCHIVED)
-                .append(", ").append(DATE).append(", ").append(CONTACT_IDS).append(") VALUES (");
+                .append(", ").append(DATE).append(", ").append(ADDRESS).append(", ").append(CONTACT_IDS).append(") VALUES (");
         call.append(thread.getExtra()).append(", ");
         call.append(thread.isArchived() ? 1 : 0).append(", ");
         call.append("\"").append(thread.getDate()).append("\"").append(", ");
+        call.append("\"").append(formatAddresses(thread.getContacts())).append("\"").append(", ");
         call.append("\"").append(formatContactIds(thread.getContacts())).append("\"").append(");");
         stmt.executeUpdate(call.toString());
     }
@@ -58,11 +60,12 @@ public class ThreadDatabase extends MacDatabase {
     public void update(ConversationThread thread) throws SQLException {
         StringBuilder call = new StringBuilder();
         call.append("INSERT OR REPLACE INTO ").append(TABLE_NAME).append(" (").append(ID).append(", ").append(THREAD_ID).append(", ").append(ARCHIVED)
-                .append(", ").append(DATE).append(", ").append(CONTACT_IDS).append(") VALUES (");
+                .append(", ").append(DATE).append(", ").append(ADDRESS).append(", ").append(CONTACT_IDS).append(") VALUES (");
         call.append(String.valueOf(getId(thread))).append(", ");
         call.append(thread.getExtra()).append(", ");
         call.append(thread.isArchived() ? 1 : 0).append(", ");
         call.append("\"").append(thread.getDate()).append("\"").append(", ");
+        call.append("\"").append(formatAddresses(thread.getContacts())).append("\"").append(", ");
         call.append("\"").append(formatContactIds(thread.getContacts())).append("\"").append(");");
         stmt.executeUpdate(call.toString());
     }
@@ -75,7 +78,7 @@ public class ThreadDatabase extends MacDatabase {
             e.printStackTrace();
         }
         if(rs != null) {
-            if(rs.first()) {
+            if(rs.next()) {
                 ConversationThread thread = makeConversationThread(rs);
                 rs.close();
                 return thread;
@@ -124,7 +127,7 @@ public class ThreadDatabase extends MacDatabase {
             e.printStackTrace();
         }
         if(rs != null) {
-            if(rs.first()) {
+            if(rs.next()) {
                 int id = rs.getInt(ID);
                 rs.close();
                 return id;
@@ -146,8 +149,30 @@ public class ThreadDatabase extends MacDatabase {
         thread.putExtra(rs.getInt(THREAD_ID));
         thread.setArchived(rs.getInt(ARCHIVED) == 1);
         thread.setDate(rs.getString(DATE));
-        for(String s: rs.getString(CONTACT_IDS).split(" ")) {
-            thread.addContact(makeContact(Integer.parseInt(s)));
+        String address = rs.getString(ADDRESS);
+        String contactIds = rs.getString(CONTACT_IDS);
+        if(contactIds != null || contactIds.equals("")) {
+            for(String s: contactIds.split(" ")) {
+                if(s.equals("")) {
+                    continue;
+                }
+                Contact c = makeContact(Integer.parseInt(s));
+                if(c != null) {
+                    thread.addContact(c);
+                }
+            }
+        }
+        Contact[] contacts = thread.getContacts();
+        outerLoop:
+        for(String s: address.split(";")) {
+            for(int i = 0; i < contacts.length; i++) {
+                if(contacts[i].getExtra().equals(s)) {
+                    continue outerLoop;
+                }
+            }
+            Contact c = new Contact();
+            c.putExtra(s);
+            thread.addContact(c);
         }
         return thread;
     }
@@ -167,6 +192,17 @@ public class ThreadDatabase extends MacDatabase {
     private Contact makeContact(int contactId) throws SQLException {
         ContactDatabase cd = DatabaseFactory.getContactDatabase(macAddress);
         return cd.queryContact(contactId);
+    }
+
+    private String formatAddresses(Contact[] contacts) {
+        StringBuilder b = new StringBuilder();
+        for(int i = 0; i < contacts.length; i++) {
+            b.append(contacts[i].getExtra());
+            if(i < contacts.length - 1) {
+                b.append(";");
+            }
+        }
+        return b.toString();
     }
 
     private String formatContactIds(Contact[] contacts) {

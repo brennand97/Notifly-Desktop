@@ -184,7 +184,7 @@ public class MessageDatabase extends MacDatabase {
     public int getId(SMS sms) throws SQLException, UnequalArraysException {
         ResultSet rs = query(TABLE_NAME, null, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()}, null, null);
         if(rs != null) {
-            if(rs.first()) {
+            if(rs.next()) {
                 int id = rs.getInt(ID);
                 rs.close();
                 return id;

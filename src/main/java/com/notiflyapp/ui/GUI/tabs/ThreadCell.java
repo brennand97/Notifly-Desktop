@@ -37,7 +37,17 @@ public class ThreadCell {
         this.house = house;
         this.threadId = threadId;
         try {
+            thread = DatabaseFactory.getThreadDatabase(client.getDeviceMac()).queryThread(threadId);
+            if( thread != null ) {
+                handleContact(thread);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(thread == null) {
             retrieveContact();
+        }
+        try {
             createNode();
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,17 +96,23 @@ public class ThreadCell {
         request.putExtra(UUID.randomUUID());
         request.putRequestValue(String.valueOf(threadId));
         RequestHandler.ResponseCallback callback = (request1, response) -> {
-            handleContact((ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD));
+            try {
+                handleContact((ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         };
         RequestHandler.getInstance().sendRequest(client, request, callback);
     }
 
-    private void handleContact(ConversationThread thread) {
+    private void handleContact(ConversationThread thread) throws SQLException {
         this.thread = thread;
+        DatabaseFactory.getThreadDatabase(client.getDeviceMac()).nonDuplicateInsert(thread);
         Contact[] contacts = thread.getContacts();
         if(contacts.length > 1) {
             StringBuilder b = new StringBuilder();
             for(int i = 0; i < contacts.length; i++) {
+                DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[i]);
                 if(contacts[i].getBody() == null) {
                     b.append(contacts[i].getExtra());
                 } else {
@@ -106,12 +122,15 @@ public class ThreadCell {
                     b.append(", ");
                 }
             }
-        } else {
+        } else if(contacts.length != 0){
+            DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[0]);
             if(contacts[0].getBody() == null) {
                 name = contacts[0].getExtra();
             } else {
                 name = contacts[0].getBody();
             }
+        } else {
+            name = String.valueOf(threadId);
         }
         Application.invokeLater(() -> house.updateName(this));
     }
