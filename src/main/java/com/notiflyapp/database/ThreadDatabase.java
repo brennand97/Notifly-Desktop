@@ -57,7 +57,7 @@ public class ThreadDatabase extends MacDatabase {
 
     public void update(ConversationThread thread) throws SQLException {
         StringBuilder call = new StringBuilder();
-        call.append("INSERT INTO ").append(TABLE_NAME).append(" (").append(ID).append(", ").append(THREAD_ID).append(", ").append(ARCHIVED)
+        call.append("INSERT OR REPLACE INTO ").append(TABLE_NAME).append(" (").append(ID).append(", ").append(THREAD_ID).append(", ").append(ARCHIVED)
                 .append(", ").append(DATE).append(", ").append(CONTACT_IDS).append(") VALUES (");
         call.append(String.valueOf(getId(thread))).append(", ");
         call.append(thread.getExtra()).append(", ");
@@ -86,7 +86,7 @@ public class ThreadDatabase extends MacDatabase {
         return getAllConversationThreads(rs, true);
     }
 
-    public ConversationThread[] getAllThreads() throws SQLException{
+    public ConversationThread[] getAllThreads() throws SQLException {
         ResultSet rs = null;
         try {
             rs = query(TABLE_NAME, null, null, null, null, null);
@@ -106,10 +106,12 @@ public class ThreadDatabase extends MacDatabase {
         } catch (UnequalArraysException e) {
             e.printStackTrace();
         }
-        if(rs != null && rs.first()) {
-            int id = rs.getInt(ID);
-            rs.close();
-            return id;
+        if(rs != null) {
+            if(rs.first()) {
+                int id = rs.getInt(ID);
+                rs.close();
+                return id;
+            }
         }
         return -1;
     }

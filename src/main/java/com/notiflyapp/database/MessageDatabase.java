@@ -174,10 +174,12 @@ public class MessageDatabase extends MacDatabase {
 
     public int getId(SMS sms) throws SQLException, UnequalArraysException {
         ResultSet rs = query(TABLE_NAME, null, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()}, null, null);
-        if(rs != null && rs.first()) {
-            int id = rs.getInt(ID);
-            rs.close();
-            return id;
+        if(rs != null) {
+            if(rs.first()) {
+                int id = rs.getInt(ID);
+                rs.close();
+                return id;
+            }
         }
         return -1;
     }
@@ -210,6 +212,7 @@ public class MessageDatabase extends MacDatabase {
         return null;
     }
 
+    @Deprecated     //The function in the new super class should be used instead.
     String formatMac(String mac) {
         String[] split = mac.split(":");
         if(split.length == 6) {
