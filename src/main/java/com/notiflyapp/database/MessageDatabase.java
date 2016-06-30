@@ -13,13 +13,9 @@ import java.util.ArrayList;
 /**
  * Created by Brennan on 6/8/2016.
  */
-public class MessageDatabase extends Database {
+public class MessageDatabase extends MacDatabase {
 
     private final static String TABLE_NAME_PREFIX = "messages_";
-    private String macAddress;
-
-    protected String TABLE_NAME;
-    protected String CREATE_TABLE;
 
     private static final String ADDRESS = "address";
     private static final String ORIGINATING_ADDRESS = "originating_address";
@@ -37,18 +33,20 @@ public class MessageDatabase extends Database {
     private static final String TYPE_MMS = "mms";
 
     public MessageDatabase(String mac) {
-        macAddress = formatMac(mac);
-        this.TABLE_NAME = TABLE_NAME_PREFIX + formatMac(macAddress);
-        this.CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY, " +
-                ADDRESS + " TEXT, " + ORIGINATING_ADDRESS + " TEXT, " + BODY + " TEXT, " + CREATOR + " TEXT, " +
-                DATE + " INTEGER, " + DATE_SENT + " INTEGER, " + PERSON + " TEXT, " + READ + " INTEGER, " + SUBSCRIPTION_ID + " INTEGER, " +
-                THREAD_ID + " INTEGER, " + TYPE + " STRING);";
-        super.initialize();
+        super(mac);
+    }
+
+    @Override
+    protected String getTableNamePrefix() {
+        return TABLE_NAME_PREFIX;
     }
 
     @Override
     protected String getCreateTableString() {
-        return CREATE_TABLE;
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY, " +
+                ADDRESS + " TEXT, " + ORIGINATING_ADDRESS + " TEXT, " + BODY + " TEXT, " + CREATOR + " TEXT, " +
+                DATE + " INTEGER, " + DATE_SENT + " INTEGER, " + PERSON + " TEXT, " + READ + " INTEGER, " + SUBSCRIPTION_ID + " INTEGER, " +
+                THREAD_ID + " INTEGER, " + TYPE + " STRING);";
     }
 
     public void insert(SMS sms) throws SQLException {
@@ -176,13 +174,11 @@ public class MessageDatabase extends Database {
 
     public int getId(SMS sms) throws SQLException, UnequalArraysException {
         ResultSet rs = query(TABLE_NAME, null, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()}, null, null);
-        if(rs != null) {
-            rs.next();
+        if(rs != null && rs.first()) {
             int id = rs.getInt(ID);
             rs.close();
             return id;
         }
-        rs.close();
         return -1;
     }
 
@@ -210,6 +206,7 @@ public class MessageDatabase extends Database {
     }
 
     private MMS makeMms(ResultSet rs) throws SQLException {
+        //TODO fill with code to make an MMS object
         return null;
     }
 

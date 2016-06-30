@@ -86,30 +86,34 @@ public class ThreadCell {
         request.putExtra(UUID.randomUUID());
         request.putRequestValue(String.valueOf(threadId));
         RequestHandler.ResponseCallback callback = (request1, response) -> {
-            thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
-            Contact[] contacts = thread.getContacts();
-            if(contacts.length > 1) {
-                StringBuilder b = new StringBuilder();
-                for(int i = 0; i < contacts.length; i++) {
-                    if(contacts[i].getBody() == null) {
-                        b.append(contacts[i].getExtra());
-                    } else {
-                        b.append(contacts[i].getBody());
-                    }
-                    if(i < contacts.length - 1) {
-                        b.append(", ");
-                    }
-                }
-            } else {
-                if(contacts[0].getBody() == null) {
-                    name = contacts[0].getExtra();
-                } else {
-                    name = contacts[0].getBody();
-                }
-            }
-            Application.invokeLater(() -> house.updateName(this));
+            handleContact((ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD));
         };
         RequestHandler.getInstance().sendRequest(client, request, callback);
+    }
+
+    private void handleContact(ConversationThread thread) {
+        this.thread = thread;
+        Contact[] contacts = thread.getContacts();
+        if(contacts.length > 1) {
+            StringBuilder b = new StringBuilder();
+            for(int i = 0; i < contacts.length; i++) {
+                if(contacts[i].getBody() == null) {
+                    b.append(contacts[i].getExtra());
+                } else {
+                    b.append(contacts[i].getBody());
+                }
+                if(i < contacts.length - 1) {
+                    b.append(", ");
+                }
+            }
+        } else {
+            if(contacts[0].getBody() == null) {
+                name = contacts[0].getExtra();
+            } else {
+                name = contacts[0].getBody();
+            }
+        }
+        Application.invokeLater(() -> house.updateName(this));
     }
 
     public String getName() {
