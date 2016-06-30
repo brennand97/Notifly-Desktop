@@ -67,6 +67,23 @@ public class ThreadDatabase extends MacDatabase {
         stmt.executeUpdate(call.toString());
     }
 
+    public ConversationThread queryThread(int threadId) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = query(TABLE_NAME, null, new String[]{ THREAD_ID }, new String[]{ String.valueOf(threadId) }, null, null);
+        } catch (UnequalArraysException e) {
+            e.printStackTrace();
+        }
+        if(rs != null) {
+            if(rs.first()) {
+                ConversationThread thread = makeConversationThread(rs);
+                rs.close();
+                return thread;
+            }
+        }
+        return null;
+    }
+
     public ConversationThread[] queryThreads(int[] threadIds) throws SQLException {
         String[] selection = new String[threadIds.length];
         String[] values = new String[threadIds.length];
@@ -147,12 +164,9 @@ public class ThreadDatabase extends MacDatabase {
         return list.toArray(array);
     }
 
-    private Contact makeContact(int contactId) {
-        //TODO integrate with respective contact database
-        //This is just temp code until the above is complete
-        Contact c = new Contact();
-        c.setContactId(contactId);
-        return c;
+    private Contact makeContact(int contactId) throws SQLException {
+        ContactDatabase cd = DatabaseFactory.getContactDatabase(macAddress);
+        return cd.queryContact(contactId);
     }
 
     private String formatContactIds(Contact[] contacts) {

@@ -1,13 +1,9 @@
 package com.notiflyapp.database;
 
-import com.notiflyapp.data.DataObject;
-import com.notiflyapp.data.DeviceInfo;
-import com.notiflyapp.data.MMS;
-import com.notiflyapp.data.SMS;
+import com.notiflyapp.data.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -32,8 +28,21 @@ public class MessageDatabase extends MacDatabase {
     private static final String TYPE_SMS = "sms";
     private static final String TYPE_MMS = "mms";
 
+    private ThreadDatabase threadDatabase;
+    private ContactDatabase contactDatabase;
+
     public MessageDatabase(String mac) {
         super(mac);
+        threadDatabase = new ThreadDatabase(mac);
+        contactDatabase = new ContactDatabase(mac);
+    }
+
+    public ThreadDatabase getThreadDatabase() {
+        return threadDatabase;
+    }
+
+    public ContactDatabase getContactDatabase() {
+        return contactDatabase;
     }
 
     @Override
@@ -213,7 +222,7 @@ public class MessageDatabase extends MacDatabase {
     }
 
     @Deprecated     //The function in the new super class should be used instead.
-    String formatMac(String mac) {
+    String formatMacOld(String mac) {
         String[] split = mac.split(":");
         if(split.length == 6) {
             StringBuilder newMac = new StringBuilder();

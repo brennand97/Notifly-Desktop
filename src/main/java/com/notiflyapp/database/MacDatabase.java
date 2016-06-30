@@ -17,9 +17,13 @@ public abstract class MacDatabase extends Database {
         super.initialize();
     }
 
+    public String getMacAddress() {
+        return macAddress;
+    }
+
     protected abstract String getTableNamePrefix();
 
-    String formatMac(String mac) {
+    static String formatMac(String mac) {
         String[] split = mac.split(":");
         if(split.length == 6) {
             StringBuilder newMac = new StringBuilder();

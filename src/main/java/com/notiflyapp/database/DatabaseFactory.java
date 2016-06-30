@@ -1,6 +1,7 @@
 package com.notiflyapp.database;
 
 import com.notiflyapp.data.DeviceInfo;
+import com.notiflyapp.ui.GUI.tabs.ThreadCell;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class DatabaseFactory {
             throw new NullPointerException();
         }
         for(MessageDatabase md: getInstance().messages) {
-            if(md.formatMac(md.getMacAddress()).equals(md.formatMac(mac))) {
+            if(MacDatabase.formatMac(md.getMacAddress()).equals(md.formatMacOld(mac))) {
                 return md;
             }
         }
@@ -45,19 +46,14 @@ public class DatabaseFactory {
         return md;
     }
 
-    public static MessageDatabase getMessageDatabase(DeviceInfo di) throws NullPointerException {
-        String mac = di.getDeviceMac();
-        if(mac == null) {
-            throw new NullPointerException();
-        }
-        for(MessageDatabase md: getInstance().messages) {
-            if(md.formatMac(md.getMacAddress()).equals(md.formatMac(mac))) {
-                return md;
-            }
-        }
-        MessageDatabase md = new MessageDatabase(mac);
-        getInstance().messages.add(md);
-        return md;
+    public static ThreadDatabase getThreadDatabase(String mac) {
+        MessageDatabase md = getMessageDatabase(mac);
+        return md.getThreadDatabase();
+    }
+
+    public static ContactDatabase getContactDatabase(String mac) {
+        MessageDatabase md = getMessageDatabase(mac);
+        return md.getContactDatabase();
     }
 
     public void dropMessageTables() throws SQLException {
