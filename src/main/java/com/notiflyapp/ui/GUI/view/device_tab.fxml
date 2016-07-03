@@ -39,14 +39,14 @@
                                  <children>
                                     <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-5.0">
                                        <children>
-                                          <TextArea promptText="Send message" wrapText="true" HBox.hgrow="SOMETIMES">
+                                          <TextArea id="message_entry" promptText="Send message" wrapText="true" HBox.hgrow="SOMETIMES">
                                              <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
                                              </HBox.margin>
                                           </TextArea>
                                           <AnchorPane cacheShape="false" focusTraversable="true">
                                              <children>
-                                                <Button alignment="BOTTOM_CENTER" mnemonicParsing="false" text="Send" AnchorPane.topAnchor="5.0" />
+                                                <Button id="send_button" alignment="BOTTOM_CENTER" mnemonicParsing="false" text="Send" AnchorPane.bottomAnchor="0.0" />
                                              </children>
                                              <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

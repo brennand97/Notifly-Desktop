@@ -58,7 +58,7 @@ public class MessageDatabase extends MacDatabase {
                 THREAD_ID + " INTEGER, " + TYPE + " STRING);";
     }
 
-    public void insert(SMS sms) throws SQLException {
+    public int insert(SMS sms) throws SQLException {
         StringBuilder call = new StringBuilder();
         call.append("INSERT INTO ").append(TABLE_NAME).append("(").append(ADDRESS).append(", ").append(ORIGINATING_ADDRESS).append(", ")
                 .append(BODY).append(", ").append(CREATOR).append(", ").append(DATE).append(", ").append(DATE_SENT).append(", ").append(PERSON).append(", ")
@@ -75,14 +75,20 @@ public class MessageDatabase extends MacDatabase {
         call.append(sms.getThreadId()).append(", ");
         call.append("\"").append(TYPE_SMS).append("\"").append(");");
         stmt.executeUpdate(call.toString());
+        try {
+            return getId(sms);
+        } catch (UnequalArraysException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
-    public void update(SMS sms) throws UnequalArraysException, SQLException {
+    public int update(int id, SMS sms) throws UnequalArraysException, SQLException {
         StringBuilder call = new StringBuilder();
         call.append("INSERT OR REPLACE INTO ").append(TABLE_NAME).append("(").append(ID).append(", ").append(ADDRESS).append(", ").append(ORIGINATING_ADDRESS).append(", ")
                 .append(BODY).append(", ").append(CREATOR).append(", ").append(DATE).append(", ").append(DATE_SENT).append(", ").append(PERSON).append(", ")
                 .append(READ).append(", ").append(SUBSCRIPTION_ID).append(", ").append(THREAD_ID).append(", ").append(TYPE).append(") VALUES(");
-        call.append(getId(sms)).append(", ");
+        call.append(id).append(", ");
         call.append("\"").append(sms.getAddress()).append("\"").append(", ");
         call.append("\"").append(sms.getOriginatingAddress()).append("\"").append(", ");
         call.append("\"").append(sms.getBody()).append("\"").append(", ");
@@ -95,13 +101,19 @@ public class MessageDatabase extends MacDatabase {
         call.append(sms.getThreadId()).append(", ");
         call.append("\"").append(TYPE_SMS).append("\"").append(");");
         stmt.executeUpdate(call.toString());
+        try {
+            return getId(sms);
+        } catch (UnequalArraysException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
-    public void nonDuplicateInsert(SMS sms) throws UnequalArraysException, NullResultSetException, SQLException {
+    public int nonDuplicateInsert(SMS sms) throws UnequalArraysException, NullResultSetException, SQLException {
         if(has(sms)) {
-            update(sms);
+            return update(getId(sms), sms);
         } else {
-            insert(sms);
+            return insert(sms);
         }
     }
 
@@ -182,7 +194,7 @@ public class MessageDatabase extends MacDatabase {
     }
 
     public int getId(SMS sms) throws SQLException, UnequalArraysException {
-        ResultSet rs = query(TABLE_NAME, null, new String[]{ BODY, DATE, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDate()), sms.getPerson()}, null, null);
+        ResultSet rs = query(TABLE_NAME, null, new String[]{ BODY, DATE_SENT, PERSON }, new String[]{sms.getBody(), String.valueOf(sms.getDateSent()), sms.getPerson()}, null, null);
         if(rs != null) {
             if(rs.next()) {
                 int id = rs.getInt(ID);

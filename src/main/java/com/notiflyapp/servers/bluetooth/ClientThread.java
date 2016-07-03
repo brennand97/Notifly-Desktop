@@ -9,9 +9,7 @@ import com.google.gson.stream.MalformedJsonException;
 import com.notiflyapp.data.ConversationThread;
 import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.DataObjectDeserializer;
-import com.notiflyapp.data.requestframework.Response;
-import com.notiflyapp.data.requestframework.RequestHandler;
-import com.notiflyapp.data.requestframework.ResponseDeserializer;
+import com.notiflyapp.data.requestframework.*;
 
 import javax.microedition.io.StreamConnection;
 import java.io.*;
@@ -123,7 +121,9 @@ class ClientThread extends Thread{
         //serverOut(str);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Response.class, new ResponseDeserializer());
+        gsonBuilder.registerTypeAdapter(Request.class, new RequestDeserializer());
         gsonBuilder.registerTypeAdapter(DataObject.class, new DataObjectDeserializer());
+        gsonBuilder.serializeNulls();
         Gson gson = gsonBuilder.create();
         DataObject obj = gson.fromJson(str, DataObject.class);
         client.receivedMsg(obj);

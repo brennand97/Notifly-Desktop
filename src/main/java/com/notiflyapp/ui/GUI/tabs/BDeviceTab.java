@@ -1,17 +1,20 @@
 package com.notiflyapp.ui.GUI.tabs;
 
-import com.notiflyapp.data.DataObject;
-import com.notiflyapp.data.DeviceInfo;
-import com.notiflyapp.data.MMS;
-import com.notiflyapp.data.SMS;
+import com.notiflyapp.data.*;
+import com.notiflyapp.data.requestframework.Request;
+import com.notiflyapp.data.requestframework.RequestHandler;
+import com.notiflyapp.data.requestframework.Response;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
+import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
 import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -35,12 +38,15 @@ public class BDeviceTab extends TabHouse {
     private ListView<Node> messageView;
     private ArrayList<DataObject> messages = new ArrayList<>();
     private Label nameLabel;
+    private Button sendButton;
+    private TextArea textArea;
 
     private ThreadCell current;
     private double smsMaxWidth;
 
     private static final long gracePeriod = 5000;
     private static final String defaultName = "Bluetooth Device";
+    private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.BDeviceTab";
 
     public BDeviceTab(Tab tab, BluetoothClient client) {
         super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
@@ -77,6 +83,25 @@ public class BDeviceTab extends TabHouse {
         messageView = (ListView<Node>) tab.getContent().lookup("#active_conversation_message_list_view");
         smsMaxWidth = (messageView.getWidth() * 0.75);
         nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
+        textArea = (TextArea) tab.getContent().lookup("#message_entry");
+        sendButton = (Button) tab.getContent().lookup("#send_button");
+        sendButton.setOnAction(e -> {
+            if(current.getThreadType().equals(ThreadCell.THREAD_TYPE_SINGLE)) {
+                SMS sms = new SMS();
+                sms.setBody(textArea.getText());
+                sms.setAddress(current.getAddress());
+                sms.setCreator(creatorName);
+                sms.setDateSent(System.currentTimeMillis());
+                sms.setRead(true);
+                sms.setSubscriptionId(1);
+                sms.setThreadId(current.getThreadId());
+                textArea.clear();
+                sendMessage(sms);
+                handleNewMessage(sms);
+            } else {
+                //TODO handle creation of MMS message
+            }
+        });
         try {
             int[] threadIds = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getThreadIds();
             for(int i: threadIds) {
@@ -219,16 +244,22 @@ public class BDeviceTab extends TabHouse {
     public void newMessage(SMS sms) {
         try {
             Node node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/sms_cell.fxml"));
-            node.prefWidth(smsMaxWidth);
+            if(sms.getAddress().equals(current.getAddress())) {
+                node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+            } else {
+                node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            }
             TextFlow textFlow = (TextFlow) node.lookup("#message_text");
-            textFlow.prefWidthProperty().set(smsMaxWidth);
+            textFlow.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             textFlow.setTextAlignment(TextAlignment.LEFT);
             Text text = new Text();
-            text.prefWidth(smsMaxWidth);
             text.setFont(new Font(16));
             text.setText(sms.getBody());
             text.setTextAlignment(TextAlignment.LEFT);
             textFlow.getChildren().add(text);
+            if(textFlow.getWidth() > smsMaxWidth) {
+                textFlow.prefWidthProperty().set(smsMaxWidth);
+            }
             messageView.getItems().add(node);
             messages.add(sms);
             messageView.scrollTo(node);
@@ -239,6 +270,41 @@ public class BDeviceTab extends TabHouse {
 
     public void newMessage(MMS mms) {
 
+    }
+
+    public void sendMessage(DataObject object) {
+        Request request = new Request();
+        switch (object.getType()) {
+            case DataObject.Type.SMS:
+                final int index;
+                int index1;
+                try {
+                    index1 = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
+                } catch (UnequalArraysException | NullResultSetException | SQLException e) {
+                    index1 = -1;
+                    e.printStackTrace();
+                }
+                index = index1;
+                request.putBody(RequestHandler.RequestCode.SEND_SMS);
+                request.putItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT, object);
+                RequestHandler.getInstance().sendRequest(client, request, (request1, response) -> {
+                    if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_SENT)) {
+                        try {
+                            if(index != -1) {
+                                DatabaseFactory.getMessageDatabase(client.getDeviceMac()).update(index, (SMS) response.getItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT));
+                            }
+                        } catch (UnequalArraysException | SQLException e) {
+                            e.printStackTrace();
+                        }
+                    } else if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_FAILED)) {
+                        //TODO display that message failed to send and try to resend on user request
+                    }
+                });
+                break;
+            case DataObject.Type.MMS:
+                //TODO handle sending MMS message
+                break;
+        }
     }
 
 }

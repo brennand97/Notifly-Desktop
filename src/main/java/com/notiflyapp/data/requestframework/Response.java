@@ -27,6 +27,7 @@ public class Response extends DataObject<String , UUID> {
         response.putBody(request.getBody());
         response.putExtra(request.getExtra());
         response.putRequestValue(request.getRequestValue());
+        response.putHashMap(request.getHashMap());
         return response;
     }
 

@@ -3,6 +3,7 @@ package com.notiflyapp.ui.GUI.tabs;
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
+import com.notiflyapp.database.Database;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
@@ -11,16 +12,21 @@ import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
  * Created by Brennan on 6/17/2016.
  */
 public class ThreadCell {
+
+    public static final String THREAD_TYPE_SINGLE = "single";
+    public static final String THREAD_TYPE_MULTIPLE = "multiple";
 
     private Node node;
     private Label label;
@@ -31,6 +37,8 @@ public class ThreadCell {
     private int threadId;
     private String name;
     private ConversationThread thread;
+
+    private ArrayList<DataObject> messages = new ArrayList<>();
 
     public ThreadCell(BluetoothClient client, BDeviceTab house, int threadId) {
         this.client = client;
@@ -52,13 +60,37 @@ public class ThreadCell {
         label.setText(getName());
     }
 
+    public void newMessage(DataObject dataObject) {
+        switch (dataObject.getType()) {
+            case DataObject.Type.SMS:
+                messages.add(dataObject);
+                break;
+            case DataObject.Type.MMS:
+                messages.add(dataObject);
+                break;
+        }
+    }
+
     public DataObject[] getMessages() {
+        if(messages.size() == 0) {
+            DataObject[] msgs = retrieveMessages();
+            for(DataObject msg: msgs) {
+                messages.add(msg);
+            }
+            return msgs;
+        } else {
+            DataObject[] msgs = new DataObject[messages.size()];
+            return messages.toArray(msgs);
+        }
+    }
+
+    private DataObject[] retrieveMessages() {
         try {
             return DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
         } catch (SQLException | NullResultSetException | UnequalArraysException e) {
             e.printStackTrace();
         }
-        return new DataObject[0];
+        return null;
     }
 
     public Node getNode() {
@@ -149,6 +181,36 @@ public class ThreadCell {
         } else {
             return name;
         }
+    }
+
+    public String getThreadType() {
+        if(getAddress().contains(";")) {
+            return THREAD_TYPE_MULTIPLE;
+        } else {
+            return THREAD_TYPE_SINGLE;
+        }
+    }
+
+    public String getAddress() {
+        return formatOutAddress(thread.getContacts());
+    }
+
+    String formatOutAddress(Contact[] contacts) {
+        StringBuilder b = new StringBuilder();
+        for(int i = 0; i < contacts.length; i++) {
+            String raw = contacts[i].getExtra().replace(" ", "").replace("(", "").replace(")", "").replace("-", "").replace("+", "");
+            if(raw.length() == 10) {
+                b.append("+1");
+                b.append(raw);
+            } else {
+                b.append("+");
+                b.append(raw);
+            }
+            if(i < contacts.length - 1) {
+                b.append(";");
+            }
+        }
+        return b.toString();
     }
 
 }
