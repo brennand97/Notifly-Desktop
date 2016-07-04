@@ -103,7 +103,7 @@ public class BluetoothClient {
         switch (msg.getType()) {
             case DataObject.Type.SMS:
                 DateFormat df = DateFormat.getDateTimeInstance();
-                serverOutNoLog(((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
+                //serverOutNoLog(((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
                 Houston.getHandler().send(() -> Houston.getInstance().incomingMessage(this, msg));
                 break;
             case DataObject.Type.MMS:
@@ -115,11 +115,11 @@ public class BluetoothClient {
                 break;
             case DataObject.Type.REQUEST:
                 RequestHandler.getInstance().handleRequest(this, (Request) msg);
-                serverOut("Received Request : " + msg.getExtra().toString() + " by device : " + getDeviceMac() + " containing : " + msg.getBody());
+                serverOut("Received Request : " + msg.getExtra().toString() + " from device : " + getDeviceMac() + " containing : " + msg.getBody());
                 break;
             case DataObject.Type.RESPONSE:
                 RequestHandler.getInstance().handleResponse((Response) msg);
-                serverOut("Received Response : " + msg.getExtra().toString() + " by device : " + getDeviceMac() + " containing : " + msg.getBody());
+                serverOut("Received Response : " + msg.getExtra().toString() + " from device : " + getDeviceMac() + " containing : " + msg.getBody());
                 break;
         }
         received.add(msg);
@@ -147,7 +147,7 @@ public class BluetoothClient {
         if(!(msg instanceof Request) && !(msg instanceof Response)) {
             serverOutNoLog("Sent message to device : " + getDeviceMac()  + " :   " + msg.getBody());
         } else {
-            serverOut("Sending " + msg.getType() + " : " + msg.getExtra().toString() + " from device : " + getDeviceMac() + " containing : " + msg.getBody());
+            serverOut("Sending " + msg.getType() + " : " + msg.getExtra().toString() + " by device : " + getDeviceMac() + " containing : " + msg.getBody());
         }
     }
 

@@ -60,31 +60,7 @@ public class ThreadCell {
         label.setText(getName());
     }
 
-    public void newMessage(DataObject dataObject) {
-        switch (dataObject.getType()) {
-            case DataObject.Type.SMS:
-                messages.add(dataObject);
-                break;
-            case DataObject.Type.MMS:
-                messages.add(dataObject);
-                break;
-        }
-    }
-
     public DataObject[] getMessages() {
-        if(messages.size() == 0) {
-            DataObject[] msgs = retrieveMessages();
-            for(DataObject msg: msgs) {
-                messages.add(msg);
-            }
-            return msgs;
-        } else {
-            DataObject[] msgs = new DataObject[messages.size()];
-            return messages.toArray(msgs);
-        }
-    }
-
-    private DataObject[] retrieveMessages() {
         try {
             return DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
         } catch (SQLException | NullResultSetException | UnequalArraysException e) {

@@ -3,7 +3,6 @@ package com.notiflyapp.ui.GUI.tabs;
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
-import com.notiflyapp.data.requestframework.Response;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
@@ -14,13 +13,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -45,8 +44,11 @@ public class BDeviceTab extends TabHouse {
     private double smsMaxWidth;
 
     private static final long gracePeriod = 5000;
+    private static final int messageFontSize = 16;
     private static final String defaultName = "Bluetooth Device";
     private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.BDeviceTab";
+
+    private final URL SMS_NODE_URL = getClass().getResource("/com/notiflyapp/ui/GUI/view/sms_cell.fxml");
 
     public BDeviceTab(Tab tab, BluetoothClient client) {
         super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
@@ -84,6 +86,7 @@ public class BDeviceTab extends TabHouse {
         smsMaxWidth = (messageView.getWidth() * 0.75);
         nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
         textArea = (TextArea) tab.getContent().lookup("#message_entry");
+        textArea.setFont(new Font(messageFontSize));
         sendButton = (Button) tab.getContent().lookup("#send_button");
         sendButton.setOnAction(e -> {
             if(current.getThreadType().equals(ThreadCell.THREAD_TYPE_SINGLE)) {
@@ -122,7 +125,7 @@ public class BDeviceTab extends TabHouse {
             smsMaxWidth = tmpSmsMaxWidth;
             for(Node node: messageView.getItems()) {
                 //TODO correct for double sided conversation with "gravity"
-                ((TextFlow) node.lookup("#message_text")).prefWidthProperty().set(smsMaxWidth);
+                ((TextFlow) node.lookup("#message_text")).maxWidthProperty().set(smsMaxWidth);
             }
         }
     }
@@ -229,6 +232,7 @@ public class BDeviceTab extends TabHouse {
                             break;
                         }
                     }
+                    messages.add(sms);
                     newMessage(sms);
                 } else {
                     addThreadCell(sms.getThreadId());
@@ -243,25 +247,25 @@ public class BDeviceTab extends TabHouse {
 
     public void newMessage(SMS sms) {
         try {
-            Node node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/sms_cell.fxml"));
-            if(sms.getAddress().equals(current.getAddress())) {
-                node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+            Node node = FXMLLoader.load(SMS_NODE_URL);
+            if(sms.getAddress() != null) {
+                if(sms.getAddress().equals(current.getAddress())) {
+                    node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+                }
             } else {
                 node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             }
             TextFlow textFlow = (TextFlow) node.lookup("#message_text");
-            textFlow.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             textFlow.setTextAlignment(TextAlignment.LEFT);
+            textFlow.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            textFlow.maxWidthProperty().set(smsMaxWidth);
             Text text = new Text();
-            text.setFont(new Font(16));
-            text.setText(sms.getBody());
+            text.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             text.setTextAlignment(TextAlignment.LEFT);
+            text.setFont(new Font(messageFontSize));
+            text.setText(sms.getBody());
             textFlow.getChildren().add(text);
-            if(textFlow.getWidth() > smsMaxWidth) {
-                textFlow.prefWidthProperty().set(smsMaxWidth);
-            }
             messageView.getItems().add(node);
-            messages.add(sms);
             messageView.scrollTo(node);
         } catch (IOException e) {
             e.printStackTrace();
