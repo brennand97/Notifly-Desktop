@@ -3,7 +3,10 @@ package com.notiflyapp.ui.GUI.tabs;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Created by Brennan on 7/10/2016.
@@ -11,19 +14,27 @@ import java.util.Comparator;
 public class ThreadNodeComparator implements Comparator<Node> {
     @Override
     public int compare(Node o1, Node o2) {
-        long date1;
-        long date2;
+        Date date1;
+        Date date2;
         try {
-            date1 = Long.parseLong(((Label) o1.lookup("#date_label")).getText());
-        } catch (NumberFormatException e) {
-            date1 = 0;
+            if(ThreadCell.MILITARY_TIME) {
+                date1 = (new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).parse(((Label) o1.lookup("#date_label")).getText());
+            } else {
+                date1 = (new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).parse(((Label) o1.lookup("#date_label")).getText());
+            }
+        } catch (ParseException e) {
+            date1 = new Date(0);
         }
         try {
-            date2 = Long.parseLong(((Label) o2.lookup("#date_label")).getText());
-        } catch (NumberFormatException e) {
-            date2 = 0;
+            if(ThreadCell.MILITARY_TIME) {
+                date2 = (new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).parse(((Label) o1.lookup("#date_label")).getText());
+            } else {
+                date2 = (new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).parse(((Label) o1.lookup("#date_label")).getText());
+            }
+        } catch (ParseException e) {
+            date2 = new Date(0);
         }
-        if(date1 < date2) {
+        if(date1.getTime() < date2.getTime()) {
             return 1;
         } else {
             return -1;

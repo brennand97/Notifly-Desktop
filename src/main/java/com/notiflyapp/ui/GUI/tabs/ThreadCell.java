@@ -15,7 +15,9 @@ import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -25,6 +27,9 @@ public class ThreadCell {
 
     public static final String THREAD_TYPE_SINGLE = "single";
     public static final String THREAD_TYPE_MULTIPLE = "multiple";
+    protected static final String DATE_FORMAT_12 = "MM/dd/yyyy, hh:mm a";
+    protected static final String DATE_FORMAT_24 = "MM/dd/yyyy, HH:mm";
+    protected static final boolean MILITARY_TIME = false;
 
     private Node node;
     private Label nameLabel;
@@ -61,7 +66,11 @@ public class ThreadCell {
 
         nameLabel.setText(getName());
         if(mostRecent != 0) {
-            dateLabel.setText(String.valueOf(mostRecent));
+            if(MILITARY_TIME) {
+                dateLabel.setText((new SimpleDateFormat(DATE_FORMAT_24)).format(new Date(mostRecent)));
+            } else {
+                dateLabel.setText((new SimpleDateFormat(DATE_FORMAT_12)).format(new Date(mostRecent)));
+            }
         } else {
             dateLabel.setText("");
         }
@@ -98,7 +107,11 @@ public class ThreadCell {
             }
             if(date > mostRecent) {
                 mostRecent = date;
-                dateLabel.setText(String.valueOf(mostRecent));
+                if(MILITARY_TIME) {
+                    dateLabel.setText((new SimpleDateFormat(DATE_FORMAT_24)).format(new Date(mostRecent)));
+                } else {
+                    dateLabel.setText((new SimpleDateFormat(DATE_FORMAT_12)).format(new Date(mostRecent)));
+                }
             }
         }
     }

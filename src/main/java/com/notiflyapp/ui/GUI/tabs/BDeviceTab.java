@@ -21,7 +21,10 @@ import javafx.scene.text.TextFlow;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -234,13 +237,29 @@ public class BDeviceTab extends TabHouse {
                     newMessage(sms);
                 } else {
                     addThreadCell(sms.getThreadId());
-                    //TODO check to see if newest message and then send thread_cell to top of the list
+                    for(ThreadCell cell: threadCells) {
+                        if(cell.getThreadId() == sms.getThreadId()) {
+                            cell.addMessage(sms);
+                        }
+                    }
                 }
+
                 break;
             case DataObject.Type.MMS:
 
                 break;
         }
+
+        if(ThreadCell.MILITARY_TIME) {
+            ((Label) threadView.getItems().get(threadCells.indexOf(current)).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
+        } else {
+            ((Label) threadView.getItems().get(threadCells.indexOf(current)).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
+        }
+
+        threadCells.sort(new ThreadComparator());
+        threadView.getItems().sort(new ThreadNodeComparator());
+        threadView.refresh();
+
     }
 
     public void newMessage(SMS sms) {
@@ -264,10 +283,6 @@ public class BDeviceTab extends TabHouse {
             text.setText(sms.getBody());
             textFlow.getChildren().add(text);
             messageView.getItems().add(node);
-
-            threadCells.sort(new ThreadComparator());
-            threadView.getItems().sort(new ThreadNodeComparator());
-
             messageView.scrollTo(node);
         } catch (IOException e) {
             e.printStackTrace();
