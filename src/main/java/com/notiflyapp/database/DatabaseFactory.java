@@ -3,8 +3,10 @@ package com.notiflyapp.database;
 import com.notiflyapp.data.DeviceInfo;
 import com.notiflyapp.ui.GUI.tabs.ThreadCell;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.jar.Pack200;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -61,6 +63,24 @@ public class DatabaseFactory {
             d.drop(d.TABLE_NAME);
         }
         messages.clear();
+
+        ResultSet rsMsg = Database.stmt.executeQuery("select name from sqlite_master where type = 'table' and name like '" + MessageDatabase.TABLE_NAME_PREFIX + "%';");
+
+        if(rsMsg != null) {
+            while(rsMsg.next()) {
+                Database.stmt.execute("drop table if exists " + rsMsg.getString("name") + ";");
+            }
+            rsMsg.close();
+        }
+
+        ResultSet rsThr = Database.stmt.executeQuery("select name from sqlite_master where type = 'table' and name like '" + ThreadDatabase.TABLE_NAME_PREFIX + "%';");
+
+        if(rsThr != null) {
+            while(rsThr.next()) {
+                Database.stmt.execute("drop table if exists " + rsThr.getString("name") + ";");
+            }
+            rsThr.close();
+        }
     }
 
 }

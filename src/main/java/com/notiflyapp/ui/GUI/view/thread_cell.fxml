@@ -23,14 +23,29 @@
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </HBox.margin>
             </ImageView>
-            <Label id="name_label" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="155.0" text="Brennan Douglas" HBox.hgrow="ALWAYS">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
+            <VBox prefHeight="40.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label id="name_label" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="155.0" text="First Last Name">
+                     <padding>
+                        <Insets left="10.0" right="10.0" />
+                     </padding>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <Label id="date_label" text="Date">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                     <padding>
+                        <Insets left="10.0" right="10.0" top="-5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </VBox>
          </children>
       </HBox>
    </children>

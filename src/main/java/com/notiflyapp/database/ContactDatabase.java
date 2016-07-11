@@ -14,7 +14,7 @@ public class ContactDatabase extends MacDatabase {
 
     //TODO **WARNING** this database should still be in development because the contact object hasn't been fully fleshed out
 
-    private final static String TABLE_NAME_PREFIX = "contacts_";
+    protected final static String TABLE_NAME_PREFIX = "contacts_";
 
     public final static String CONTACT_ID = "contact_id";
     public final static String NAME = "name";

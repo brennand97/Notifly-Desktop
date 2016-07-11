@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class ThreadDatabase extends MacDatabase {
 
-    private final static String TABLE_NAME_PREFIX = "threads_";
+    protected final static String TABLE_NAME_PREFIX = "threads_";
 
     public final static String THREAD_ID = "thread_id";
     public final static String ARCHIVED = "archived";

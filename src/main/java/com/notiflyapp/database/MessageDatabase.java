@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class MessageDatabase extends MacDatabase {
 
-    private final static String TABLE_NAME_PREFIX = "messages_";
+    protected final static String TABLE_NAME_PREFIX = "messages_";
 
     private static final String ADDRESS = "address";
     private static final String ORIGINATING_ADDRESS = "originating_address";

@@ -3,7 +3,6 @@ package com.notiflyapp.ui.GUI.tabs;
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
-import com.notiflyapp.database.Database;
 import com.notiflyapp.database.DatabaseFactory;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
@@ -12,7 +11,6 @@ import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Pagination;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
@@ -29,7 +27,8 @@ public class ThreadCell {
     public static final String THREAD_TYPE_MULTIPLE = "multiple";
 
     private Node node;
-    private Label label;
+    private Label nameLabel;
+    private Label dateLabel;
     private ImageView imageView;
 
     private BluetoothClient client;
@@ -39,6 +38,7 @@ public class ThreadCell {
     private ConversationThread thread;
 
     private ArrayList<DataObject> messages = new ArrayList<>();
+    private long mostRecent = 0L;
 
     public ThreadCell(BluetoothClient client, BDeviceTab house, int threadId) {
         this.client = client;
@@ -50,23 +50,61 @@ public class ThreadCell {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        getMessages();
     }
 
     private void createNode() throws IOException {
         node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/thread_cell.fxml"));
-        label = (Label) node.lookup("#name_label");
+        nameLabel = (Label) node.lookup("#name_label");
         imageView = (ImageView) node.lookup("#image_icon");
+        dateLabel = (Label) node.lookup("#date_label");
 
-        label.setText(getName());
+        nameLabel.setText(getName());
+        if(mostRecent != 0) {
+            dateLabel.setText(String.valueOf(mostRecent));
+        } else {
+            dateLabel.setText("");
+        }
     }
 
     public DataObject[] getMessages() {
         try {
-            return DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
+            DataObject[] output = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
+            for(DataObject o: output) {
+                addMessage(o);
+            }
+            return output;
         } catch (SQLException | NullResultSetException | UnequalArraysException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ArrayList<DataObject> getMessageList() {
+        return messages;
+    }
+
+    public void addMessage(DataObject msg) {
+        if(!messages.contains(msg)) {
+            messages.add(msg);
+            long date = 0;
+            switch (msg.getType()) {
+                case DataObject.Type.SMS:
+                    date = ((SMS) msg).getDate();
+                    break;
+                case DataObject.Type.MMS:
+                    //date = ((MMS) msg).getDate();
+                    break;
+            }
+            if(date > mostRecent) {
+                mostRecent = date;
+                dateLabel.setText(String.valueOf(mostRecent));
+            }
+        }
+    }
+
+    public long getMostRecent() {
+        return mostRecent;
     }
 
     public Node getNode() {

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -139,6 +140,9 @@ public class BDeviceTab extends TabHouse {
         ThreadCell cell = new ThreadCell(client, this, threadId);
         threadCells.add(cell);
         threadView.getItems().add(cell.getNode());
+
+        threadCells.sort(new ThreadComparator());
+        threadView.getItems().sort(new ThreadNodeComparator());
     }
 
     private void selectThread(int index) {
@@ -150,14 +154,7 @@ public class BDeviceTab extends TabHouse {
             nameLabel.setText(current.getName());
             DataObject[] messages = current.getMessages();
             for(DataObject msg: messages) {
-                switch (msg.getType()) {
-                    case DataObject.Type.SMS:
-                        newMessage((SMS) msg);
-                        break;
-                    case DataObject.Type.MMS:
-                        newMessage((MMS) msg);
-                        break;
-                }
+                handleNewMessage(msg);
             }
         }
     }
@@ -233,6 +230,7 @@ public class BDeviceTab extends TabHouse {
                         }
                     }
                     messages.add(sms);
+                    current.addMessage(sms);
                     newMessage(sms);
                 } else {
                     addThreadCell(sms.getThreadId());
@@ -266,6 +264,10 @@ public class BDeviceTab extends TabHouse {
             text.setText(sms.getBody());
             textFlow.getChildren().add(text);
             messageView.getItems().add(node);
+
+            threadCells.sort(new ThreadComparator());
+            threadView.getItems().sort(new ThreadNodeComparator());
+
             messageView.scrollTo(node);
         } catch (IOException e) {
             e.printStackTrace();

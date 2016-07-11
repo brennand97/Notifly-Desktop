@@ -33,7 +33,7 @@ public class HomeTabController {
     }
 
     @FXML private void clearMessages(ActionEvent event) {
-        System.out.println("Clear message button pushed");
+        System.out.println("Clear messages");
         Houston.getHandler().send(() -> Houston.getInstance().clearMessages());
     }
 
