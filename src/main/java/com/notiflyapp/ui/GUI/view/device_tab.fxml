@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="device_tab_pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="device_tab_pane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <SplitPane id="split_pane_1" dividerPositions="0.18896321070234115" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -32,7 +32,11 @@
                           <items>
                               <AnchorPane id="active_conversation_message_pane">
                                  <children>
-                                    <ListView id="active_conversation_message_list_view" fx:id="conversationView" layoutX="7.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <ScrollPane id="active_conversation_message_scroll_pane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <content>
+                                          <VBox id="active_conversation_message_vbox" />
+                                       </content>
+                                    </ScrollPane>
                                  </children>
                               </AnchorPane>
                               <AnchorPane maxHeight="200.0" minHeight="50.0" prefHeight="50.0">

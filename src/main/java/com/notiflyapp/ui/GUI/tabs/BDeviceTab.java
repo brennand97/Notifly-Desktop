@@ -13,6 +13,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -21,7 +23,6 @@ import javafx.scene.text.TextFlow;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +39,8 @@ public class BDeviceTab extends TabHouse {
     private Tab tab;
     private ListView<Node> threadView;
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
-    private ListView<Node> messageView;
+    private VBox messageView;
+    private ScrollPane messageScroll;
     private ArrayList<DataObject> messages = new ArrayList<>();
     private Label nameLabel;
     private Button sendButton;
@@ -86,7 +88,11 @@ public class BDeviceTab extends TabHouse {
                 selectThread(threadView.getSelectionModel().getSelectedIndex());
             }
         });
-        messageView = (ListView<Node>) tab.getContent().lookup("#active_conversation_message_list_view");
+        messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
+        messageScroll = (ScrollPane) tab.getContent().lookup("#active_conversation_message_scroll_pane");
+        messageScroll.addEventFilter(ScrollEvent.ANY, event -> {
+            System.out.println(messageScroll.getVvalue());
+        });
         smsMaxWidth = (messageView.getWidth() * 0.75);
         nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
         textArea = (TextArea) tab.getContent().lookup("#message_entry");
@@ -127,7 +133,7 @@ public class BDeviceTab extends TabHouse {
         double tmpSmsMaxWidth = (messageView.getWidth() * 0.75);
         if(tmpSmsMaxWidth != smsMaxWidth) {
             smsMaxWidth = tmpSmsMaxWidth;
-            for(Node node: messageView.getItems()) {
+            for(Node node: messageView.getChildren()) {
                 //TODO correct for double sided conversation with "gravity"
                 ((TextFlow) node.lookup("#message_text")).maxWidthProperty().set(smsMaxWidth);
             }
@@ -149,9 +155,11 @@ public class BDeviceTab extends TabHouse {
     }
 
     private void selectThread(int index) {
-        //TODO change threadCells to a RearrangeableArrayList (Needs to be created) so that the index list always makes that of the listView
         ThreadCell tmpCurrent = threadCells.get(index);
         if(!tmpCurrent.equals(current)) {
+            if(messageScroll != null && current != null) {
+                current.setScrollPoint(messageScroll.getVvalue());
+            }
             current = tmpCurrent;
             clearMessageListView();
             nameLabel.setText(current.getName());
@@ -159,7 +167,10 @@ public class BDeviceTab extends TabHouse {
             for(DataObject msg: messages) {
                 handleNewMessage(msg);
             }
+            Application.invokeLater(() -> messageScroll.setVvalue(current.getScrollPoint()));
         }
+        System.out.println(current.getScrollPoint());
+        System.out.println(messageScroll.getVvalue());
     }
 
     protected void updateName(ThreadCell cell) {
@@ -177,7 +188,7 @@ public class BDeviceTab extends TabHouse {
 
     private void clearMessageListView() {
         messages.clear();
-        messageView.getItems().clear();
+        messageView.getChildren().clear();
     }
 
     private void clearThreadListView() { threadView.getItems().clear(); }
@@ -243,10 +254,9 @@ public class BDeviceTab extends TabHouse {
                         }
                     }
                 }
-
                 break;
             case DataObject.Type.MMS:
-                //Changed
+
                 break;
         }
 
@@ -259,7 +269,6 @@ public class BDeviceTab extends TabHouse {
         threadCells.sort(new ThreadComparator());
         threadView.getItems().sort(new ThreadNodeComparator());
         threadView.refresh();
-
     }
 
     public void newMessage(SMS sms) {
@@ -282,8 +291,12 @@ public class BDeviceTab extends TabHouse {
             text.setFont(new Font(messageFontSize));
             text.setText(sms.getBody());
             textFlow.getChildren().add(text);
-            messageView.getItems().add(node);
-            messageView.scrollTo(node);
+            messageView.getChildren().add(node);
+
+            threadCells.sort(new ThreadComparator());
+            threadView.getItems().sort(new ThreadNodeComparator());
+
+            messageScroll.setVvalue(1.0);
         } catch (IOException e) {
             e.printStackTrace();
         }
