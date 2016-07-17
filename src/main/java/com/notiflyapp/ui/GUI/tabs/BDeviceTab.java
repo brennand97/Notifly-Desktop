@@ -246,7 +246,7 @@ public class BDeviceTab extends TabHouse {
 
                 break;
             case DataObject.Type.MMS:
-
+                //Changed
                 break;
         }
 
