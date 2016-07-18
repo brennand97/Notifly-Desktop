@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -29,7 +30,8 @@ public class ThreadCell {
     public static final String THREAD_TYPE_MULTIPLE = "multiple";
     protected static final String DATE_FORMAT_12 = "MM/dd/yyyy, hh:mm:ss a";
     protected static final String DATE_FORMAT_24 = "MM/dd/yyyy, HH:mm:ss";
-    protected static final boolean MILITARY_TIME = false;
+
+    protected static boolean MILITARY_TIME = false;
 
     private Node node;
     private Label nameLabel;
@@ -60,7 +62,7 @@ public class ThreadCell {
     }
 
     private void createNode() throws IOException {
-        node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/thread_cell.fxml"));
+        node = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/fxml/thread_cell.fxml"));
         nameLabel = (Label) node.lookup("#name_label");
         imageView = (ImageView) node.lookup("#image_icon");
         dateLabel = (Label) node.lookup("#date_label");

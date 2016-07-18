@@ -1,0 +1,12 @@
+.left-message {
+    -fx-background-color: #0ea7b5;
+    -fx-border-radius: 10 10 5 5;
+    -fx-background-radius: 10 10 10 0;
+}
+
+.right-message {
+    -fx-background-color: #ffbe4f;
+    -fx-border-radius: 10 10 5 5;
+    -fx-background-radius: 10 10 0 10;
+}
+

@@ -1,7 +1,5 @@
 package com.notiflyapp.controlcenter;
 
-import com.notiflyapp.controlcenter.ServerHandler;
-import com.notiflyapp.controlcenter.Houston;
 import com.notiflyapp.servers.bluetooth.BluetoothServer;
 import com.notiflyapp.ui.commandline.Commands;
 import javafx.application.Application;
@@ -21,9 +19,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
 
-        Parent root = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/fxml/main.fxml"));
         Scene scene = new Scene(root);
-        //scene.getStylesheets().add(getClass().getResource(Put Style sheet reference here));
+        scene.getStylesheets().add(getClass().getResource("/com/notiflyapp/ui/GUI/style/Notifly.css").toExternalForm());
         primaryStage.setScene(scene);
 
         Houston.initialize(primaryStage, scene);

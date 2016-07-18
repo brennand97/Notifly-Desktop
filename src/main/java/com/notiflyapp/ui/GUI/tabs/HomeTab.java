@@ -14,7 +14,7 @@ public class HomeTab extends TabHouse {
         super(tab, title);
         try {
             tab.setClosable(false);
-            tab.setContent(FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/view/home_screen.fxml")));
+            tab.setContent(FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/fxml/home_screen.fxml")));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -7,7 +7,7 @@ import java.io.File;
  *
  * Used for sending Short Message Service (SMS) messages between devices
  */
-public class SMS extends DataObject<String, File> {
+public class SMS extends Message<String, File> {
 
     private static final long serialVersionUID = 3349238414148539467L;
 
@@ -15,12 +15,8 @@ public class SMS extends DataObject<String, File> {
     private String address;
     private String originatingAddress;
     private String creator;
-    private long date;
-    private long dateSent;
     private String person;
     private boolean read;
-    private long subscriptionId;
-    private int threadId;
 
     /**
      * Default constructor, degines DataObject.Type
@@ -129,18 +125,6 @@ public class SMS extends DataObject<String, File> {
         this.creator = creator;
     }
 
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
-    }
-
-    public long getDateSent() {
-        return dateSent;
-    }
-
     public void setDateSent(long dateSent) {
         this.dateSent = dateSent;
     }
@@ -159,22 +143,6 @@ public class SMS extends DataObject<String, File> {
 
     public void setRead(boolean read) {
         this.read = read;
-    }
-
-    public long getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public void setSubscriptionId(long subscriptionId) {
-        this.subscriptionId = subscriptionId;
-    }
-
-    public int getThreadId() {
-        return threadId;
-    }
-
-    public void setThreadId(int threadId) {
-        this.threadId = threadId;
     }
 
 }

@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -26,7 +27,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -41,7 +41,7 @@ public class BDeviceTab extends TabHouse {
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private VBox messageView;
     private ScrollPane messageScroll;
-    private ArrayList<DataObject> messages = new ArrayList<>();
+    private ArrayList<Message> messages = new ArrayList<>();
     private Label nameLabel;
     private Button sendButton;
     private TextArea textArea;
@@ -54,7 +54,7 @@ public class BDeviceTab extends TabHouse {
     private static final String defaultName = "Bluetooth Device";
     private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.BDeviceTab";
 
-    private final URL SMS_NODE_URL = getClass().getResource("/com/notiflyapp/ui/GUI/view/sms_cell.fxml");
+    private final URL SMS_NODE_URL = getClass().getResource("/com/notiflyapp/ui/GUI/fxml/sms_cell.fxml");
 
     public BDeviceTab(Tab tab, BluetoothClient client) {
         super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
@@ -63,7 +63,7 @@ public class BDeviceTab extends TabHouse {
         tab.setOnClosed(event -> close() );
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/notiflyapp/ui/GUI/view/device_tab.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/notiflyapp/ui/GUI/fxml/device_tab.fxml"));
             Node node = loader.load();
             tab.setContent(node);
 
@@ -86,6 +86,11 @@ public class BDeviceTab extends TabHouse {
             int index = threadView.getSelectionModel().getSelectedIndex();
             if(index != -1) {
                 selectThread(threadView.getSelectionModel().getSelectedIndex());
+            }
+            if(event.getButton().equals(MouseButton.PRIMARY)) {
+                if(event.getClickCount() == 2) {
+                    Application.invokeLater(() -> messageScroll.setVvalue(1.0));
+                }
             }
         });
         messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
@@ -110,7 +115,7 @@ public class BDeviceTab extends TabHouse {
                 sms.setThreadId(current.getThreadId());
                 textArea.clear();
                 sendMessage(sms);
-                handleNewMessage(sms);
+                Application.invokeLater(() -> messageScroll.setVvalue(1.0));
             } else {
                 //TODO handle creation of MMS message
             }
@@ -134,7 +139,6 @@ public class BDeviceTab extends TabHouse {
         if(tmpSmsMaxWidth != smsMaxWidth) {
             smsMaxWidth = tmpSmsMaxWidth;
             for(Node node: messageView.getChildren()) {
-                //TODO correct for double sided conversation with "gravity"
                 ((TextFlow) node.lookup("#message_text")).maxWidthProperty().set(smsMaxWidth);
             }
         }
@@ -147,8 +151,10 @@ public class BDeviceTab extends TabHouse {
             }
         }
         ThreadCell cell = new ThreadCell(client, this, threadId);
+        Node node = cell.getNode();
+
         threadCells.add(cell);
-        threadView.getItems().add(cell.getNode());
+        threadView.getItems().add(node);
 
         threadCells.sort(new ThreadComparator());
         threadView.getItems().sort(new ThreadNodeComparator());
@@ -165,12 +171,10 @@ public class BDeviceTab extends TabHouse {
             nameLabel.setText(current.getName());
             DataObject[] messages = current.getMessages();
             for(DataObject msg: messages) {
-                handleNewMessage(msg);
+                handleNewMessage(msg, false);
             }
             Application.invokeLater(() -> messageScroll.setVvalue(current.getScrollPoint()));
         }
-        System.out.println(current.getScrollPoint());
-        System.out.println(messageScroll.getVvalue());
     }
 
     protected void updateName(ThreadCell cell) {
@@ -233,7 +237,13 @@ public class BDeviceTab extends TabHouse {
         });
     }
 
-    public void handleNewMessage(DataObject object) {
+    public interface DateSet {
+        void setDate(String date);
+        void enableRetry();
+    }
+
+    public DateSet handleNewMessage(DataObject object, boolean sending) {
+        DateSet output = null;
         switch (object.getType()) {
             case DataObject.Type.SMS:
                 SMS sms = (SMS) object;
@@ -245,7 +255,8 @@ public class BDeviceTab extends TabHouse {
                     }
                     messages.add(sms);
                     current.addMessage(sms);
-                    newMessage(sms);
+                    messages.sort(new MessageComparator());
+                    output = newMessage(sms, sending);
                 } else {
                     addThreadCell(sms.getThreadId());
                     for(ThreadCell cell: threadCells) {
@@ -269,19 +280,30 @@ public class BDeviceTab extends TabHouse {
         threadCells.sort(new ThreadComparator());
         threadView.getItems().sort(new ThreadNodeComparator());
         threadView.refresh();
+
+        return output;
     }
 
-    public void newMessage(SMS sms) {
+    public DateSet newMessage(SMS sms, boolean sending) {
+        boolean scrollAtBottom = false;
+        if(messageScroll.getVvalue() == 1.0) {
+            scrollAtBottom = true;
+        }
         try {
-            Node node = FXMLLoader.load(SMS_NODE_URL);
+            final Node node = FXMLLoader.load(SMS_NODE_URL);
+            TextFlow textFlow = (TextFlow) node.lookup("#message_text");
             if(sms.getAddress() != null) {
                 if(sms.getAddress().equals(current.getAddress())) {
                     node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+                    textFlow.getStyleClass().clear();
+                    textFlow.getStyleClass().add("right-message");
                 }
             } else {
                 node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+                textFlow.getStyleClass().clear();
+                textFlow.getStyleClass().add("left-message");
             }
-            TextFlow textFlow = (TextFlow) node.lookup("#message_text");
+
             textFlow.setTextAlignment(TextAlignment.LEFT);
             textFlow.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             textFlow.maxWidthProperty().set(smsMaxWidth);
@@ -291,47 +313,84 @@ public class BDeviceTab extends TabHouse {
             text.setFont(new Font(messageFontSize));
             text.setText(sms.getBody());
             textFlow.getChildren().add(text);
-            messageView.getChildren().add(node);
+            final Label dateLabel = (Label) node.lookup("#message_date");
+            DateSet output = null;
+            if(!sending) {
+                if(ThreadCell.MILITARY_TIME) {
+                    dateLabel.setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(sms.getDate()));
+                } else {
+                    dateLabel.setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(sms.getDate()));
+                }
+            } else {
+                dateLabel.setText("Sending...");
+                output = new DateSet() {
+                    @Override
+                    public void setDate(String date) {
+                        dateLabel.setText(date);
+                    }
 
-            threadCells.sort(new ThreadComparator());
-            threadView.getItems().sort(new ThreadNodeComparator());
+                    @Override
+                    public void enableRetry() {
+                        node.setOnMouseClicked(event -> {
+                            if(event.getButton().equals(MouseButton.PRIMARY)) {
+                                if(event.getClickCount() == 2) {
+                                    messageView.getChildren().remove(node);
+                                    messages.remove(sms);
+                                    sendMessage(sms);
+                                }
+                            }
+                        });
+                    }
+                };
+            }
 
-            messageScroll.setVvalue(1.0);
+            messageView.getChildren().add(messages.indexOf(sms), node);
+            if(scrollAtBottom) {
+                Application.invokeLater(() -> messageScroll.setVvalue(1.0));
+            }
+
+            return output;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
-    public void newMessage(MMS mms) {
+    public void newMessage(MMS mms, boolean sending) {
 
     }
 
     public void sendMessage(DataObject object) {
+        final DateSet dateSet = handleNewMessage(object, true);
         Request request = new Request();
         switch (object.getType()) {
             case DataObject.Type.SMS:
-                final int index;
-                int index1;
-                try {
-                    index1 = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
-                } catch (UnequalArraysException | NullResultSetException | SQLException e) {
-                    index1 = -1;
-                    e.printStackTrace();
-                }
-                index = index1;
                 request.putBody(RequestHandler.RequestCode.SEND_SMS);
                 request.putItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT, object);
                 RequestHandler.getInstance().sendRequest(client, request, (request1, response) -> {
                     if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_SENT)) {
                         try {
-                            if(index != -1) {
-                                DatabaseFactory.getMessageDatabase(client.getDeviceMac()).update(index, (SMS) response.getItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT));
+                            SMS sms = (SMS) response.getItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT);
+                            DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert(sms);
+                            if(dateSet != null) {
+                                if(ThreadCell.MILITARY_TIME) {
+                                    Application.invokeLater(() -> dateSet.setDate((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(((SMS) object).getDate())));
+                                } else {
+                                    Application.invokeLater(() -> dateSet.setDate((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(((SMS) object).getDate())));
+                                }
                             }
-                        } catch (UnequalArraysException | SQLException e) {
+
+                        } catch (UnequalArraysException | SQLException | NullResultSetException e) {
                             e.printStackTrace();
                         }
                     } else if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_FAILED)) {
                         //TODO display that message failed to send and try to resend on user request
+                        if(dateSet != null) {
+                            Application.invokeLater(() -> {
+                                dateSet.setDate("Message failed to send. Double click to retry");
+                                dateSet.enableRetry();
+                            });
+                        }
                     }
                 });
                 break;

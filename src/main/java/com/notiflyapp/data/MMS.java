@@ -5,7 +5,7 @@ package com.notiflyapp.data;
  *
  * Used for sending Multimedia Messaging Service (MMS) messages between devices.
  */
-public class MMS extends DataObject<String, Byte[]>{
+public class MMS extends Message<String, Byte[]>{
 
     private static final long serialVersionUID = 3349238414148539468L;
 
@@ -47,6 +47,10 @@ public class MMS extends DataObject<String, Byte[]>{
     @Override
     public void putExtra(Byte[] extra) {
         this.extra = extra;
+    }
+
+    public long getDate() {
+        return 0;
     }
 
 }

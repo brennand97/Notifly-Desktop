@@ -192,7 +192,7 @@ public class Houston {
             try {
                 DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
                 BDeviceTab bDeviceTab = getBDeviceTab(client);
-                bDeviceTab.handleNewMessage(object);
+                bDeviceTab.handleNewMessage(object, false);
             } catch (SQLException | UnequalArraysException | NullResultSetException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {
