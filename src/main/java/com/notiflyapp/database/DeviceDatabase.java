@@ -105,7 +105,6 @@ public class DeviceDatabase extends Database {
             rs.close();
             return infos;
         } else {
-            rs.close();
             throw NullResultSetException.makeException(TABLE_NAME);
         }
     }

@@ -35,7 +35,9 @@ public class ThreadNodeComparator implements Comparator<Node> {
         } catch (ParseException e) {
             date2 = new Date(0);
         }
-        if(date1.getTime() < date2.getTime()) {
+        if(date1.getTime() == date2.getTime()) {
+            return 0;
+        } else if(date1.getTime() < date2.getTime()) {
             return 1;
         } else {
             return -1;

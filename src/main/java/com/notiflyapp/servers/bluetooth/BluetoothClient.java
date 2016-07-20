@@ -102,7 +102,7 @@ public class BluetoothClient {
         }
         switch (msg.getType()) {
             case DataObject.Type.SMS:
-                DateFormat df = DateFormat.getDateTimeInstance();
+                //DateFormat df = DateFormat.getDateTimeInstance();
                 //serverOutNoLog(((SMS) msg).getOriginatingAddress() + " (" + df.format(((SMS) msg).getDate()) + "): " + msg.getBody());
                 Houston.getHandler().send(() -> Houston.getInstance().incomingMessage(this, msg));
                 break;

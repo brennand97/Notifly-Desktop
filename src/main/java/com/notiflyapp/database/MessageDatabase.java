@@ -124,6 +124,7 @@ public class MessageDatabase extends MacDatabase {
             while (rs.next()) {
                 smsArray.add(makeSms(rs));
             }
+            rs.close();
             SMS[] smses = new SMS[smsArray.size()];
             for(int i =  0; i < smsArray.size(); i++) {
                 smses[i] = smsArray.get(i);
@@ -145,6 +146,7 @@ public class MessageDatabase extends MacDatabase {
                     msgArray.add(makeMms(rs));
                 }
             }
+            rs.close();
             DataObject[] msgs = new DataObject[msgArray.size()];
             for(int i =  0; i < msgArray.size(); i++) {
                 msgs[i] = msgArray.get(i);
@@ -166,6 +168,7 @@ public class MessageDatabase extends MacDatabase {
                     msgArray.add(makeMms(rs));
                 }
             }
+            rs.close();
             DataObject[] msgs = new DataObject[msgArray.size()];
             for(int i =  0; i < msgArray.size(); i++) {
                 msgs[i] = msgArray.get(i);
@@ -183,6 +186,7 @@ public class MessageDatabase extends MacDatabase {
             while (rs.next()) {
                 tmpId.add(rs.getInt(THREAD_ID));
             }
+            rs.close();
             int[] ids = new int[tmpId.size()];
             for(int i = 0; i < ids.length; i++) {
                 ids[i] = tmpId.get(i);

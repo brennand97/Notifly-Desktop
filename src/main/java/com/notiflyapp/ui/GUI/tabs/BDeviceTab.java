@@ -96,7 +96,7 @@ public class BDeviceTab extends TabHouse {
         messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
         messageScroll = (ScrollPane) tab.getContent().lookup("#active_conversation_message_scroll_pane");
         messageScroll.addEventFilter(ScrollEvent.ANY, event -> {
-            System.out.println(messageScroll.getVvalue());
+            //System.out.println(messageScroll.getVvalue());
         });
         smsMaxWidth = (messageView.getWidth() * 0.75);
         nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
@@ -346,7 +346,14 @@ public class BDeviceTab extends TabHouse {
 
             messageView.getChildren().add(messages.indexOf(sms), node);
             if(scrollAtBottom) {
-                Application.invokeLater(() -> messageScroll.setVvalue(1.0));
+                Application.invokeLater(() -> {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    messageScroll.setVvalue(1.0);
+                });
             }
 
             return output;

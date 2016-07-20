@@ -34,7 +34,10 @@ public class MessageNodeComparator implements Comparator<Node> {
         } catch (ParseException e) {
             return 0;
         }
-        if(date1.getTime() < date2.getTime()) {
+
+        if(date1.getTime() == date2.getTime()) {
+            return 0;
+        } else if(date1.getTime() < date2.getTime()) {
             return 1;
         } else {
             return -1;

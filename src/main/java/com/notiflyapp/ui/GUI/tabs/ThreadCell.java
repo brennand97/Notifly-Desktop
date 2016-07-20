@@ -158,6 +158,7 @@ public class ThreadCell {
             request.putRequestValue(String.valueOf(threadId));
             RequestHandler.ResponseCallback callback = (request1, response) -> {
                 thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
+                System.out.println(thread.getBody());
                 try {
                     handleContact(thread);
                 } catch (SQLException e) {
@@ -189,6 +190,7 @@ public class ThreadCell {
                     b.append(", ");
                 }
             }
+            name = b.toString();
         } else if(contacts.length != 0){
             if(contacts[0].getBody() != null) {
                 //TODO only insert if has actual contactId;
