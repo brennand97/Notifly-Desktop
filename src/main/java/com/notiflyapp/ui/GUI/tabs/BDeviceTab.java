@@ -381,9 +381,9 @@ public class BDeviceTab extends TabHouse {
                             DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert(sms);
                             if(dateSet != null) {
                                 if(ThreadCell.MILITARY_TIME) {
-                                    Application.invokeLater(() -> dateSet.setDate((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(((SMS) object).getDate())));
+                                    Application.invokeLater(() -> dateSet.setDate((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(((SMS) object).getDateSent())));
                                 } else {
-                                    Application.invokeLater(() -> dateSet.setDate((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(((SMS) object).getDate())));
+                                    Application.invokeLater(() -> dateSet.setDate((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(((SMS) object).getDateSent())));
                                 }
                             }
 
@@ -394,7 +394,7 @@ public class BDeviceTab extends TabHouse {
                         //TODO display that message failed to send and try to resend on user request
                         if(dateSet != null) {
                             Application.invokeLater(() -> {
-                                dateSet.setDate("Message failed to send. Double click to retry");
+                                dateSet.setDate("Message failed to send. Double click to retry.");
                                 dateSet.enableRetry();
                             });
                         }
