@@ -14,7 +14,6 @@
          <children>
             <ImageView id="image_icon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image />
                </image>
                <viewport>
                   <Rectangle2D />
