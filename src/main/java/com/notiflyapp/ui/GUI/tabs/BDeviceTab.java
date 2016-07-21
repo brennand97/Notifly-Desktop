@@ -391,7 +391,7 @@ public class BDeviceTab extends TabHouse {
                             e.printStackTrace();
                         }
                     } else if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_FAILED)) {
-                        //TODO display that message failed to send and try to resend on user request
+                        //Message failed
                         if(dateSet != null) {
                             Application.invokeLater(() -> {
                                 dateSet.setDate("Message failed to send. Double click to retry.");
