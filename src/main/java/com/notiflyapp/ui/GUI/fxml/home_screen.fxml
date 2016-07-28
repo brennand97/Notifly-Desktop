@@ -6,40 +6,35 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.notiflyapp.ui.GUI.controller.HomeTabController">
+<AnchorPane stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.notiflyapp.ui.GUI.controller.HomeTabController">
    <children>
-      <BorderPane prefHeight="200.0" prefWidth="440.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane prefHeight="200.0" prefWidth="440.0" styleClass="tab-background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
-            <Text opacity="0.3" strokeType="OUTSIDE" strokeWidth="0.0" text="Connect Device" textAlignment="CENTER" BorderPane.alignment="CENTER">
-               <font>
-                  <Font size="36.0" />
-               </font>
+            <Text id="connect_message" opacity="0.3" strokeType="OUTSIDE" strokeWidth="0.0" text="Connect Device" textAlignment="CENTER" translateX="-80.0" translateY="-35.0" BorderPane.alignment="CENTER">
                <BorderPane.margin>
-                  <Insets bottom="70.0" right="100.0" />
+                  <Insets />
                </BorderPane.margin>
             </Text>
          </center>
          <left>
-            <VBox BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" BorderPane.alignment="CENTER">
                <children>
-                  <AnchorPane>
-                     <children>
-                        <Button fx:id="discoverBtn" alignment="CENTER" mnemonicParsing="false" onAction="#toggleDiscovery" text="Start Discovery" wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="10.0">
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                        </Button>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane>
-                     <children>
-                        <Button fx:id="clearMsgBtn" mnemonicParsing="false" onAction="#clearMessages" text="Clear Messages" wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                        </Button>
-                     </children>
-                  </AnchorPane>
+                  <Button fx:id="discoverBtn" alignment="CENTER" mnemonicParsing="false" onAction="#toggleDiscovery" prefWidth="150.0" styleClass="menu-button" text="Start Discovery" textAlignment="CENTER" translateY="-35.0" wrapText="true">
+                     <padding>
+                        <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="clearMsgBtn" alignment="CENTER" mnemonicParsing="false" onAction="#clearMessages" prefWidth="150.0" styleClass="menu-button" text="Clear Messages" textAlignment="CENTER" translateY="-35.0" wrapText="true">
+                     <padding>
+                        <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
                </children>
             </VBox>
          </left>

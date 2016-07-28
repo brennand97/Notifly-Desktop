@@ -22,10 +22,14 @@ public class HomeTabController {
     @FXML private void toggleDiscovery(ActionEvent event) {
         System.out.println("Discovery button pushed");
         if(discovering) {
+            discoverBtn.getStyleClass().clear();
+            discoverBtn.getStyleClass().add("menu-button");
             Houston.getInstance().stopBluetoothDiscovery();
             discoverBtn.setText("Start Discovery");
             discovering = false;
         } else {
+            discoverBtn.getStyleClass().clear();
+            discoverBtn.getStyleClass().add("menu-button-toggled");
             Houston.getInstance().startBluetoothDiscovery();
             discoverBtn.setText("Stop Discovery");
             discovering = true;

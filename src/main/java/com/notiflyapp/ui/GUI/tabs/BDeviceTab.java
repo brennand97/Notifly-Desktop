@@ -173,6 +173,7 @@ public class BDeviceTab extends TabHouse {
             for(DataObject msg: messages) {
                 handleNewMessage(msg, false);
             }
+            messageScroll.setVvalue(current.getScrollPoint());
             Application.invokeLater(() -> messageScroll.setVvalue(current.getScrollPoint()));
         }
     }
