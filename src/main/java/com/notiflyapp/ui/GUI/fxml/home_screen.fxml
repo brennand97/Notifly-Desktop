@@ -10,34 +10,32 @@
    <children>
       <BorderPane prefHeight="200.0" prefWidth="440.0" styleClass="tab-background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
-            <Text id="connect_message" opacity="0.3" strokeType="OUTSIDE" strokeWidth="0.0" text="Connect Device" textAlignment="CENTER" translateX="-80.0" translateY="-35.0" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets />
-               </BorderPane.margin>
-            </Text>
-         </center>
-         <left>
             <VBox alignment="CENTER" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="discoverBtn" alignment="CENTER" mnemonicParsing="false" onAction="#toggleDiscovery" prefWidth="150.0" styleClass="menu-button" text="Start Discovery" textAlignment="CENTER" translateY="-35.0" wrapText="true">
-                     <padding>
-                        <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="clearMsgBtn" alignment="CENTER" mnemonicParsing="false" onAction="#clearMessages" prefWidth="150.0" styleClass="menu-button" text="Clear Messages" textAlignment="CENTER" translateY="-35.0" wrapText="true">
-                     <padding>
-                        <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </VBox.margin>
-                  </Button>
+                  <Label id="connect_message" opacity="0.3" text="Connect Device" textAlignment="CENTER" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="discoverBtn" alignment="CENTER" mnemonicParsing="false" onAction="#toggleDiscovery" prefWidth="150.0" styleClass="menu-button" text="Start Discovery" textAlignment="CENTER" wrapText="true">
+                           <padding>
+                              <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="clearMsgBtn" alignment="CENTER" mnemonicParsing="false" onAction="#clearMessages" prefWidth="150.0" styleClass="menu-button" text="Clear Messages" textAlignment="CENTER" wrapText="true">
+                           <padding>
+                              <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
                </children>
             </VBox>
-         </left>
+         </center>
       </BorderPane>
    </children>
 </AnchorPane>

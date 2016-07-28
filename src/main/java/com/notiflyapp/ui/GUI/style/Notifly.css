@@ -34,6 +34,14 @@
     -fx-font-size: 16px;
 }
 
+.menu-button:hover {
+    -fx-background-color: derive(#666699, -5%);
+}
+
+.menu-button:pressed {
+    -fx-background-color: #52527a;
+}
+
 .menu-button-toggled {
     -fx-background-color: #52527a;
     -fx-background-radius: 0 0 0 0;
@@ -42,6 +50,10 @@
     -fx-font-weight: 600;
     -fx-text-fill: whitesmoke;
     -fx-font-size: 16px;
+}
+
+.menu-button-toggled:hover {
+    -fx-background-color: derive(#52527a, -5%);
 }
 
 #connect_message {
