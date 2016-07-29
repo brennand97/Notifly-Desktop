@@ -16,11 +16,11 @@
                   <ListView id="thread_list_view" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="220.0" styleClass="tab-background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <AnchorPane minWidth="200.0" prefHeight="398.0" prefWidth="163.0">
+            <AnchorPane styleClass="message-back-border" minWidth="200.0" prefHeight="398.0" prefWidth="163.0">
                <children>
-                  <VBox prefHeight="398.0" prefWidth="441.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox styleClass="message-back-border" prefHeight="398.0" prefWidth="441.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane id="active_conversation_title_bar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css">
+                        <AnchorPane id="active_conversation_title_bar" styleClass="message-capend" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css">
                            <children>
                               <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" text="Start Conversation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <font>
@@ -28,20 +28,20 @@
                                  </font></Label>
                            </children>
                         </AnchorPane>
-                        <SplitPane dividerPositions="0.8583815028901735" orientation="VERTICAL" VBox.vgrow="SOMETIMES">
+                        <SplitPane id="active_message_split_pane" styleClass="message-back-border" dividerPositions="0.8583815028901735" orientation="VERTICAL" VBox.vgrow="SOMETIMES">
                           <items>
-                              <AnchorPane id="active_conversation_message_pane">
+                              <AnchorPane id="active_conversation_message_pane" styleClass="message-back-border">
                                  <children>
-                                    <ScrollPane id="active_conversation_message_scroll_pane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <ScrollPane id="active_conversation_message_scroll_pane" styleClass="message-back-border" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <content>
                                           <VBox id="active_conversation_message_vbox" styleClass="tab-background" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" />
                                        </content>
                                     </ScrollPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane maxHeight="200.0" minHeight="50.0" prefHeight="50.0">
+                              <AnchorPane styleClass="message-capend" maxHeight="200.0" minHeight="50.0" prefHeight="50.0">
                                  <children>
-                                    <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-5.0">
+                                    <HBox id="active_conversation_send_text_hbox" styleClass="message-capend" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-5.0">
                                        <children>
                                           <TextArea id="message_entry" promptText="Send message" wrapText="true" HBox.hgrow="SOMETIMES">
                                              <HBox.margin>

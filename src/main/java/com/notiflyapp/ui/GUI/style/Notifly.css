@@ -1,25 +1,91 @@
+
+/* CONVERSATION MESSAGES */
+
 .left-message {
-    -fx-background-color: #0ea7b5;
-    -fx-border-radius: 10 10 5 5;
+    -fx-border-color: derive(#52527a, -15%);
+    -fx-background-color: derive(#52527a, -10%);
+    -fx-border-radius: 10 10 10 0;
     -fx-background-radius: 10 10 10 0;
+    -fx-border-width: 1px;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+    -fx-font-size: 14px;
 }
 
 .right-message {
-    -fx-background-color: #ffbe4f;
-    -fx-border-radius: 10 10 5 5;
+    -fx-border-color: derive(#cccccc, -5%);
+    -fx-background-color: #cccccc;
+    -fx-border-radius: 10 10 0 10;
     -fx-background-radius: 10 10 0 10;
+    -fx-border-width: 1px;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-font-size: 14px;
 }
 
-.message-backdrop {
-    
-}
-
-#active_conversation_title_bar {
-
+#message_date {
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
 }
 
 #active_conversation_title_bar_title {
+    -fx-stroke: transparent;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+}
 
+#active_message_split_pane > .split-pane-divider {
+    -fx-background-color: derive(#404040, 10%);
+}
+
+.message-capend {
+    -fx-background-color: derive(#404040, 10%);
+    -fx-border-color: derive(#404040, 10%);
+    -fx-border-width: 0px;
+}
+
+.message-back-border {
+    -fx-background-color: #404040;
+    -fx-border-color: #404040;
+    -fx-border-width: 0px;
+}
+
+
+/* SCROLL BAR */
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar > .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar > .track-background {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: #404040;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: derive(#404040, +50%);
+    -fx-background-radius: 0em;
+    -fx-border-color: transparent;
+    -fx-border-width: 0em;
+}
+
+.scroll-bar > .thumb:hover {
+    -fx-background-color: derive(#404040, +55%);
+}
+
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: derive(#404040, +60%);
 }
 
 /* HOME SCREEN (HOME TAB) */
@@ -67,6 +133,7 @@
 
 .tab-background {
     -fx-background-color: #404040;
+    -fx-border-color: #404040;
 }
 
 .tab-header-background {

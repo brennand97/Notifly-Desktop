@@ -9,7 +9,9 @@ import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
 import com.sun.glass.ui.Application;
+import com.sun.javafx.scene.layout.region.Margins;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -37,7 +39,7 @@ public class BDeviceTab extends TabHouse {
     private DeviceInfo deviceInfo;
 
     private Tab tab;
-    private ListView<Node> threadView;
+    private ListView threadView;
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private VBox messageView;
     private ScrollPane messageScroll;
@@ -81,7 +83,7 @@ public class BDeviceTab extends TabHouse {
     }
 
     private void initialize() {
-        threadView = (ListView<Node>) tab.getContent().lookup("#thread_list_view");
+        threadView = (ListView) tab.getContent().lookup("#thread_list_view");
         threadView.setOnMouseClicked(event ->  {
             int index = threadView.getSelectionModel().getSelectedIndex();
             if(index != -1) {
@@ -94,6 +96,9 @@ public class BDeviceTab extends TabHouse {
             }
         });
         messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
+        messageView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+            Application.invokeLater(() -> handleResize(newSceneWidth.doubleValue()));
+        });
         messageScroll = (ScrollPane) tab.getContent().lookup("#active_conversation_message_scroll_pane");
         messageScroll.addEventFilter(ScrollEvent.ANY, event -> {
             //System.out.println(messageScroll.getVvalue());
@@ -139,7 +144,7 @@ public class BDeviceTab extends TabHouse {
         if(tmpSmsMaxWidth != smsMaxWidth) {
             smsMaxWidth = tmpSmsMaxWidth;
             for(Node node: messageView.getChildren()) {
-                ((TextFlow) node.lookup("#message_text")).maxWidthProperty().set(smsMaxWidth);
+                ((Label) node.lookup("#message_text")).maxWidthProperty().set(smsMaxWidth);
             }
         }
     }
@@ -273,9 +278,9 @@ public class BDeviceTab extends TabHouse {
         }
 
         if(ThreadCell.MILITARY_TIME) {
-            ((Label) threadView.getItems().get(threadCells.indexOf(current)).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
+            ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
         } else {
-            ((Label) threadView.getItems().get(threadCells.indexOf(current)).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
+            ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
         }
 
         threadCells.sort(new ThreadComparator());
@@ -292,28 +297,25 @@ public class BDeviceTab extends TabHouse {
         }
         try {
             final Node node = FXMLLoader.load(SMS_NODE_URL);
-            TextFlow textFlow = (TextFlow) node.lookup("#message_text");
+            Label label = (Label) node.lookup("#message_text");
             if(sms.getAddress() != null) {
                 if(sms.getAddress().equals(current.getAddress())) {
                     node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-                    textFlow.getStyleClass().clear();
-                    textFlow.getStyleClass().add("right-message");
+                    label.getStyleClass().clear();
+                    label.getStyleClass().add("right-message");
                 }
             } else {
                 node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-                textFlow.getStyleClass().clear();
-                textFlow.getStyleClass().add("left-message");
+                label.getStyleClass().clear();
+                label.getStyleClass().add("left-message");
             }
-
-            textFlow.setTextAlignment(TextAlignment.LEFT);
-            textFlow.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            textFlow.maxWidthProperty().set(smsMaxWidth);
-            Text text = new Text();
-            text.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            text.setTextAlignment(TextAlignment.LEFT);
-            text.setFont(new Font(messageFontSize));
-            text.setText(sms.getBody());
-            textFlow.getChildren().add(text);
+            if(messageView.getChildren().size() == 0) {
+                VBox.setMargin(label, new Insets(10, 10, 0, 10));
+            }
+            label.setTextAlignment(TextAlignment.LEFT);
+            label.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            label.maxWidthProperty().set(smsMaxWidth);
+            label.setText(sms.getBody());
             final Label dateLabel = (Label) node.lookup("#message_date");
             DateSet output = null;
             if(!sending) {
