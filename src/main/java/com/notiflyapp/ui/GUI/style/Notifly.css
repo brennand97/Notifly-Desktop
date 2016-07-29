@@ -65,11 +65,6 @@
 
 /* ALL TABS */
 
-.root {
-    -fx-focus-color: transparent;
-    -fx-background-color: #404040;
-}
-
 .tab-background {
     -fx-background-color: #404040;
 }
@@ -104,4 +99,18 @@
 
 .tab-pane:focused > .tab-header-area > .headers-region > .tab .focus-indicator {
     -fx-border-color: transparent;
+}
+
+/* ROOT */
+
+.root-pane {
+    -fx-background-radius: 6;
+    -fx-border-color: #303030;
+    -fx-border-style: solid;
+    -fx-border-width: 1;
+}
+
+.root {
+    -fx-focus-color: transparent;
+    -fx-background-color: #404040;
 }

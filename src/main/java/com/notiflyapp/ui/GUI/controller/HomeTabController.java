@@ -25,13 +25,11 @@ public class HomeTabController {
             discoverBtn.getStyleClass().clear();
             discoverBtn.getStyleClass().add("menu-button");
             Houston.getInstance().stopBluetoothDiscovery();
-            discoverBtn.setText("Start Discovery");
             discovering = false;
         } else {
             discoverBtn.getStyleClass().clear();
             discoverBtn.getStyleClass().add("menu-button-toggled");
             Houston.getInstance().startBluetoothDiscovery();
-            discoverBtn.setText("Stop Discovery");
             discovering = true;
         }
     }

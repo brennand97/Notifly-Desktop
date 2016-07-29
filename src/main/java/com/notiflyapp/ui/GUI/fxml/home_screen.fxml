@@ -15,7 +15,7 @@
                   <Label id="connect_message" opacity="0.3" text="Connect Device" textAlignment="CENTER" />
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="discoverBtn" alignment="CENTER" mnemonicParsing="false" onAction="#toggleDiscovery" prefWidth="150.0" styleClass="menu-button" text="Start Discovery" textAlignment="CENTER" wrapText="true">
+                        <Button fx:id="discoverBtn" alignment="CENTER" mnemonicParsing="false" onAction="#toggleDiscovery" prefWidth="150.0" styleClass="menu-button" text="Discovery" textAlignment="CENTER" wrapText="true">
                            <padding>
                               <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
                            </padding>

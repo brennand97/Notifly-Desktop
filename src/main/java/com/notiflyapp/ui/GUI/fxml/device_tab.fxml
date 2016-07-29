@@ -13,16 +13,16 @@
         <items>
           <AnchorPane id="thread_anchor_pane" maxWidth="-Infinity" minHeight="0.0" minWidth="-Infinity" prefHeight="160.0" prefWidth="220.0" SplitPane.resizableWithParent="false">
                <children>
-                  <ListView id="thread_list_view" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="220.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ListView id="thread_list_view" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="220.0" styleClass="tab-background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
             <AnchorPane minWidth="200.0" prefHeight="398.0" prefWidth="163.0">
                <children>
                   <VBox prefHeight="398.0" prefWidth="441.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane id="active_conversation_title_bar" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="441.0">
+                        <AnchorPane id="active_conversation_title_bar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css">
                            <children>
-                              <Label id="active_conversation_title_bar_title" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" text="Start Conversation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" text="Start Conversation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <font>
                                     <Font size="24.0" />
                                  </font></Label>
@@ -34,7 +34,7 @@
                                  <children>
                                     <ScrollPane id="active_conversation_message_scroll_pane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <content>
-                                          <VBox id="active_conversation_message_vbox" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" styleClass="message-backdrop"/>
+                                          <VBox id="active_conversation_message_vbox" styleClass="tab-background" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" />
                                        </content>
                                     </ScrollPane>
                                  </children>
