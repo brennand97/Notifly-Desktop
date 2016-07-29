@@ -9,6 +9,7 @@ import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
 import com.sun.glass.ui.Application;
+import com.sun.glass.ui.SystemClipboard;
 import com.sun.javafx.scene.layout.region.Margins;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -135,6 +136,8 @@ public class BDeviceTab extends TabHouse {
             }
             if(threadIds.length > 0) {
                 selectThread(0);
+            } else {
+                current = null;
             }
         } catch (SQLException | NullResultSetException | NullPointerException e) {
             e.printStackTrace();
@@ -210,6 +213,9 @@ public class BDeviceTab extends TabHouse {
         clearMessageListView();
         clearThreadListView();
         nameLabel.setText("Start Conversation");
+        current = null;
+        messages.clear();
+        threadCells.clear();
     }
 
     @Override
@@ -253,19 +259,22 @@ public class BDeviceTab extends TabHouse {
 
     public DateSet handleNewMessage(DataObject object, boolean sending) {
         DateSet output = null;
+        System.out.println("before handle switch");
         switch (object.getType()) {
             case DataObject.Type.SMS:
                 SMS sms = (SMS) object;
+                if(threadCells.size() == 0 || current == null) {
+                    addThreadCell(sms.getThreadId());
+                    selectThread(threadCells.size() - 1);
+                }
                 if(sms.getThreadId() == current.getThreadId()) {
-                    for(DataObject s: messages) {
-                        if(s.equals(sms)) {
-                            break;
-                        }
+                    if(!messages.contains(sms)) {
+                        messages.add(sms);
+                        current.addMessage(sms);
+                        messages.sort(new MessageComparator());
+                        System.out.println("before new message call");
+                        output = newMessage(sms, sending);
                     }
-                    messages.add(sms);
-                    current.addMessage(sms);
-                    messages.sort(new MessageComparator());
-                    output = newMessage(sms, sending);
                 } else {
                     addThreadCell(sms.getThreadId());
                     for(ThreadCell cell: threadCells) {
@@ -280,10 +289,12 @@ public class BDeviceTab extends TabHouse {
                 break;
         }
 
-        if(ThreadCell.MILITARY_TIME) {
-            ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
-        } else {
-            ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
+        if(threadView.getItems().size() == threadCells.size()) {
+            if(ThreadCell.MILITARY_TIME) {
+                ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
+            } else {
+                ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
+            }
         }
 
         threadCells.sort(new ThreadComparator());
@@ -294,6 +305,7 @@ public class BDeviceTab extends TabHouse {
     }
 
     public DateSet newMessage(SMS sms, boolean sending) {
+        System.out.println("New message called.");
         boolean scrollAtBottom = false;
         if(messageScroll.getVvalue() == 1.0) {
             scrollAtBottom = true;
@@ -306,6 +318,10 @@ public class BDeviceTab extends TabHouse {
                     node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
                     label.getStyleClass().clear();
                     label.getStyleClass().add("right-message");
+                } else {
+                    node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+                    label.getStyleClass().clear();
+                    label.getStyleClass().add("left-message");
                 }
             } else {
                 node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);

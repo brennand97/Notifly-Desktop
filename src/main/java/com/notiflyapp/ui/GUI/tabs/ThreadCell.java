@@ -8,6 +8,7 @@ import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.sun.glass.ui.Application;
+import com.sun.glass.ui.SystemClipboard;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -80,20 +81,21 @@ public class ThreadCell {
     }
 
     public DataObject[] getMessages() {
+        if(messages.size() != 0) {
+            DataObject[] msgs = new DataObject[messages.size()];
+            return messages.toArray(msgs);
+        }
         try {
             DataObject[] output = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
             for(DataObject o: output) {
                 addMessage(o);
             }
+            System.out.println(output.length);
             return output;
         } catch (SQLException | NullResultSetException | UnequalArraysException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public ArrayList<DataObject> getMessageList() {
-        return messages;
     }
 
     public void addMessage(DataObject msg) {
@@ -105,7 +107,7 @@ public class ThreadCell {
                     date = ((SMS) msg).getDate();
                     break;
                 case DataObject.Type.MMS:
-                    //date = ((MMS) msg).getDate();
+                    date = ((MMS) msg).getDate();
                     break;
             }
             if(date > mostRecent) {
@@ -142,7 +144,6 @@ public class ThreadCell {
     }
 
     private void retrieveContact() {
-        //TODO retrieve name from future threadId database received from device
         try {
             thread = DatabaseFactory.getThreadDatabase(client.getDeviceMac()).queryThread(threadId);
             if(thread != null) {
@@ -224,7 +225,10 @@ public class ThreadCell {
     }
 
     public String getAddress() {
-        return formatOutAddress(thread.getContacts());
+        if(thread != null) {
+            return formatOutAddress(thread.getContacts());
+        }
+        return null;
     }
 
     String formatOutAddress(Contact[] contacts) {

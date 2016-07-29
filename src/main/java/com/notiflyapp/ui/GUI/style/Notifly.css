@@ -198,7 +198,7 @@
 
 .tab-header-background {
     -fx-background-color: derive(#52527a, -10%);
-    -fx-border-color: transparent transparent #202020 transparent;
+    -fx-border-color: transparent transparent #363636 transparent;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab {
@@ -214,14 +214,14 @@
 
 .tab-pane > .tab-header-area > .headers-region > .tab:top {
     -fx-background-color: #808080;
-    -fx-border-color: #303030 #303030 #303030 #303030;
+    -fx-border-color: #363636 #363636 #363636 #363636;
     -fx-color: #808080;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
     -fx-background-color: #404040;
     -fx-color: #404040;
-    -fx-border-color: #303030 #303030 #404040 #303030;
+    -fx-border-color: #363636 #363636 #404040 #363636;
 }
 
 .tab-pane:focused > .tab-header-area > .headers-region > .tab .focus-indicator {
