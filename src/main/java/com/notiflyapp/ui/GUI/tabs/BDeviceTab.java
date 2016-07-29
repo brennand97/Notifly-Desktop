@@ -110,6 +110,9 @@ public class BDeviceTab extends TabHouse {
         sendButton = (Button) tab.getContent().lookup("#send_button");
         sendButton.setOnAction(e -> {
             if(current.getThreadType().equals(ThreadCell.THREAD_TYPE_SINGLE)) {
+                if(textArea.getText().trim().equals("")) {
+                    return;
+                }
                 SMS sms = new SMS();
                 sms.setBody(textArea.getText());
                 sms.setAddress(current.getAddress());

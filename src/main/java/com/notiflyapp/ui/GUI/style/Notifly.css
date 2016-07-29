@@ -27,6 +27,24 @@
     -fx-text-fill: whitesmoke;
 }
 
+.message-capend {
+    -fx-background-color: derive(#404040, 10%);
+    -fx-border-color: derive(#404040, 10%);
+    -fx-border-width: 0px;
+}
+
+.message-back-border {
+    -fx-background-color: derive(#404040, -10%);
+    -fx-border-color: derive(#404040, -10%);
+    -fx-border-width: 0px;
+}
+
+#active_conversation_title_bar {
+    -fx-background-color: #404040;
+    -fx-border-color: #404040;
+    -fx-border-width: 0px;
+}
+
 #active_conversation_title_bar_title {
     -fx-stroke: transparent;
     -fx-font-family: Verdana, Tahoma;
@@ -35,22 +53,59 @@
     -fx-font-weight: 700;
 }
 
-#active_message_split_pane > .split-pane-divider {
+.split-pane > .split-pane-divider {
     -fx-background-color: derive(#404040, 10%);
 }
 
-.message-capend {
+.text-area#message_entry .content {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 0em;
+    -fx-border-color: transparent;
+    -fx-border-width: 0em;
+    -fx-padding: 0.5em;
+}
+
+.text-area#message_entry .scroll-pane {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 0em;
+    -fx-border-color: transparent;
+    -fx-border-width: 0em;
+}
+
+.text-area#message_entry {
+    -fx-prompt-text-fill: #606060;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-font-size: 14px;
+    -fx-focus-color: transparent;
+}
+
+.button#send_button {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+#thread_list_view {
     -fx-background-color: derive(#404040, 10%);
     -fx-border-color: derive(#404040, 10%);
     -fx-border-width: 0px;
 }
 
-.message-back-border {
-    -fx-background-color: #404040;
-    -fx-border-color: #404040;
-    -fx-border-width: 0px;
+.list-view#thread_list_view .cell.indexed-cell.list-cell:even:filled,
+.list-view#thread_list_view .cell.indexed-cell.list-cell:odd:filled {
+    -fx-background-color: derive(#666699, -30%);
+    -fx-padding: 0.25em;
+    -fx-border-width: 0.25em;
+    -fx-border-color: derive(#404040, 10%);
 }
 
+.list-view#thread_list_view .cell.indexed-cell.list-cell:even:empty,
+.list-view#thread_list_view .cell.indexed-cell.list-cell:odd:empty {
+    -fx-background-color: derive(#404040, 10%);;
+}
+
+#split_pane_1 {
+    -fx-border-color: #404040 derive(#404040, 10%) derive(#404040, 10%) derive(#404040, 10%);
+}
 
 /* SCROLL BAR */
 
@@ -68,7 +123,7 @@
 
 .scroll-bar > .increment-button,
 .scroll-bar > .decrement-button {
-    -fx-background-color: #404040;
+    -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-width: 0px;
 }
@@ -91,21 +146,8 @@
 /* HOME SCREEN (HOME TAB) */
 
 .menu-button {
-    -fx-background-color: #666699;
-    -fx-background-radius: 0 0 0 0;
-    -fx-border-radius: 0 0 0 0;
-    -fx-font-family: Verdana, Tahoma;
     -fx-font-weight: 600;
-    -fx-text-fill: whitesmoke;
     -fx-font-size: 16px;
-}
-
-.menu-button:hover {
-    -fx-background-color: derive(#666699, -5%);
-}
-
-.menu-button:pressed {
-    -fx-background-color: #52527a;
 }
 
 .menu-button-toggled {
@@ -129,6 +171,24 @@
     -fx-font-size: 36px;
 }
 
+/* BUTTONS */
+
+.button {
+    -fx-background-color: #666699;
+    -fx-background-radius: 0 0 0 0;
+    -fx-border-radius: 0 0 0 0;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+}
+
+.button:hover {
+    -fx-background-color: derive(#666699, -5%);
+}
+
+.button:pressed {
+    -fx-background-color: #52527a;
+}
+
 /* ALL TABS */
 
 .tab-background {
@@ -138,7 +198,7 @@
 
 .tab-header-background {
     -fx-background-color: derive(#52527a, -10%);
-    -fx-border-color: transparent transparent #303030 transparent;
+    -fx-border-color: transparent transparent #202020 transparent;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab {
