@@ -69,6 +69,7 @@ public class BDeviceTab extends TabHouse {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/notiflyapp/ui/GUI/fxml/device_tab.fxml"));
             Node node = loader.load();
             tab.setContent(node);
+            tab.getContent().getScene().getRoot().applyCss();
 
             Application.invokeLater(() -> {
                 try {
@@ -190,8 +191,10 @@ public class BDeviceTab extends TabHouse {
     }
 
     protected void updateName(ThreadCell cell) {
-        if(current.equals(cell)) {
-            nameLabel.setText(cell.getName());
+        if(current != null) {
+            if(current.equals(cell)) {
+                nameLabel.setText(cell.getName());
+            }
         }
         for(int i = 0; i < threadCells.size(); i++) {
             if(threadCells.get(i).getThreadId() == cell.getThreadId()) {
