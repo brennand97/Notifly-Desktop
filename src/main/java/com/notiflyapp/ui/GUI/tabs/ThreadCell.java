@@ -13,7 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -90,7 +89,6 @@ public class ThreadCell {
             for(DataObject o: output) {
                 addMessage(o);
             }
-            System.out.println(output.length);
             return output;
         } catch (SQLException | NullResultSetException | UnequalArraysException e) {
             e.printStackTrace();
@@ -126,10 +124,12 @@ public class ThreadCell {
     }
 
     public Node getNode() {
-        try {
-            createNode();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(node == null) {
+            try {
+                createNode();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return node;
     }
@@ -148,6 +148,7 @@ public class ThreadCell {
             thread = DatabaseFactory.getThreadDatabase(client.getDeviceMac()).queryThread(threadId);
             if(thread != null) {
                 handleContact(thread);
+                return;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -205,7 +206,17 @@ public class ThreadCell {
         } else {
             name = String.valueOf(threadId);
         }
-        Application.invokeLater(() -> house.updateName(this));
+        if(nameLabel == null) {
+            try {
+                createNode();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Application.invokeLater(() -> {
+            nameLabel.setText(getName());
+            house.updateCurrentNameLabel();
+        });
     }
 
     public String getName() {

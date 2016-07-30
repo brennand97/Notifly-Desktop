@@ -81,6 +81,15 @@ public class DatabaseFactory {
             }
             rsThr.close();
         }
+
+        ResultSet rsCon = Database.stmt.executeQuery("select name from sqlite_master where type = 'table' and name like '" + ContactDatabase.TABLE_NAME_PREFIX + "%';");
+
+        if(rsCon != null) {
+            while(rsCon.next()) {
+                Database.stmt.execute("drop table if exists " + rsCon.getString("name") + ";");
+            }
+            rsCon.close();
+        }
     }
 
 }

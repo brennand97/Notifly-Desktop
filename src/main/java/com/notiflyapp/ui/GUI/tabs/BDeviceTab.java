@@ -11,6 +11,8 @@ import com.notiflyapp.controlcenter.Houston;
 import com.sun.glass.ui.Application;
 import com.sun.glass.ui.SystemClipboard;
 import com.sun.javafx.scene.layout.region.Margins;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -29,7 +31,9 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -40,7 +44,7 @@ public class BDeviceTab extends TabHouse {
     private DeviceInfo deviceInfo;
 
     private Tab tab;
-    private ListView threadView;
+    private ListView<Node> threadView;
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private VBox messageView;
     private ScrollPane messageScroll;
@@ -85,7 +89,7 @@ public class BDeviceTab extends TabHouse {
     }
 
     private void initialize() {
-        threadView = (ListView) tab.getContent().lookup("#thread_list_view");
+        threadView = (ListView<Node>) tab.getContent().lookup("#thread_list_view");
         threadView.setOnMouseClicked(event ->  {
             int index = threadView.getSelectionModel().getSelectedIndex();
             if(index != -1) {
@@ -159,6 +163,7 @@ public class BDeviceTab extends TabHouse {
     private void addThreadCell(int threadId) {
         for(ThreadCell cell: threadCells) {
             if(cell.getThreadId() == threadId) {
+                System.out.println("Return");
                 return;
             }
         }
@@ -167,7 +172,6 @@ public class BDeviceTab extends TabHouse {
 
         threadCells.add(cell);
         threadView.getItems().add(node);
-
         threadCells.sort(new ThreadComparator());
         threadView.getItems().sort(new ThreadNodeComparator());
     }
@@ -175,6 +179,7 @@ public class BDeviceTab extends TabHouse {
     private void selectThread(int index) {
         ThreadCell tmpCurrent = threadCells.get(index);
         if(!tmpCurrent.equals(current)) {
+            threadView.getSelectionModel().select(index);
             if(messageScroll != null && current != null) {
                 current.setScrollPoint(messageScroll.getVvalue());
             }
@@ -190,18 +195,9 @@ public class BDeviceTab extends TabHouse {
         }
     }
 
-    protected void updateName(ThreadCell cell) {
+    protected void updateCurrentNameLabel() {
         if(current != null) {
-            if(current.equals(cell)) {
-                nameLabel.setText(cell.getName());
-            }
-        }
-        for(int i = 0; i < threadCells.size(); i++) {
-            if(threadCells.get(i).getThreadId() == cell.getThreadId()) {
-                threadView.getItems().remove(i);
-                threadView.getItems().add(i, cell.getNode());
-
-            }
+            nameLabel.setText(current.getName());
         }
     }
 
@@ -263,22 +259,32 @@ public class BDeviceTab extends TabHouse {
     public DateSet handleNewMessage(DataObject object, boolean sending) {
         DateSet output = null;
         System.out.println("before handle switch");
+        //System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()).replace(",","\n  "));
         switch (object.getType()) {
             case DataObject.Type.SMS:
                 SMS sms = (SMS) object;
-                if(threadCells.size() == 0 || current == null) {
-                    addThreadCell(sms.getThreadId());
-                    selectThread(threadCells.size() - 1);
+                boolean isPartOfCurrent = false;
+                if(current != null) {
+                    if(sms.getThreadId() == current.getThreadId()) {
+                        isPartOfCurrent = true;
+                    }
+                } else {
+                    if(threadCells.size() == 0) {
+                        addThreadCell(sms.getThreadId());
+                        selectThread(0);
+                    }
                 }
-                if(sms.getThreadId() == current.getThreadId()) {
+                if(isPartOfCurrent) {
+                    System.out.println("Current thread matches ID");
                     if(!messages.contains(sms)) {
+                        System.out.println(messages.size());
                         messages.add(sms);
                         current.addMessage(sms);
                         messages.sort(new MessageComparator());
-                        System.out.println("before new message call");
                         output = newMessage(sms, sending);
                     }
                 } else {
+                    System.out.println("Current thread does not match ID");
                     addThreadCell(sms.getThreadId());
                     for(ThreadCell cell: threadCells) {
                         if(cell.getThreadId() == sms.getThreadId()) {
@@ -291,7 +297,7 @@ public class BDeviceTab extends TabHouse {
 
                 break;
         }
-
+        /*
         if(threadView.getItems().size() == threadCells.size()) {
             if(ThreadCell.MILITARY_TIME) {
                 ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
@@ -299,7 +305,7 @@ public class BDeviceTab extends TabHouse {
                 ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
             }
         }
-
+        */
         threadCells.sort(new ThreadComparator());
         threadView.getItems().sort(new ThreadNodeComparator());
         threadView.refresh();
@@ -308,7 +314,6 @@ public class BDeviceTab extends TabHouse {
     }
 
     public DateSet newMessage(SMS sms, boolean sending) {
-        System.out.println("New message called.");
         boolean scrollAtBottom = false;
         if(messageScroll.getVvalue() == 1.0) {
             scrollAtBottom = true;
@@ -382,6 +387,7 @@ public class BDeviceTab extends TabHouse {
             }
 
             return output;
+
         } catch (IOException e) {
             e.printStackTrace();
             return null;
