@@ -144,8 +144,7 @@ public class SMS extends Message<String, File> {
                     sms.getBody().equals(body) &&
                     sms.getDate() == date &&
                     sms.getDateSent() == dateSent &&
-                    sms.getOriginatingAddress().equals(originatingAddress) &&
-                    sms.getId() == id) {
+                    sms.getOriginatingAddress().equals(originatingAddress)) {
                 return true;
             } else {
                 return false;

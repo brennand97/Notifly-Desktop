@@ -1,4 +1,4 @@
-package com.notiflyapp.ui.GUI.tabs;
+package com.notiflyapp.ui.GUI.tabs.device;
 
 import java.util.Comparator;
 

@@ -1,4 +1,4 @@
-package com.notiflyapp.ui.GUI.tabs;
+package com.notiflyapp.ui.GUI.tabs.device;
 
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
@@ -8,7 +8,6 @@ import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.sun.glass.ui.Application;
-import com.sun.glass.ui.SystemClipboard;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -44,14 +43,16 @@ public class ThreadCell {
     private String name;
     private ConversationThread thread;
     private double scrollPoint = 1.0;
+    private double maxWidth;
 
     private ArrayList<DataObject> messages = new ArrayList<>();
     private long mostRecent = 0L;
 
-    public ThreadCell(BluetoothClient client, BDeviceTab house, int threadId) {
+    public ThreadCell(BluetoothClient client, BDeviceTab house, int threadId, double maxWidth) {
         this.client = client;
         this.house = house;
         this.threadId = threadId;
+        this.maxWidth = maxWidth;
         retrieveContact();
         try {
             createNode();
@@ -77,6 +78,7 @@ public class ThreadCell {
         } else {
             dateLabel.setText("");
         }
+        node.maxWidth(maxWidth);
     }
 
     public DataObject[] getMessages() {
@@ -160,7 +162,6 @@ public class ThreadCell {
             request.putRequestValue(String.valueOf(threadId));
             RequestHandler.ResponseCallback callback = (request1, response) -> {
                 thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
-                System.out.println(thread.getBody());
                 try {
                     handleContact(thread);
                 } catch (SQLException e) {
@@ -266,6 +267,12 @@ public class ThreadCell {
 
     public void setScrollPoint(double scrollPoint) {
         this.scrollPoint = scrollPoint;
+    }
+
+    public void updateMaxWidth(double newMaxWidth) {
+        this.maxWidth = newMaxWidth;
+        node.maxWidth(maxWidth);
+        System.out.println(maxWidth);
     }
 
 }

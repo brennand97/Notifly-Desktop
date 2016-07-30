@@ -23,12 +23,13 @@ public class HomeTabController {
         System.out.println("Discovery button pushed");
         if(discovering) {
             discoverBtn.getStyleClass().clear();
-            discoverBtn.getStyleClass().add("menu-button");
+            discoverBtn.getStyleClass().add("home-menu-button");
+            discoverBtn.getStyleClass().add("button");
             Houston.getInstance().stopBluetoothDiscovery();
             discovering = false;
         } else {
             discoverBtn.getStyleClass().clear();
-            discoverBtn.getStyleClass().add("menu-button-toggled");
+            discoverBtn.getStyleClass().add("home-menu-button-toggled");
             Houston.getInstance().startBluetoothDiscovery();
             discovering = true;
         }

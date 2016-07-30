@@ -1,4 +1,4 @@
-package com.notiflyapp.ui.GUI.tabs;
+package com.notiflyapp.ui.GUI.tabs.device;
 
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
@@ -8,11 +8,8 @@ import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
+import com.notiflyapp.ui.GUI.tabs.TabHouse;
 import com.sun.glass.ui.Application;
-import com.sun.glass.ui.SystemClipboard;
-import com.sun.javafx.scene.layout.region.Margins;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -22,18 +19,13 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -55,11 +47,12 @@ public class BDeviceTab extends TabHouse {
 
     private ThreadCell current;
     private double smsMaxWidth;
+    private double threadMaxWidth;
 
     private static final long gracePeriod = 5000;
     private static final int messageFontSize = 16;
     private static final String defaultName = "Bluetooth Device";
-    private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.BDeviceTab";
+    private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.device.BDeviceTab";
 
     private final URL SMS_NODE_URL = getClass().getResource("/com/notiflyapp/ui/GUI/fxml/sms_cell.fxml");
 
@@ -75,14 +68,8 @@ public class BDeviceTab extends TabHouse {
             tab.setContent(node);
             tab.getContent().getScene().getRoot().applyCss();
 
-            Application.invokeLater(() -> {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                initialize();
-            });
+            initialize();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,6 +88,19 @@ public class BDeviceTab extends TabHouse {
                 }
             }
         });
+        threadView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+            Application.invokeLater(() -> {
+                threadMaxWidth = newSceneWidth.doubleValue();
+                for(ThreadCell cell : threadCells) {
+                    cell.updateMaxWidth(threadMaxWidth);
+                }
+                for(Node node: threadView.getItems()) {
+                    node.maxWidth(threadMaxWidth);
+                }
+            });
+        });
+        threadMaxWidth = 220;
+        threadView.setPrefWidth(threadMaxWidth);
         messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
         messageView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
             Application.invokeLater(() -> handleResize(newSceneWidth.doubleValue()));
@@ -167,7 +167,7 @@ public class BDeviceTab extends TabHouse {
                 return;
             }
         }
-        ThreadCell cell = new ThreadCell(client, this, threadId);
+        ThreadCell cell = new ThreadCell(client, this, threadId, threadMaxWidth);
         Node node = cell.getNode();
 
         threadCells.add(cell);
@@ -374,7 +374,13 @@ public class BDeviceTab extends TabHouse {
                 };
             }
 
-            messageView.getChildren().add(messages.indexOf(sms), node);
+            int index = messages.indexOf(sms);
+            if(index > -1) {
+                messageView.getChildren().add(index, node);
+            } else {
+                messageView.getChildren().add(node);
+            }
+
             if(scrollAtBottom) {
                 Application.invokeLater(() -> {
                     try {

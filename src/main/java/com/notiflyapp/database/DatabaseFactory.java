@@ -1,12 +1,8 @@
 package com.notiflyapp.database;
 
-import com.notiflyapp.data.DeviceInfo;
-import com.notiflyapp.ui.GUI.tabs.ThreadCell;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.jar.Pack200;
 
 /**
  * Created by Brennan on 6/8/2016.

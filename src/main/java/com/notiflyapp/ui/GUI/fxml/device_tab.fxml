@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="device_tab_pane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="device_tab_pane" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -16,11 +16,11 @@
                      <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" text="Start Conversation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                  </children>
              </AnchorPane>
-            <SplitPane id="split_pane_1" dividerPositions="0.18896321070234115" styleClass="message-capend" VBox.vgrow="SOMETIMES">
+            <SplitPane id="split_pane_1" dividerPositions="0.1" styleClass="message-capend" VBox.vgrow="SOMETIMES">
               <items>
-                <AnchorPane id="thread_anchor_pane" styleClass="message-capend" maxWidth="-Infinity" minHeight="0.0" minWidth="-Infinity" prefHeight="160.0" prefWidth="220.0" SplitPane.resizableWithParent="false">
+                <AnchorPane id="thread_anchor_pane" styleClass="message-capend">
                      <children>
-                        <ListView id="thread_list_view" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="220.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ListView id="thread_list_view" minWidth="220.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                   <AnchorPane minWidth="200.0" prefHeight="398.0" prefWidth="163.0" styleClass="message-capend">

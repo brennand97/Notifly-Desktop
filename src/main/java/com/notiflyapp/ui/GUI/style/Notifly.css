@@ -25,6 +25,7 @@
 #message_date {
     -fx-font-family: Verdana, Tahoma;
     -fx-text-fill: whitesmoke;
+    -fx-font-size: 9px;
 }
 
 .message-capend {
@@ -90,8 +91,8 @@
     -fx-border-width: 0px;
 }
 
-.list-view#thread_list_view .cell.indexed-cell.list-cell:even:filled,
-.list-view#thread_list_view .cell.indexed-cell.list-cell:odd:filled {
+.list-view#thread_list_view .list-cell:even:filled,
+.list-view#thread_list_view .list-cell:odd:filled {
     -fx-background-color: derive(#666699, -30%);
     -fx-padding: 0.25em;
     -fx-border-width: 0.25em;
@@ -101,6 +102,34 @@
 .list-view#thread_list_view .cell.indexed-cell.list-cell:even:empty,
 .list-view#thread_list_view .cell.indexed-cell.list-cell:odd:empty {
     -fx-background-color: derive(#404040, 10%);;
+}
+
+.list-view#thread_list_view .list-cell:even:filled:selected,
+.list-view#thread_list_view .list-cell:odd:filled:selected{
+    -fx-background-color: derive(#666699, -10%);
+}
+
+.list-view#thread_list_view .list-cell:even:filled:hover,
+.list-view#thread_list_view .list-cell:odd:filled:hover {
+    -fx-background-color: derive(#666699, -35%);
+}
+
+.list-view#thread_list_view .list-cell:even:filled:selected:hover,
+.list-view#thread_list_view .list-cell:odd:filled:selected:hover {
+    -fx-background-color: derive(#666699, -15%);
+}
+
+.list-view#thread_list_view .cell.indexed-cell.list-cell .label {
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+}
+
+.list-view#thread_list_view .cell.indexed-cell.list-cell .label#date_label {
+     -fx-font-size: 9px;
+}
+
+.list-view#thread_list_view .cell.indexed-cell.list-cell .label#name_label {
+    -fx-font-size: 16px;
 }
 
 #split_pane_1 {
@@ -145,12 +174,12 @@
 
 /* HOME SCREEN (HOME TAB) */
 
-.menu-button {
+.home-menu-button {
     -fx-font-weight: 600;
     -fx-font-size: 16px;
 }
 
-.menu-button-toggled {
+.home-menu-button-toggled {
     -fx-background-color: #52527a;
     -fx-background-radius: 0 0 0 0;
     -fx-border-radius: 0 0 0 0;
@@ -160,7 +189,7 @@
     -fx-font-size: 16px;
 }
 
-.menu-button-toggled:hover {
+.home-menu-button-toggled:hover {
     -fx-background-color: derive(#52527a, -5%);
 }
 

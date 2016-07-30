@@ -1,4 +1,4 @@
-package com.notiflyapp.ui.GUI.tabs;
+package com.notiflyapp.ui.GUI.tabs.device;
 
 import com.notiflyapp.data.DataObject;
 import com.notiflyapp.data.MMS;
