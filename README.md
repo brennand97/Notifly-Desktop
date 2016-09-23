@@ -5,4 +5,4 @@ between the phone and the computer.  It sends any incoming SMS messages directly
 as the connection has been enabled.  Future plans include MMS capability and Notification support.
 
 ## Notifly-Android
-The android application can be found [here](https://github.com/brennand97/Notifly-Desktop/).
+The android application can be found [here](https://github.com/brennand97/Notifly-Android/).
