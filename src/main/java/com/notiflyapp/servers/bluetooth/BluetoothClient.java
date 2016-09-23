@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Brennan Douglas
+ */
+
 package com.notiflyapp.servers.bluetooth;
 
 import com.google.gson.Gson;

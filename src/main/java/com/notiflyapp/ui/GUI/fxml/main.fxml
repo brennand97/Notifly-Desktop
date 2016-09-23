@@ -9,6 +9,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 
+<!--
+  ~ Copyright (c) 2016 Brennan Douglas
+  -->
+
 <AnchorPane stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="650.0" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.notiflyapp.ui.GUI.controller.MainController">
    <children>
       <TabPane id="main_tab_pane" prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />

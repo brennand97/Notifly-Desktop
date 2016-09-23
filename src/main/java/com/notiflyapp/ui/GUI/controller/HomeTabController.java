@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Brennan Douglas
+ */
+
 package com.notiflyapp.ui.GUI.controller;
 
 import com.notiflyapp.controlcenter.Houston;

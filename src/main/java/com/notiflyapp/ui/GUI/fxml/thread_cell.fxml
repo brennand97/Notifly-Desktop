@@ -8,6 +8,10 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
+<!--
+  ~ Copyright (c) 2016 Brennan Douglas
+  -->
+
 <AnchorPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="200.0" prefHeight="40.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" minWidth="200.0" prefHeight="40.0">

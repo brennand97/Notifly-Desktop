@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Brennan Douglas
+ */
+
 package com.notiflyapp.controlcenter;
 
 import com.notiflyapp.servers.bluetooth.BluetoothServer;
@@ -6,6 +10,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,6 +25,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
 
         Parent root = FXMLLoader.load(getClass().getResource("/com/notiflyapp/ui/GUI/fxml/main.fxml"));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/com/notiflyapp/ui/notifly_icon-512.png")));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/com/notiflyapp/ui/GUI/style/Notifly.css").toExternalForm());
         primaryStage.setScene(scene);

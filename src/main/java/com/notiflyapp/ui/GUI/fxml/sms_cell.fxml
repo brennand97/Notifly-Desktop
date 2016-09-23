@@ -6,6 +6,10 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
+<!--
+  ~ Copyright (c) 2016 Brennan Douglas
+  -->
+
 <AnchorPane fx:id="anchor" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox fillWidth="false">

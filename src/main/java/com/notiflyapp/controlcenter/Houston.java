@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Brennan Douglas
+ */
+
 package com.notiflyapp.controlcenter;
 
 import com.notiflyapp.data.*;
@@ -15,9 +19,12 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -199,6 +206,14 @@ public class Houston {
         } else if(object instanceof MMS) {
 
         }
+        URL notificationSound = getClass().getResource("/com/notiflyapp/ui/GUI/sounds/glass_ping.mp3");
+        playNotificationSound(notificationSound);
+    }
+
+    public static synchronized void playNotificationSound(URL filePath) {
+        Media hit = new Media(filePath.toExternalForm());
+        MediaPlayer mediaPlayer = new MediaPlayer(hit);
+        mediaPlayer.play();
     }
 
     public void removeTab(TabHouse tab) {

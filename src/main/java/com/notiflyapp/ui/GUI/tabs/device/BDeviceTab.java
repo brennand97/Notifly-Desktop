@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Brennan Douglas
+ */
+
 package com.notiflyapp.ui.GUI.tabs.device;
 
 import com.notiflyapp.data.*;
@@ -20,6 +24,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -163,7 +169,6 @@ public class BDeviceTab extends TabHouse {
     private void addThreadCell(int threadId) {
         for(ThreadCell cell: threadCells) {
             if(cell.getThreadId() == threadId) {
-                System.out.println("Return");
                 return;
             }
         }
@@ -258,7 +263,6 @@ public class BDeviceTab extends TabHouse {
 
     public DateSet handleNewMessage(DataObject object, boolean sending) {
         DateSet output = null;
-        System.out.println("before handle switch");
         //System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()).replace(",","\n  "));
         switch (object.getType()) {
             case DataObject.Type.SMS:
@@ -275,16 +279,13 @@ public class BDeviceTab extends TabHouse {
                     }
                 }
                 if(isPartOfCurrent) {
-                    System.out.println("Current thread matches ID");
                     if(!messages.contains(sms)) {
-                        System.out.println(messages.size());
                         messages.add(sms);
                         current.addMessage(sms);
                         messages.sort(new MessageComparator());
                         output = newMessage(sms, sending);
                     }
                 } else {
-                    System.out.println("Current thread does not match ID");
                     addThreadCell(sms.getThreadId());
                     for(ThreadCell cell: threadCells) {
                         if(cell.getThreadId() == sms.getThreadId()) {

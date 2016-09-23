@@ -6,6 +6,10 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
+<!--
+  ~ Copyright (c) 2016 Brennan Douglas
+  -->
+
 <AnchorPane stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.notiflyapp.ui.GUI.controller.HomeTabController">
    <children>
       <BorderPane prefHeight="200.0" prefWidth="440.0" styleClass="tab-background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
