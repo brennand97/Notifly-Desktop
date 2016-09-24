@@ -204,6 +204,14 @@
     -fx-font-size: 36px;
 }
 
+#copyright_message {
+    -fx-font-weight: 400;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+    -fx-font-size: 12px;
+    -fx-opacity: 0.3;
+}
+
 /* BUTTONS */
 
 .button {
