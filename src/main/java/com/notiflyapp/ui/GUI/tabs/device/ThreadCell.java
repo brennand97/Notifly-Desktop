@@ -42,7 +42,7 @@ public class ThreadCell {
     private ImageView imageView;
 
     private BluetoothClient client;
-    private BDeviceTab house;
+    private DeviceTab house;
     private int threadId;
     private String name;
     private ConversationThread thread;
@@ -52,7 +52,7 @@ public class ThreadCell {
     private ArrayList<DataObject> messages = new ArrayList<>();
     private long mostRecent = 0L;
 
-    public ThreadCell(BluetoothClient client, BDeviceTab house, int threadId, double maxWidth) {
+    public ThreadCell(BluetoothClient client, DeviceTab house, int threadId, double maxWidth) {
         this.client = client;
         this.house = house;
         this.threadId = threadId;
@@ -129,7 +129,7 @@ public class ThreadCell {
         return mostRecent;
     }
 
-    public Node getNode() {
+    public Node toNode() {
         if(node == null) {
             try {
                 createNode();

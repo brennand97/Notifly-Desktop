@@ -20,12 +20,12 @@ import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,13 +36,13 @@ import java.util.ArrayList;
 /**
  * Created by Brennan on 6/8/2016.
  */
-public class BDeviceTab extends TabHouse {
+public class DeviceTab extends TabHouse {
 
     private BluetoothClient client;
     private DeviceInfo deviceInfo;
 
     private Tab tab;
-    private ListView<Node> threadView;
+    private ListView<ThreadCell> threadView;
     private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private VBox messageView;
     private ScrollPane messageScroll;
@@ -50,6 +50,8 @@ public class BDeviceTab extends TabHouse {
     private Label nameLabel;
     private Button sendButton;
     private TextArea textArea;
+    private VBox optionButton;
+    private Circle[] optionDots = new Circle[3];
 
     private ThreadCell current;
     private double smsMaxWidth;
@@ -58,11 +60,11 @@ public class BDeviceTab extends TabHouse {
     private static final long gracePeriod = 5000;
     private static final int messageFontSize = 16;
     private static final String defaultName = "Bluetooth Device";
-    private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.device.BDeviceTab";
+    private static final String creatorName = "com.notiflyapp.ui.GUI.tabs.device.DeviceTab";
 
     private final URL SMS_NODE_URL = getClass().getResource("/com/notiflyapp/ui/GUI/fxml/sms_cell.fxml");
 
-    public BDeviceTab(Tab tab, BluetoothClient client) {
+    public DeviceTab(Tab tab, BluetoothClient client) {
         super(tab, client.getDeviceName() == null ? client.getDeviceMac() == null ? defaultName : client.getDeviceMac() : client.getDeviceName());
         this.tab = tab;
         this.client = client;
@@ -82,7 +84,50 @@ public class BDeviceTab extends TabHouse {
     }
 
     private void initialize() {
-        threadView = (ListView<Node>) tab.getContent().lookup("#thread_list_view");
+
+        //Lookup FXML objects
+
+        threadView = (ListView<ThreadCell>) tab.getContent().lookup("#thread_list_view");
+        messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
+        messageScroll = (ScrollPane) tab.getContent().lookup("#active_conversation_message_scroll_pane");
+        nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
+
+        optionButton = (VBox) tab.getContent().lookup("#option_button");
+            optionDots[0] = (Circle) optionButton.lookup("#option_dot_1");
+            optionDots[1] = (Circle) optionButton.lookup("#option_dot_2");
+            optionDots[2] = (Circle) optionButton.lookup("#option_dot_3");
+
+        textArea = (TextArea) tab.getContent().lookup("#message_entry");
+        sendButton = (Button) tab.getContent().lookup("#send_button");
+
+        //Define initial SMS width
+        smsMaxWidth = (messageView.getWidth() * 0.75);
+
+
+
+        //Thread View (Conversations ListView)
+
+        threadView.setCellFactory(new Callback<ListView<ThreadCell>, ListCell<ThreadCell>>() {
+            @Override
+            public ListCell<ThreadCell> call(ListView<ThreadCell> param) {
+                return new ListCell<ThreadCell>() {
+
+                    @Override
+                    protected void updateItem(ThreadCell item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            Node node = item.toNode();
+                            setGraphic(node);
+                        } else {
+                            setText("ITEM NOT RENDERED");
+                        }
+
+                    }
+
+                };
+            }
+        });
         threadView.setOnMouseClicked(event ->  {
             int index = threadView.getSelectionModel().getSelectedIndex();
             if(index != -1) {
@@ -100,26 +145,47 @@ public class BDeviceTab extends TabHouse {
                 for(ThreadCell cell : threadCells) {
                     cell.updateMaxWidth(threadMaxWidth);
                 }
+                threadView.refresh();
+                /*
                 for(Node node: threadView.getItems()) {
                     node.maxWidth(threadMaxWidth);
-                }
+                }*/
             });
         });
         threadMaxWidth = 220;
         threadView.setPrefWidth(threadMaxWidth);
-        messageView = (VBox) tab.getContent().lookup("#active_conversation_message_vbox");
+
+
+
+        //Message View (Message VBox)
+
         messageView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
             Application.invokeLater(() -> handleResize(newSceneWidth.doubleValue()));
         });
-        messageScroll = (ScrollPane) tab.getContent().lookup("#active_conversation_message_scroll_pane");
-        messageScroll.addEventFilter(ScrollEvent.ANY, event -> {
-            //System.out.println(messageScroll.getVvalue());
+
+
+
+        //Option Button/Dots (VBox in top right containing 3 circles)
+
+        for(Circle dot: optionDots) {
+            //Initialize the style of the circles
+            dot.setFill(Paint.valueOf("#808080"));
+            dot.setStroke(dot.getFill());
+        }
+        optionButton.setOnMouseClicked(event -> {
+            //TODO react to option dots being pushed
         });
-        smsMaxWidth = (messageView.getWidth() * 0.75);
-        nameLabel = (Label) tab.getContent().lookup("#active_conversation_title_bar_title");
-        textArea = (TextArea) tab.getContent().lookup("#message_entry");
+
+
+
+        //Text Area (Input Text Area for outgoing messages)
+
         textArea.setFont(new Font(messageFontSize));
-        sendButton = (Button) tab.getContent().lookup("#send_button");
+
+
+
+        //Send Button (Button in bottom left to send outgoing messages
+
         sendButton.setOnAction(e -> {
             if(current.getThreadType().equals(ThreadCell.THREAD_TYPE_SINGLE)) {
                 if(textArea.getText().trim().equals("")) {
@@ -140,6 +206,11 @@ public class BDeviceTab extends TabHouse {
                 //TODO handle creation of MMS message
             }
         });
+
+
+
+        //Initialize Conversation Threads from SQLite Database for device if available
+
         try {
             int[] threadIds = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getThreadIds();
             for(int i: threadIds) {
@@ -153,6 +224,8 @@ public class BDeviceTab extends TabHouse {
         } catch (SQLException | NullResultSetException | NullPointerException e) {
             e.printStackTrace();
         }
+
+
     }
 
     @Override
@@ -173,12 +246,11 @@ public class BDeviceTab extends TabHouse {
             }
         }
         ThreadCell cell = new ThreadCell(client, this, threadId, threadMaxWidth);
-        Node node = cell.getNode();
 
         threadCells.add(cell);
-        threadView.getItems().add(node);
+        threadView.getItems().add(cell);
         threadCells.sort(new ThreadComparator());
-        threadView.getItems().sort(new ThreadNodeComparator());
+        threadView.getItems().sort(new ThreadComparator());
     }
 
     private void selectThread(int index) {

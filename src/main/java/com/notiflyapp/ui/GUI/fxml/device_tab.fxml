@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.*?>
@@ -17,7 +19,35 @@
          <children>
              <AnchorPane id="active_conversation_title_bar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css">
                  <children>
-                     <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" text="Start Conversation" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <BorderPane prefHeight="50.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <center>
+                           <Label id="active_conversation_title_bar_title" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="441.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" text="Start Conversation" BorderPane.alignment="CENTER" />
+                     </center>
+                     <right>
+                        <VBox id="option_button" fx:id="option_button" alignment="CENTER" prefWidth="50.0" stylesheets="/com/notiflyapp/ui/GUI/style/Notifly.css" BorderPane.alignment="CENTER">
+                           <children>
+                              <Circle id="option_dot_1" fx:id="option_dot_1" fill="#1887ee" radius="4.0" stroke="BLACK" strokeType="INSIDE">
+                                 <VBox.margin>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </VBox.margin>
+                              </Circle>
+                              <Circle id="option_dot_2" fx:id="option_dot_2" fill="#1887ee" radius="4.0" stroke="BLACK" strokeType="INSIDE">
+                                 <VBox.margin>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </VBox.margin>
+                              </Circle>
+                              <Circle id="option_dot_3" fx:id="option_dot_3" fill="#1887ee" radius="4.0" stroke="BLACK" strokeType="INSIDE">
+                                 <VBox.margin>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </VBox.margin>
+                              </Circle>
+                           </children>
+                        </VBox>
+                     </right>
+                     <left>
+                        <AnchorPane prefWidth="50.0" BorderPane.alignment="CENTER" />
+                     </left>
+                  </BorderPane>
                  </children>
              </AnchorPane>
             <SplitPane id="split_pane_1" dividerPositions="0.1" styleClass="message-capend" VBox.vgrow="SOMETIMES">
@@ -43,7 +73,7 @@
                                           </ScrollPane>
                                        </children>
                                     </AnchorPane>
-                                    <AnchorPane maxHeight="200.0" minHeight="50.0" prefHeight="50.0" styleClass="message-capend">
+                                    <AnchorPane maxHeight="200.0" minHeight="50.0" prefHeight="70.0" styleClass="message-capend">
                                        <children>
                                           <HBox id="active_conversation_send_text_hbox" styleClass="message-capend" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-5.0">
                                              <children>
@@ -54,7 +84,7 @@
                                                 </TextArea>
                                                 <AnchorPane cacheShape="false" focusTraversable="true" styleClass="message-capend">
                                                    <children>
-                                                      <Button id="send_button" alignment="BOTTOM_CENTER" mnemonicParsing="false" text="Send" AnchorPane.bottomAnchor="0.0" />
+                                                      <Button id="send_button" alignment="CENTER" mnemonicParsing="false" text="Send" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="5.0" />
                                                    </children>
                                                    <HBox.margin>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -12,7 +12,7 @@ import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.servers.bluetooth.BluetoothServer;
 import com.notiflyapp.ui.GUI.controller.HomeTabController;
 import com.notiflyapp.ui.GUI.controller.MainController;
-import com.notiflyapp.ui.GUI.tabs.device.BDeviceTab;
+import com.notiflyapp.ui.GUI.tabs.device.DeviceTab;
 import com.notiflyapp.ui.GUI.tabs.HomeTab;
 import com.notiflyapp.ui.GUI.tabs.TabHouse;
 import javafx.application.Platform;
@@ -148,15 +148,15 @@ public class Houston {
     private void addBluetoothDevice(BluetoothClient client) {
         if(GUI) {
             try {
-                BDeviceTab bDeviceTab = getBDeviceTab(client);
-                if(!bDeviceTab.getBluetoothClient().isConnected()) {
-                    bDeviceTab.setBluetoothClient(client);
+                DeviceTab deviceTab = getBDeviceTab(client);
+                if(!deviceTab.getBluetoothClient().isConnected()) {
+                    deviceTab.setBluetoothClient(client);
                     return;
                 }
             } catch (NullPointerException e) {}
             Tab tab = new Tab();
             tabPane.getTabs().add(tab);
-            BDeviceTab bdt = new BDeviceTab(tab, client);
+            DeviceTab bdt = new DeviceTab(tab, client);
             tabs.add(bdt);
         }
     }
@@ -169,8 +169,8 @@ public class Houston {
 
     private void updateBluetoothDevice(BluetoothClient client) {
         for(TabHouse tabHouse: tabs) {
-            if(tabHouse instanceof BDeviceTab) {
-                if(((BDeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
+            if(tabHouse instanceof DeviceTab) {
+                if(((DeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
                     tabHouse.refresh();
                 }
             }
@@ -181,11 +181,11 @@ public class Houston {
         btServer.disconnectClient(client);
     }
 
-    private BDeviceTab getBDeviceTab(BluetoothClient client) throws NullPointerException {
+    private DeviceTab getBDeviceTab(BluetoothClient client) throws NullPointerException {
         for(TabHouse tabHouse: tabs) {
-            if(tabHouse instanceof BDeviceTab) {
-                if(((BDeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
-                    return (BDeviceTab) tabHouse;
+            if(tabHouse instanceof DeviceTab) {
+                if(((DeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
+                    return (DeviceTab) tabHouse;
                 }
             }
         }
@@ -196,8 +196,8 @@ public class Houston {
         if(object instanceof SMS) {
             try {
                 DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
-                BDeviceTab bDeviceTab = getBDeviceTab(client);
-                bDeviceTab.handleNewMessage(object, false);
+                DeviceTab deviceTab = getBDeviceTab(client);
+                deviceTab.handleNewMessage(object, false);
             } catch (SQLException | UnequalArraysException | NullResultSetException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {
@@ -225,8 +225,8 @@ public class Houston {
         try {
             DatabaseFactory.getInstance().dropMessageTables();
             for(TabHouse tabHouse: tabs) {
-                if(tabHouse instanceof BDeviceTab) {
-                    ((BDeviceTab) tabHouse).clearMessages();
+                if(tabHouse instanceof DeviceTab) {
+                    ((DeviceTab) tabHouse).clearMessages();
                 }
             }
         } catch (SQLException e) {
