@@ -129,7 +129,7 @@ public class ThreadCell {
         return mostRecent;
     }
 
-    public Node toNode() {
+    public Node getNode() {
         if(node == null) {
             try {
                 createNode();

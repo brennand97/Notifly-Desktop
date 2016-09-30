@@ -43,7 +43,7 @@ public class DeviceTab extends TabHouse {
 
     private Tab tab;
     private ListView<ThreadCell> threadView;
-    private ArrayList<ThreadCell> threadCells = new ArrayList<>();
+    //private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private VBox messageView;
     private ScrollPane messageScroll;
     private ArrayList<Message> messages = new ArrayList<>();
@@ -117,10 +117,10 @@ public class DeviceTab extends TabHouse {
                         super.updateItem(item, empty);
 
                         if (empty || item == null) {
-                            Node node = item.toNode();
-                            setGraphic(node);
+                            //Do Nothing
                         } else {
-                            setText("ITEM NOT RENDERED");
+                            Node node = item.getNode();
+                            setGraphic(node);
                         }
 
                     }
@@ -142,7 +142,7 @@ public class DeviceTab extends TabHouse {
         threadView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
             Application.invokeLater(() -> {
                 threadMaxWidth = newSceneWidth.doubleValue();
-                for(ThreadCell cell : threadCells) {
+                for(ThreadCell cell : threadView.getItems()) {
                     cell.updateMaxWidth(threadMaxWidth);
                 }
                 threadView.refresh();
@@ -240,21 +240,19 @@ public class DeviceTab extends TabHouse {
     }
 
     private void addThreadCell(int threadId) {
-        for(ThreadCell cell: threadCells) {
+        for(ThreadCell cell: threadView.getItems()) {
             if(cell.getThreadId() == threadId) {
                 return;
             }
         }
         ThreadCell cell = new ThreadCell(client, this, threadId, threadMaxWidth);
 
-        threadCells.add(cell);
         threadView.getItems().add(cell);
-        threadCells.sort(new ThreadComparator());
         threadView.getItems().sort(new ThreadComparator());
     }
 
     private void selectThread(int index) {
-        ThreadCell tmpCurrent = threadCells.get(index);
+        ThreadCell tmpCurrent = threadView.getItems().get(index);
         if(!tmpCurrent.equals(current)) {
             threadView.getSelectionModel().select(index);
             if(messageScroll != null && current != null) {
@@ -291,7 +289,6 @@ public class DeviceTab extends TabHouse {
         nameLabel.setText("Start Conversation");
         current = null;
         messages.clear();
-        threadCells.clear();
     }
 
     @Override
@@ -345,7 +342,7 @@ public class DeviceTab extends TabHouse {
                         isPartOfCurrent = true;
                     }
                 } else {
-                    if(threadCells.size() == 0) {
+                    if(threadView.getItems().size() == 0) {
                         addThreadCell(sms.getThreadId());
                         selectThread(0);
                     }
@@ -359,7 +356,7 @@ public class DeviceTab extends TabHouse {
                     }
                 } else {
                     addThreadCell(sms.getThreadId());
-                    for(ThreadCell cell: threadCells) {
+                    for(ThreadCell cell: threadView.getItems()) {
                         if(cell.getThreadId() == sms.getThreadId()) {
                             cell.addMessage(sms);
                         }
@@ -379,8 +376,7 @@ public class DeviceTab extends TabHouse {
             }
         }
         */
-        threadCells.sort(new ThreadComparator());
-        threadView.getItems().sort(new ThreadNodeComparator());
+        threadView.getItems().sort(new ThreadComparator());
         threadView.refresh();
 
         return output;
