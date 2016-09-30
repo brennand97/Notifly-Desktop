@@ -13,8 +13,11 @@ import java.util.Comparator;
 
 /**
  * Created by Brennan on 7/10/2016.
+ *
+ * This Comparator is used to compare Message objects in the DeviceTab Message ArrayList which is
+ * then used to update the Message VBox
  */
-public class MessageComparator implements Comparator<Message> {
+class MessageComparator implements Comparator<Message> {
     @Override
     public int compare(Message o1, Message o2) {
         if(o1.getDate() < o2.getDate()) {

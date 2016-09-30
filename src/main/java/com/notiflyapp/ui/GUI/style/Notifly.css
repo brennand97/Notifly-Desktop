@@ -89,6 +89,14 @@
     -fx-font-weight: 600;
 }
 
+#split_pane_1 {
+    -fx-border-color: #404040 derive(#404040, 10%) derive(#404040, 10%) derive(#404040, 10%);
+}
+
+
+
+/* CONVERSATION THREAD LIST VIEW */
+
 #thread_list_view {
     -fx-background-color: derive(#404040, 10%);
     -fx-border-color: derive(#404040, 10%);
@@ -136,9 +144,7 @@
     -fx-font-size: 16px;
 }
 
-#split_pane_1 {
-    -fx-border-color: #404040 derive(#404040, 10%) derive(#404040, 10%) derive(#404040, 10%);
-}
+
 
 /* SCROLL BAR */
 
@@ -176,6 +182,8 @@
     -fx-background-color: derive(#404040, +60%);
 }
 
+
+
 /* HOME SCREEN (HOME TAB) */
 
 .home-menu-button {
@@ -212,6 +220,8 @@
     -fx-opacity: 0.3;
 }
 
+
+
 /* BUTTONS */
 
 .button {
@@ -229,6 +239,8 @@
 .button:pressed {
     -fx-background-color: #52527a;
 }
+
+
 
 /* ALL TABS */
 
@@ -268,6 +280,8 @@
 .tab-pane:focused > .tab-header-area > .headers-region > .tab .focus-indicator {
     -fx-border-color: transparent;
 }
+
+
 
 /* ROOT */
 

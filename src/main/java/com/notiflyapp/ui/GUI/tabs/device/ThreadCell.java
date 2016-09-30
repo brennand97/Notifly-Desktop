@@ -16,7 +16,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,14 +27,14 @@ import java.util.UUID;
 /**
  * Created by Brennan on 6/17/2016.
  */
-public class ThreadCell {
+class ThreadCell {
 
-    public static final String THREAD_TYPE_SINGLE = "single";
-    public static final String THREAD_TYPE_MULTIPLE = "multiple";
-    protected static final String DATE_FORMAT_12 = "MM/dd/yyyy, hh:mm:ss a";
-    protected static final String DATE_FORMAT_24 = "MM/dd/yyyy, HH:mm:ss";
+    static final String THREAD_TYPE_SINGLE = "single";
+    static final String THREAD_TYPE_MULTIPLE = "multiple";
+    static final String DATE_FORMAT_12 = "MM/dd/yyyy, hh:mm:ss a";
+    static final String DATE_FORMAT_24 = "MM/dd/yyyy, HH:mm:ss";
 
-    protected static boolean MILITARY_TIME = false;
+    static boolean MILITARY_TIME = false;
 
     private Node node;
     private Label nameLabel;
@@ -53,7 +52,7 @@ public class ThreadCell {
     private ArrayList<DataObject> messages = new ArrayList<>();
     private long mostRecent = 0L;
 
-    public ThreadCell(BluetoothClient client, DeviceTab house, int threadId, double maxWidth) {
+    ThreadCell(BluetoothClient client, DeviceTab house, int threadId, double maxWidth) {
         this.client = client;
         this.house = house;
         this.threadId = threadId;
@@ -103,7 +102,7 @@ public class ThreadCell {
         return null;
     }
 
-    public void addMessage(DataObject msg) {
+    void addMessage(DataObject msg) {
         if(!messages.contains(msg)) {
             messages.add(msg);
             long date = 0;
@@ -126,11 +125,11 @@ public class ThreadCell {
         }
     }
 
-    public long getMostRecent() {
+    long getMostRecent() {
         return mostRecent;
     }
 
-    public Node getNode() {
+    Node getNode() {
         if(node == null) {
             try {
                 createNode();
@@ -141,12 +140,7 @@ public class ThreadCell {
         return node;
     }
 
-    public ThreadCell setThreadId(int threadId) {
-        this.threadId = threadId;
-        return this;
-    }
-
-    public int getThreadId() {
+    int getThreadId() {
         return threadId;
     }
 
@@ -225,7 +219,7 @@ public class ThreadCell {
         });
     }
 
-    public String getName() {
+    String getName() {
         if (name == null) {
             return String.valueOf(threadId);
         } else {
@@ -233,7 +227,7 @@ public class ThreadCell {
         }
     }
 
-    public String getThreadType() {
+    String getThreadType() {
         if(getAddress().contains(";")) {
             return THREAD_TYPE_MULTIPLE;
         } else {
@@ -241,14 +235,14 @@ public class ThreadCell {
         }
     }
 
-    public String getAddress() {
+    String getAddress() {
         if(thread != null) {
             return formatOutAddress(thread.getContacts());
         }
         return null;
     }
 
-    String formatOutAddress(Contact[] contacts) {
+    private String formatOutAddress(Contact[] contacts) {
         StringBuilder b = new StringBuilder();
         for(int i = 0; i < contacts.length; i++) {
             String raw = contacts[i].getExtra().replace(" ", "").replace("(", "").replace(")", "").replace("-", "").replace("+", "");
@@ -266,15 +260,15 @@ public class ThreadCell {
         return b.toString();
     }
 
-    public double getScrollPoint() {
+    double getScrollPoint() {
         return scrollPoint;
     }
 
-    public void setScrollPoint(double scrollPoint) {
+    void setScrollPoint(double scrollPoint) {
         this.scrollPoint = scrollPoint;
     }
 
-    public void updateMaxWidth(double newMaxWidth) {
+    void updateMaxWidth(double newMaxWidth) {
         this.maxWidth = newMaxWidth;
         node.maxWidth(maxWidth);
         System.out.println(maxWidth);

@@ -37,6 +37,11 @@ public class DeviceDatabase extends Database {
         return CREATE_TABLE;
     }
 
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
     public void insert(DeviceInfo di) throws SQLException {
         StringBuilder call = new StringBuilder();
         call.append("INSERT INTO ").append(TABLE_NAME).append("(").append(MAC).append(", ").append(NAME).append(", ")

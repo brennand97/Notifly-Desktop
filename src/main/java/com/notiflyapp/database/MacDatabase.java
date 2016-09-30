@@ -25,6 +25,8 @@ public abstract class MacDatabase extends Database {
         return macAddress;
     }
 
+    public String getTableName() { return TABLE_NAME; };
+
     protected abstract String getTableNamePrefix();
 
     static String formatMac(String mac) {

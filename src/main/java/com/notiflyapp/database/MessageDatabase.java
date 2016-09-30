@@ -9,6 +9,7 @@ import com.notiflyapp.data.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 /**
  * Created by Brennan on 6/8/2016.

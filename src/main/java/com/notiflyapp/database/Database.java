@@ -39,6 +39,8 @@ public abstract class Database {
 
     protected abstract String getCreateTableString();
 
+    public abstract String getTableName();
+
     public ResultSet getAll(String table) throws SQLException {
         ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + ";");
         return rs;

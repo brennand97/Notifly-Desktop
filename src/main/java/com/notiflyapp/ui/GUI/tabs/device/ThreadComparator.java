@@ -8,8 +8,10 @@ import java.util.Comparator;
 
 /**
  * Created by Brennan on 7/10/2016.
+ *
+ * This Comparator is used to compare ThreadCell objects in the DeviceTab Conversation Thread ListView
  */
-public class ThreadComparator implements Comparator<ThreadCell> {
+class ThreadComparator implements Comparator<ThreadCell> {
     @Override
     public int compare(ThreadCell o1, ThreadCell o2) {
         if(o1.getMostRecent() < o2.getMostRecent()) {

@@ -8,17 +8,20 @@ import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
 import com.notiflyapp.database.DatabaseFactory;
+import com.notiflyapp.database.MessageDatabase;
 import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
 import com.notiflyapp.ui.GUI.tabs.TabHouse;
-import com.sun.glass.ui.Application;
+import com.sun.glass.ui.*;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
@@ -35,6 +38,9 @@ import java.util.ArrayList;
 
 /**
  * Created by Brennan on 6/8/2016.
+ *
+ * Tab for connected Bluetooth Device, displays conversation threads and their respective messages.
+ * Also allows for sending of outgoing SMS.
  */
 public class DeviceTab extends TabHouse {
 
@@ -43,7 +49,6 @@ public class DeviceTab extends TabHouse {
 
     private Tab tab;
     private ListView<ThreadCell> threadView;
-    //private ArrayList<ThreadCell> threadCells = new ArrayList<>();
     private VBox messageView;
     private ScrollPane messageScroll;
     private ArrayList<Message> messages = new ArrayList<>();
@@ -116,9 +121,7 @@ public class DeviceTab extends TabHouse {
                     protected void updateItem(ThreadCell item, boolean empty) {
                         super.updateItem(item, empty);
 
-                        if (empty || item == null) {
-                            //Do Nothing
-                        } else {
+                        if (!empty && item != null) {
                             Node node = item.getNode();
                             setGraphic(node);
                         }
@@ -139,19 +142,13 @@ public class DeviceTab extends TabHouse {
                 }
             }
         });
-        threadView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
-            Application.invokeLater(() -> {
-                threadMaxWidth = newSceneWidth.doubleValue();
-                for(ThreadCell cell : threadView.getItems()) {
-                    cell.updateMaxWidth(threadMaxWidth);
-                }
-                threadView.refresh();
-                /*
-                for(Node node: threadView.getItems()) {
-                    node.maxWidth(threadMaxWidth);
-                }*/
-            });
-        });
+        threadView.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> Application.invokeLater(() -> {
+            threadMaxWidth = newSceneWidth.doubleValue();
+            for(ThreadCell cell : threadView.getItems()) {
+                cell.updateMaxWidth(threadMaxWidth);
+            }
+            threadView.refresh();
+        }));
         threadMaxWidth = 220;
         threadView.setPrefWidth(threadMaxWidth);
 
@@ -172,8 +169,30 @@ public class DeviceTab extends TabHouse {
             dot.setFill(Paint.valueOf("#808080"));
             dot.setStroke(dot.getFill());
         }
+        final ContextMenu menu = new ContextMenu();
         optionButton.setOnMouseClicked(event -> {
             //TODO react to option dots being pushed
+            menu.hide();
+            menu.getItems().clear();
+
+            MenuItem item1 = new MenuItem();
+            item1.setText("Clear Messages");
+            item1.setStyle("-fx-font-size: 14px");
+            item1.setOnAction(event1 -> {
+                MessageDatabase database = DatabaseFactory.getMessageDatabase(deviceInfo.getDeviceMac());
+                try {
+                    database.drop(database.getTableName());
+                    clearMessages();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+            menu.getItems().add(item1);
+
+            menu.show(optionButton, 0, 0);
+            menu.setX((optionButton.getLayoutX() + optionButton.getWidth() - menu.getWidth()) + (event.getScreenX() - event.getSceneX()));
+            menu.setY((optionButton.getLayoutY() + (optionButton.getHeight() * 0.75)) + (event.getScreenY() - event.getSceneY()));
         });
 
 
@@ -270,7 +289,7 @@ public class DeviceTab extends TabHouse {
         }
     }
 
-    protected void updateCurrentNameLabel() {
+    void updateCurrentNameLabel() {
         if(current != null) {
             nameLabel.setText(current.getName());
         }
@@ -325,7 +344,7 @@ public class DeviceTab extends TabHouse {
         });
     }
 
-    public interface DateSet {
+    interface DateSet {
         void setDate(String date);
         void enableRetry();
     }
@@ -367,22 +386,14 @@ public class DeviceTab extends TabHouse {
 
                 break;
         }
-        /*
-        if(threadView.getItems().size() == threadCells.size()) {
-            if(ThreadCell.MILITARY_TIME) {
-                ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_24)).format(new Date(current.getMostRecent())));
-            } else {
-                ((Label) ((Node) threadView.getItems().get(threadCells.indexOf(current))).lookup("#date_label")).setText((new SimpleDateFormat(ThreadCell.DATE_FORMAT_12)).format(new Date(current.getMostRecent())));
-            }
-        }
-        */
+
         threadView.getItems().sort(new ThreadComparator());
         threadView.refresh();
 
         return output;
     }
 
-    public DateSet newMessage(SMS sms, boolean sending) {
+    private DateSet newMessage(SMS sms, boolean sending) {
         boolean scrollAtBottom = false;
         if(messageScroll.getVvalue() == 1.0) {
             scrollAtBottom = true;
@@ -469,11 +480,11 @@ public class DeviceTab extends TabHouse {
         }
     }
 
-    public void newMessage(MMS mms, boolean sending) {
+    private void newMessage(MMS mms, boolean sending) {
 
     }
 
-    public void sendMessage(DataObject object) {
+    private void sendMessage(DataObject object) {
         final DateSet dateSet = handleNewMessage(object, true);
         Request request = new Request();
         switch (object.getType()) {
