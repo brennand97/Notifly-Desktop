@@ -184,6 +184,33 @@
 
 
 
+/* OPTION MENU (CONTEXT MENU) */
+
+.context-menu {
+    -fx-background-color: derive(#404040, 20%);
+    -fx-border-color: derive(#404040, 20%);
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+}
+
+.menu-item {
+    -fx-font-size: 14px;
+    -fx-background-color: derive(#404040, 20%);
+    -fx-border-color: derive(#404040, 20%);
+}
+
+.menu-item:hover {
+    -fx-background-color: derive(#404040, 30%);
+    -fx-border-color: derive(#404040, 30%);
+}
+
+.menu-item:pressed {
+    -fx-background-color: derive(#404040, 25%);
+    -fx-border-color: derive(#404040, 25%);
+}
+
+
+
 /* HOME SCREEN (HOME TAB) */
 
 .home-menu-button {

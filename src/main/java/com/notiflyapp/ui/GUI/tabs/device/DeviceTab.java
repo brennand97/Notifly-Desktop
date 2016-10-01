@@ -90,6 +90,10 @@ public class DeviceTab extends TabHouse {
 
     private void initialize() {
 
+        //Apply Stylesheet
+
+        tab.getContent().getScene().getStylesheets().add(getClass().getResource("/com/notiflyapp/ui/GUI/style/Notifly.css").toExternalForm());
+
         //Lookup FXML objects
 
         threadView = (ListView<ThreadCell>) tab.getContent().lookup("#thread_list_view");
@@ -177,12 +181,24 @@ public class DeviceTab extends TabHouse {
 
             MenuItem item1 = new MenuItem();
             item1.setText("Clear Messages");
-            item1.setStyle("-fx-font-size: 14px");
+            //item1.setStyle("-fx-font-size: 14px; -fx-background-color: #5A5A5A; -fx-border-color: #5A5A5A;");
             item1.setOnAction(event1 -> {
                 MessageDatabase database = DatabaseFactory.getMessageDatabase(deviceInfo.getDeviceMac());
                 try {
                     database.drop(database.getTableName());
-                    clearMessages();
+                    if(threadView.getItems().size() > 1) {
+                        clearMessages();
+                    } else if(threadView.getItems().size() > 0) {
+                        int index = threadView.getItems().indexOf(current);
+                        System.out.println(index);
+                        if(index == 0) {
+                            selectThread(1);
+                        } else {
+                            selectThread(0);
+                        }
+                        threadView.getItems().remove(index);
+                    }
+                    threadView.refresh();
 
                 } catch (SQLException e) {
                     e.printStackTrace();
