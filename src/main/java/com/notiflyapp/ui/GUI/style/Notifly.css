@@ -199,6 +199,12 @@
     -fx-border-color: derive(#404040, 20%);
 }
 
+.menu-item .label {
+    -fx-font-size: 14px;
+    -fx-font-family: Verdana, Tahoma;
+    -fx-text-fill: whitesmoke;
+}
+
 .menu-item:hover {
     -fx-background-color: derive(#404040, 30%);
     -fx-border-color: derive(#404040, 30%);

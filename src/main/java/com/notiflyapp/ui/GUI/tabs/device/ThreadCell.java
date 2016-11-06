@@ -7,10 +7,8 @@ package com.notiflyapp.ui.GUI.tabs.device;
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
-import com.notiflyapp.database.DatabaseFactory;
-import com.notiflyapp.database.NullResultSetException;
-import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
+import com.notiflyapp.tools.CompletionCallback;
 import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -18,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +24,7 @@ import java.util.UUID;
 /**
  * Created by Brennan on 6/17/2016.
  */
-class ThreadCell {
+public class ThreadCell {
 
     static final String THREAD_TYPE_SINGLE = "single";
     static final String THREAD_TYPE_MULTIPLE = "multiple";
@@ -52,18 +49,29 @@ class ThreadCell {
     private ArrayList<DataObject> messages = new ArrayList<>();
     private long mostRecent = 0L;
 
-    ThreadCell(BluetoothClient client, DeviceTab house, int threadId, double maxWidth) {
+    ThreadCell(BluetoothClient client, DeviceTab house, int threadId, double maxWidth, CompletionCallback<ThreadCell> callback) {
         this.client = client;
         this.house = house;
         this.threadId = threadId;
         this.maxWidth = maxWidth;
-        retrieveContact();
         try {
             createNode();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        getMessages();
+        retrieveContact(callback);
+
+        /*
+        try {
+            DataObject[] output = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
+            for(DataObject o: output) {
+                addMessage(o);
+                //System.out.println(o);
+            }
+        } catch (SQLException | NullResultSetException | UnequalArraysException e) {
+            e.printStackTrace();
+        }
+        */
     }
 
     private void createNode() throws IOException {
@@ -83,23 +91,21 @@ class ThreadCell {
             dateLabel.setText("");
         }
         node.maxWidth(maxWidth);
+
     }
 
     public DataObject[] getMessages() {
-        if(messages.size() != 0) {
-            DataObject[] msgs = new DataObject[messages.size()];
-            return messages.toArray(msgs);
-        }
-        try {
-            DataObject[] output = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getMessages(threadId);
-            for(DataObject o: output) {
-                addMessage(o);
-            }
-            return output;
-        } catch (SQLException | NullResultSetException | UnequalArraysException e) {
-            e.printStackTrace();
-        }
-        return null;
+        DataObject[] msgs = new DataObject[messages.size()];
+        return messages.toArray(msgs);
+    }
+
+    public void callForMessages(long time, int count) {
+        Request request = new Request();
+        request.putBody(RequestHandler.RequestCode.RETRIEVE_PREVIOUS_SMS);
+        request.putItem(RequestHandler.RequestCode.EXTRA_THREAD_ID, new DataString(String.valueOf(this.threadId)));
+        request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_PREVIOUS_SMS_START_TIME, new DataString(String.valueOf(time)));
+        request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_PREVIOUS_SMS_MESSAGE_COUNT, new DataString(String.valueOf(count)));
+        RequestHandler.getInstance().sendRequest(client, request, null);
     }
 
     void addMessage(DataObject msg) {
@@ -125,6 +131,10 @@ class ThreadCell {
         }
     }
 
+    void clearMessages() {
+        messages.clear();
+    }
+
     long getMostRecent() {
         return mostRecent;
     }
@@ -144,45 +154,26 @@ class ThreadCell {
         return threadId;
     }
 
-    private void retrieveContact() {
-        try {
-            thread = DatabaseFactory.getThreadDatabase(client.getDeviceMac()).queryThread(threadId);
-            if(thread != null) {
-                handleContact(thread);
-                return;
+    private void retrieveContact(CompletionCallback<ThreadCell> compCall) {
+        Request request = new Request();
+        request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
+        request.putExtra(UUID.randomUUID());
+        request.putRequestValue(String.valueOf(threadId));
+        RequestHandler.ResponseCallback callback = (request1, response) -> {
+            thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
+            this.updateContact();
+            if(compCall != null) {
+                compCall.complete(ThreadCell.this);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if(thread == null) {
-            Request request = new Request();
-            request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
-            request.putExtra(UUID.randomUUID());
-            request.putRequestValue(String.valueOf(threadId));
-            RequestHandler.ResponseCallback callback = (request1, response) -> {
-                thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
-                try {
-                    handleContact(thread);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            };
-            RequestHandler.getInstance().sendRequest(client, request, callback);
-        }
-
+        };
+        RequestHandler.getInstance().sendRequest(client, request, callback);
     }
 
-    private void handleContact(ConversationThread thread) throws SQLException {
-        this.thread = thread;
-        DatabaseFactory.getThreadDatabase(client.getDeviceMac()).nonDuplicateInsert(thread);
+    private void updateContact() {
         Contact[] contacts = thread.getContacts();
         if(contacts.length > 1) {
             StringBuilder b = new StringBuilder();
             for(int i = 0; i < contacts.length; i++) {
-                if(contacts[i].getBody() != null) {
-                    //TODO only insert if has actual contactId;
-                    DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[i]);
-                }
                 if(contacts[i].getBody() == null) {
                     b.append(contacts[i].getExtra());
                 } else {
@@ -193,11 +184,7 @@ class ThreadCell {
                 }
             }
             name = b.toString();
-        } else if(contacts.length != 0){
-            if(contacts[0].getBody() != null) {
-                //TODO only insert if has actual contactId;
-                DatabaseFactory.getContactDatabase(client.getDeviceMac()).nonDuplicateInsert(contacts[0]);
-            }
+        } else if(contacts.length == 1){
             if(contacts[0].getBody() == null) {
                 name = contacts[0].getExtra();
             } else {
@@ -219,6 +206,23 @@ class ThreadCell {
         });
     }
 
+    String contactAddresses(Contact[] contacts) {
+        if(contacts.length > 1) {
+            StringBuilder b = new StringBuilder();
+            for(int i = 0; i < contacts.length; i++) {
+                b.append(contacts[i].getExtra());
+                if(i < contacts.length - 1) {
+                    b.append(";");
+                }
+            }
+            return b.toString();
+        } else if(contacts.length == 1){
+            return contacts[0].getExtra();
+        } else {
+            return String.valueOf(threadId);
+        }
+    }
+
     String getName() {
         if (name == null) {
             return String.valueOf(threadId);
@@ -238,6 +242,13 @@ class ThreadCell {
     String getAddress() {
         if(thread != null) {
             return formatOutAddress(thread.getContacts());
+        }
+        return null;
+    }
+
+    Contact[] getContacts() {
+        if(thread != null) {
+            return thread.getContacts();
         }
         return null;
     }
@@ -271,7 +282,7 @@ class ThreadCell {
     void updateMaxWidth(double newMaxWidth) {
         this.maxWidth = newMaxWidth;
         node.maxWidth(maxWidth);
-        System.out.println(maxWidth);
+        //System.out.println(maxWidth);
     }
 
 }

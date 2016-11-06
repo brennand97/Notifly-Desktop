@@ -140,6 +140,7 @@ public class MessageDatabase extends MacDatabase {
         }
     }
 
+    /*
     public DataObject[] getAllMessages() throws SQLException, NullResultSetException {
         ResultSet rs = getAll(TABLE_NAME);
         if(rs != null) {
@@ -161,6 +162,7 @@ public class MessageDatabase extends MacDatabase {
             throw NullResultSetException.makeException(TABLE_NAME);
         }
     }
+    */
 
     public DataObject[] getMessages(int threadId) throws SQLException, NullResultSetException, UnequalArraysException {
         ResultSet rs = query(TABLE_NAME, null, new String[]{ THREAD_ID }, new String[]{ String.valueOf(threadId) }, null, null);

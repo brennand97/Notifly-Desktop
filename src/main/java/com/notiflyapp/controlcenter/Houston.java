@@ -15,6 +15,7 @@ import com.notiflyapp.ui.GUI.controller.MainController;
 import com.notiflyapp.ui.GUI.tabs.device.DeviceTab;
 import com.notiflyapp.ui.GUI.tabs.HomeTab;
 import com.notiflyapp.ui.GUI.tabs.TabHouse;
+import com.sun.glass.ui.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -148,7 +149,7 @@ public class Houston {
     private void addBluetoothDevice(BluetoothClient client) {
         if(GUI) {
             try {
-                DeviceTab deviceTab = getBDeviceTab(client);
+                DeviceTab deviceTab = getDeviceTab(client);
                 if(!deviceTab.getBluetoothClient().isConnected()) {
                     deviceTab.setBluetoothClient(client);
                     return;
@@ -181,7 +182,7 @@ public class Houston {
         btServer.disconnectClient(client);
     }
 
-    private DeviceTab getBDeviceTab(BluetoothClient client) throws NullPointerException {
+    public DeviceTab getDeviceTab(BluetoothClient client) throws NullPointerException {
         for(TabHouse tabHouse: tabs) {
             if(tabHouse instanceof DeviceTab) {
                 if(((DeviceTab) tabHouse).getBluetoothClient().getDeviceMac().equals(client.getDeviceMac())) {
@@ -196,8 +197,8 @@ public class Houston {
         if(object instanceof SMS) {
             try {
                 DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
-                DeviceTab deviceTab = getBDeviceTab(client);
-                deviceTab.handleNewMessage(object, false);
+                DeviceTab deviceTab = getDeviceTab(client);
+                Application.invokeLater(() -> deviceTab.handleNewMessage(object, false, false));
             } catch (SQLException | UnequalArraysException | NullResultSetException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {
@@ -206,8 +207,6 @@ public class Houston {
         } else if(object instanceof MMS) {
 
         }
-        URL notificationSound = getClass().getResource("/com/notiflyapp/ui/GUI/sounds/glass_ping.mp3");
-        playNotificationSound(notificationSound);
     }
 
     public static synchronized void playNotificationSound(URL filePath) {

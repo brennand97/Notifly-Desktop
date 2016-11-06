@@ -59,39 +59,49 @@ class ClientThread extends Thread{
 
         while(connected) {
             try {
-                byte[] header = new byte[4];
-                int headerValue;
-                int bytes;
-                bytes = iStream.read(header);
-                if (bytes == -1) {
-                    serverOut("Client session dropped");
-                    client.close();
-                    break;
-                }
-                headerValue = retrieveHeader(header);
-                //serverOut(String.valueOf(headerValue));
-                byte[] buffer = new byte[headerValue];
-                bytes = iStream.read(buffer);
-                //****************************************************************
-                //Crucial for successful packet retrieval
-                while(bytes < headerValue) {
-                    byte[] newBuffer = new byte[headerValue - bytes];
-                    bytes += iStream.read(newBuffer);
-                    for(int i = 0; i < newBuffer.length; i++) {
-                        buffer[headerValue - newBuffer.length + i] = newBuffer[i];
+                if(true) {
+                    byte[] header = new byte[4];
+                    int headerValue;
+                    int bytes;
+                    bytes = iStream.read(header);
+                    if (bytes == -1) {
+                        serverOut("Client session dropped at header");
+                        client.close();
+                        break;
                     }
+                    headerValue = retrieveHeader(header);
+                    //serverOut(String.valueOf(headerValue));
+                    byte[] buffer = new byte[headerValue];
+                    bytes = iStream.read(buffer);
+                    //****************************************************************
+                    //Crucial for successful packet retrieval
+                    while(bytes < headerValue) {
+                        byte[] newBuffer = new byte[headerValue - bytes];
+                        int tmpBytes = iStream.read(newBuffer);
+                        if(tmpBytes == -1) { // Catch for a client drop/disconnect
+                            serverOut("Client session dropped from within catch loop.");
+                            client.close();
+                            break;
+                        }
+                        bytes += tmpBytes;
+                        for(int i = 0; i < newBuffer.length; i++) {
+                            buffer[headerValue - newBuffer.length + i] = newBuffer[i];
+                        }
+                    }
+                    //***************************************************************
+                    //serverOut(String.valueOf(bytes));
+                    if (bytes == -1) {
+                        serverOut("Client session dropped after loop");
+                        client.close();
+                        break;
+                    }
+                    dataIn(buffer);
+                } else {
+                    Thread.sleep(100);
                 }
-                //***************************************************************
-                //serverOut(String.valueOf(bytes));
-                if (bytes == -1) {
-                    serverOut("Client session dropped");
-                    client.close();
-                    break;
-                }
-                dataIn(buffer);
             } catch (InterruptedIOException e1) {
                 //This is the client being forced to disconnect
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -188,11 +198,20 @@ class ClientThread extends Thread{
                         String object = queue.poll();
                         if(oStream != null) {
                             try {
-                                oStream.write(createHeader(object.getBytes().length));
-                                oStream.write(object.getBytes());
+                                byte[] bytes = object.getBytes();
+                                byte[] header = createHeader(bytes.length);
+                                oStream.write(header);
+                                oStream.write(bytes);
                             } catch (IOException e) {
                                 e.printStackTrace();
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e1) {
+                                    e1.printStackTrace();
+                                }
+                                continue;
                             }
+                            //queue.poll();
                         }
                     }
                 }

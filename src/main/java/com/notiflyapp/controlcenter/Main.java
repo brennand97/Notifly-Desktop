@@ -36,65 +36,6 @@ public class Main extends Application {
 
         Houston.getInstance().startBluetoothServer();
 
-        /*
-        Group root = new Group();
-        primaryStage.setTitle("Hello World");
-
-        Label status = new Label();
-        status.setText("Server not initialized");
-        status.setLayoutX(0);
-        status.setLayoutY(0);
-
-        Button btn = new Button("Start server");
-        btn.setOnAction(event -> {
-            if(!serverActive) {
-                Runnable runnable = () -> {
-                    BluetoothServer btServer = new BluetoothServer();
-                    btServer.start();
-                    serverActive = true;
-                    serverHandler.addServer(btServer);
-                };
-                (new Thread(runnable)).start();
-                status.setText("Server started");
-                btn.setText("Stop server");
-            } else {
-                Runnable runnable = () -> {
-                    serverHandler.closeServers();
-                    serverActive = false;
-                };
-                (new Thread(runnable)).start();
-                status.setText("Server stopped");
-                btn.setText("Start server");
-            }
-        });
-        btn.setLayoutX(0);
-        btn.setLayoutX(50);
-
-        final TextField phoneNumber = new TextField("Phone Number");
-        phoneNumber.setLayoutX(0);
-        phoneNumber.setLayoutY(100);
-
-        final TextField message = new TextField("Message");
-        message.setLayoutX(0);
-        message.setLayoutY(150);
-
-        Button sendBtn = new Button("Send Message");
-        sendBtn.setOnAction(event -> {
-            String number = phoneNumber.getText().replace("-", "");
-            String smsMessage = message.getText();
-            message.setText("");
-            serverHandler.sendSMSMessage(new SMS(number, null, smsMessage), new DeviceInfo("G4", "00:00:00:00:00:20", BluetoothClient.Type.PHONE));
-        });
-
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(status, btn, phoneNumber, message, sendBtn);
-        root.getChildren().add(layout);
-
-        Scene scene = new Scene(root, 300, 275);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        */
-
     }
 
     @Override

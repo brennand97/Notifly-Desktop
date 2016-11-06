@@ -13,6 +13,7 @@ import com.notiflyapp.database.NullResultSetException;
 import com.notiflyapp.database.UnequalArraysException;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.controlcenter.Houston;
+import com.notiflyapp.tools.CompletionCallback;
 import com.notiflyapp.ui.GUI.tabs.TabHouse;
 import com.sun.glass.ui.*;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +36,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Brennan on 6/8/2016.
@@ -61,6 +63,7 @@ public class DeviceTab extends TabHouse {
     private ThreadCell current;
     private double smsMaxWidth;
     private double threadMaxWidth;
+    private HashMap<String, ArrayList<CompletionCallback<ThreadCell>>> currentLoadingThreadIds = new HashMap<>();
 
     private static final long gracePeriod = 5000;
     private static final int messageFontSize = 16;
@@ -181,30 +184,34 @@ public class DeviceTab extends TabHouse {
 
             MenuItem item1 = new MenuItem();
             item1.setText("Clear Messages");
-            //item1.setStyle("-fx-font-size: 14px; -fx-background-color: #5A5A5A; -fx-border-color: #5A5A5A;");
             item1.setOnAction(event1 -> {
-                MessageDatabase database = DatabaseFactory.getMessageDatabase(deviceInfo.getDeviceMac());
-                try {
-                    database.drop(database.getTableName());
-                    if(threadView.getItems().size() > 1) {
-                        clearMessages();
-                    } else if(threadView.getItems().size() > 0) {
-                        int index = threadView.getItems().indexOf(current);
-                        System.out.println(index);
-                        if(index == 0) {
-                            selectThread(1);
-                        } else {
-                            selectThread(0);
-                        }
-                        threadView.getItems().remove(index);
-                    }
-                    threadView.refresh();
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                clearMessageListView();
+                if(current != null) {
+                    current.clearMessages();
                 }
             });
+            if(current == null) {
+                item1.setDisable(true);
+            } else {
+                item1.setDisable(false);
+            }
             menu.getItems().add(item1);
+
+            MenuItem item2 = new MenuItem();
+            item2.setText("Retrieve Previous");
+            item2.setOnAction(event1 -> {
+                if(messages.size() > 0) {
+                    current.callForMessages(messages.get(0).getDate(), 20);
+                } else {
+                    current.callForMessages(System.currentTimeMillis(), 20);
+                }
+            });
+            if(current == null) {
+                item2.setDisable(true);
+            } else {
+                item2.setDisable(false);
+            }
+            menu.getItems().add(item2);
 
             menu.show(optionButton, 0, 0);
             menu.setX((optionButton.getLayoutX() + optionButton.getWidth() - menu.getWidth()) + (event.getScreenX() - event.getSceneX()));
@@ -245,7 +252,7 @@ public class DeviceTab extends TabHouse {
 
 
         //Initialize Conversation Threads from SQLite Database for device if available
-
+        /*
         try {
             int[] threadIds = DatabaseFactory.getMessageDatabase(client.getDeviceMac()).getThreadIds();
             for(int i: threadIds) {
@@ -259,7 +266,7 @@ public class DeviceTab extends TabHouse {
         } catch (SQLException | NullResultSetException | NullPointerException e) {
             e.printStackTrace();
         }
-
+        */
 
     }
 
@@ -274,16 +281,40 @@ public class DeviceTab extends TabHouse {
         }
     }
 
-    private void addThreadCell(int threadId) {
+    public void addThreadCell(int threadId, CompletionCallback<ThreadCell> callback) {
         for(ThreadCell cell: threadView.getItems()) {
             if(cell.getThreadId() == threadId) {
                 return;
             }
         }
-        ThreadCell cell = new ThreadCell(client, this, threadId, threadMaxWidth);
-
-        threadView.getItems().add(cell);
-        threadView.getItems().sort(new ThreadComparator());
+        final String sId = String.valueOf(threadId);
+        if(currentLoadingThreadIds.containsKey(sId)) {
+            currentLoadingThreadIds.get(sId).add(callback);
+            return;
+        }
+        ArrayList<CompletionCallback<ThreadCell>> list = new ArrayList<>();
+        list.add(callback);
+        currentLoadingThreadIds.put(sId, list);
+        new ThreadCell(client, this, threadId, threadMaxWidth, new CompletionCallback<ThreadCell>() {
+            @Override
+            public void complete(ThreadCell cell) {
+                threadView.getItems().add(cell);
+                threadView.getItems().sort(new ThreadComparator());
+                cell.callForMessages(System.currentTimeMillis(), 20);
+                if(threadView.getItems().size() == 1) {
+                    Application.invokeLater(() -> selectThread(0));
+                }
+                ArrayList<CompletionCallback<ThreadCell>> list = currentLoadingThreadIds.get(sId);
+                if(list != null) {
+                    for(CompletionCallback<ThreadCell> call: list) {
+                        if(call != null) {
+                            Application.invokeLater(() -> call.complete(cell));
+                        }
+                    }
+                }
+                currentLoadingThreadIds.remove(sId);
+            }
+        });
     }
 
     private void selectThread(int index) {
@@ -298,7 +329,7 @@ public class DeviceTab extends TabHouse {
             nameLabel.setText(current.getName());
             DataObject[] messages = current.getMessages();
             for(DataObject msg: messages) {
-                handleNewMessage(msg, false);
+                handleNewMessage(msg, false, true);
             }
             messageScroll.setVvalue(current.getScrollPoint());
             Application.invokeLater(() -> messageScroll.setVvalue(current.getScrollPoint()));
@@ -323,7 +354,6 @@ public class DeviceTab extends TabHouse {
         clearThreadListView();
         nameLabel.setText("Start Conversation");
         current = null;
-        messages.clear();
     }
 
     @Override
@@ -343,6 +373,11 @@ public class DeviceTab extends TabHouse {
             };
             (new Thread(runnable)).start();
         }
+    }
+
+    public void playNotificationSound() {
+        URL notificationSound = getClass().getResource("/com/notiflyapp/ui/GUI/sounds/glass_ping.mp3");
+        Houston.playNotificationSound(notificationSound);
     }
 
     public void setBluetoothClient(BluetoothClient client) {
@@ -365,36 +400,48 @@ public class DeviceTab extends TabHouse {
         void enableRetry();
     }
 
-    public DateSet handleNewMessage(DataObject object, boolean sending) {
+    public DateSet handleNewMessage(DataObject object, boolean sending, boolean old) {
         DateSet output = null;
         //System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()).replace(",","\n  "));
         switch (object.getType()) {
             case DataObject.Type.SMS:
-                SMS sms = (SMS) object;
-                boolean isPartOfCurrent = false;
+                final SMS sms = (SMS) object;
                 if(current != null) {
                     if(sms.getThreadId() == current.getThreadId()) {
-                        isPartOfCurrent = true;
+                        if(!messages.contains(sms)) {
+                            messages.add(sms);
+                            current.addMessage(sms);
+                            messages.sort(new MessageComparator());
+                            output = newMessage(sms, sending);
+                            if(!sending && !old) {
+                                playNotificationSound();
+                            }
+                        }
+                    } else {
+                        addThreadCell(sms.getThreadId(), (cell) -> {
+                            cell.addMessage(sms);
+                            if(!old) {
+                                playNotificationSound();
+                            }
+                        });
+                        for(ThreadCell cell: threadView.getItems()) {
+                            if(cell.getThreadId() == sms.getThreadId()) {
+                                cell.addMessage(sms);
+                                if(!old) {
+                                    playNotificationSound();
+                                }
+                            }
+                        }
                     }
                 } else {
                     if(threadView.getItems().size() == 0) {
-                        addThreadCell(sms.getThreadId());
-                        selectThread(0);
-                    }
-                }
-                if(isPartOfCurrent) {
-                    if(!messages.contains(sms)) {
-                        messages.add(sms);
-                        current.addMessage(sms);
-                        messages.sort(new MessageComparator());
-                        output = newMessage(sms, sending);
-                    }
-                } else {
-                    addThreadCell(sms.getThreadId());
-                    for(ThreadCell cell: threadView.getItems()) {
-                        if(cell.getThreadId() == sms.getThreadId()) {
+                        addThreadCell(sms.getThreadId(), (cell) -> {
                             cell.addMessage(sms);
-                        }
+                            selectThread(0);
+                            if(!old) {
+                                playNotificationSound();
+                            }
+                        });
                     }
                 }
                 break;
@@ -417,21 +464,18 @@ public class DeviceTab extends TabHouse {
         try {
             final Node node = FXMLLoader.load(SMS_NODE_URL);
             Label label = (Label) node.lookup("#message_text");
-            if(sms.getAddress() != null) {
-                if(sms.getAddress().equals(current.getAddress())) {
-                    node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-                    label.getStyleClass().clear();
-                    label.getStyleClass().add("right-message");
-                } else {
-                    node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-                    label.getStyleClass().clear();
-                    label.getStyleClass().add("left-message");
-                }
-            } else {
+
+
+            if(sms.getPerson() != null && !current.contactAddresses(current.getContacts()).contains(sms.getOriginatingAddress())) {
                 node.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
                 label.getStyleClass().clear();
                 label.getStyleClass().add("left-message");
+            } else {
+                node.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+                label.getStyleClass().clear();
+                label.getStyleClass().add("right-message");
             }
+
             if(messageView.getChildren().size() == 0) {
                 VBox.setMargin(label, new Insets(10, 10, 0, 10));
             }
@@ -501,7 +545,7 @@ public class DeviceTab extends TabHouse {
     }
 
     private void sendMessage(DataObject object) {
-        final DateSet dateSet = handleNewMessage(object, true);
+        final DateSet dateSet = handleNewMessage(object, true, true);
         Request request = new Request();
         switch (object.getType()) {
             case DataObject.Type.SMS:
