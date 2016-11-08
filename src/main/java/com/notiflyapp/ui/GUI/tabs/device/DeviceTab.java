@@ -19,6 +19,7 @@ import com.sun.glass.ui.*;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
@@ -59,6 +60,7 @@ public class DeviceTab extends TabHouse {
     private TextArea textArea;
     private VBox optionButton;
     private Circle[] optionDots = new Circle[3];
+    private Slider volumeSlider;
 
     private ThreadCell current;
     private double smsMaxWidth;
@@ -115,8 +117,6 @@ public class DeviceTab extends TabHouse {
         //Define initial SMS width
         smsMaxWidth = (messageView.getWidth() * 0.75);
 
-
-
         //Thread View (Conversations ListView)
 
         threadView.setCellFactory(new Callback<ListView<ThreadCell>, ListCell<ThreadCell>>() {
@@ -167,7 +167,10 @@ public class DeviceTab extends TabHouse {
             Application.invokeLater(() -> handleResize(newSceneWidth.doubleValue()));
         });
 
+        //Volume Slider for the Context Menu
 
+        volumeSlider = new Slider(0, 1, 0.5);
+        volumeSlider.getStyleClass().add("context-menu-slider");
 
         //Option Button/Dots (VBox in top right containing 3 circles)
 
@@ -181,6 +184,16 @@ public class DeviceTab extends TabHouse {
             //TODO react to option dots being pushed
             menu.hide();
             menu.getItems().clear();
+
+            CustomMenuItem volumeItem = new CustomMenuItem();
+            VBox content = new VBox();
+            Label volumeLabel = new Label("Volume");
+            volumeLabel.setPadding(new Insets(0, 0, 2, 2));
+            content.getChildren().add(volumeLabel);
+            content.getChildren().add(volumeSlider);
+            volumeItem.setHideOnClick(false);
+            volumeItem.setContent(content);
+            menu.getItems().add(volumeItem);
 
             MenuItem item1 = new MenuItem();
             item1.setText("Clear Messages");
@@ -201,9 +214,9 @@ public class DeviceTab extends TabHouse {
             item2.setText("Retrieve Previous");
             item2.setOnAction(event1 -> {
                 if(messages.size() > 0) {
-                    current.callForMessages(messages.get(0).getDate(), 20);
+                    current.callForMessages(messages.get(0).getDate(), 20, true);
                 } else {
-                    current.callForMessages(System.currentTimeMillis(), 20);
+                    current.callForMessages(System.currentTimeMillis(), 20, true);
                 }
             });
             if(current == null) {
@@ -212,6 +225,20 @@ public class DeviceTab extends TabHouse {
                 item2.setDisable(false);
             }
             menu.getItems().add(item2);
+
+            MenuItem item3 = new MenuItem();
+            item3.setText("Retrieve Recent");
+            item3.setOnAction(event1 -> {
+                if(messages.size() > 0) {
+                    current.callForMessages(messages.get(messages.size() - 1).getDate(), -1, false);
+                }
+            });
+            if(current == null || messages.size() == 0) {
+                item3.setDisable(true);
+            } else {
+                item3.setDisable(false);
+            }
+            menu.getItems().add(item3);
 
             menu.show(optionButton, 0, 0);
             menu.setX((optionButton.getLayoutX() + optionButton.getWidth() - menu.getWidth()) + (event.getScreenX() - event.getSceneX()));
@@ -295,25 +322,24 @@ public class DeviceTab extends TabHouse {
         ArrayList<CompletionCallback<ThreadCell>> list = new ArrayList<>();
         list.add(callback);
         currentLoadingThreadIds.put(sId, list);
-        new ThreadCell(client, this, threadId, threadMaxWidth, new CompletionCallback<ThreadCell>() {
-            @Override
-            public void complete(ThreadCell cell) {
+        new ThreadCell(client, this, threadId, threadMaxWidth, cell -> {
+            Application.invokeLater(() -> {
                 threadView.getItems().add(cell);
                 threadView.getItems().sort(new ThreadComparator());
-                cell.callForMessages(System.currentTimeMillis(), 20);
+                cell.callForMessages(System.currentTimeMillis(), 20, true);
                 if(threadView.getItems().size() == 1) {
-                    Application.invokeLater(() -> selectThread(0));
+                   selectThread(0);
                 }
-                ArrayList<CompletionCallback<ThreadCell>> list = currentLoadingThreadIds.get(sId);
-                if(list != null) {
-                    for(CompletionCallback<ThreadCell> call: list) {
-                        if(call != null) {
-                            Application.invokeLater(() -> call.complete(cell));
-                        }
+            });
+            ArrayList<CompletionCallback<ThreadCell>> list1 = currentLoadingThreadIds.get(sId);
+            if(list1 != null) {
+                for(CompletionCallback<ThreadCell> call: list1) {
+                    if(call != null) {
+                        Application.invokeLater(() -> call.complete(cell));
                     }
                 }
-                currentLoadingThreadIds.remove(sId);
             }
+            currentLoadingThreadIds.remove(sId);
         });
     }
 
@@ -377,7 +403,7 @@ public class DeviceTab extends TabHouse {
 
     public void playNotificationSound() {
         URL notificationSound = getClass().getResource("/com/notiflyapp/ui/GUI/sounds/glass_ping.mp3");
-        Houston.playNotificationSound(notificationSound);
+        Houston.playNotificationSound(notificationSound, (volumeSlider.getValue() / 1.5));
     }
 
     public void setBluetoothClient(BluetoothClient client) {
@@ -458,7 +484,7 @@ public class DeviceTab extends TabHouse {
 
     private DateSet newMessage(SMS sms, boolean sending) {
         boolean scrollAtBottom = false;
-        if(messageScroll.getVvalue() == 1.0) {
+        if(messageScroll.getVvalue() >= (1.0 - (1 / messages.size()))) {
             scrollAtBottom = true;
         }
         try {
@@ -552,7 +578,7 @@ public class DeviceTab extends TabHouse {
                 request.putBody(RequestHandler.RequestCode.SEND_SMS);
                 request.putItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT, object);
                 RequestHandler.getInstance().sendRequest(client, request, (request1, response) -> {
-                    if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_SENT)) {
+                    if(response.getHashMap().containsKey(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_SENT)) {
                         try {
                             SMS sms = (SMS) response.getItem(RequestHandler.RequestCode.EXTRA_SEND_SMS_SMSOBJECT);
                             DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert(sms);
@@ -567,7 +593,7 @@ public class DeviceTab extends TabHouse {
                         } catch (UnequalArraysException | SQLException | NullResultSetException e) {
                             e.printStackTrace();
                         }
-                    } else if(response.getRequestValue().equals(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_FAILED)) {
+                    } else if(response.getHashMap().containsKey(RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_FAILED)) {
                         //Message failed
                         if(dateSet != null) {
                             Application.invokeLater(() -> {

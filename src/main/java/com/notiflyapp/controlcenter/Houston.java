@@ -196,11 +196,9 @@ public class Houston {
     public void incomingMessage(BluetoothClient client, DataObject object) {
         if(object instanceof SMS) {
             try {
-                DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
+                //DatabaseFactory.getMessageDatabase(client.getDeviceMac()).nonDuplicateInsert((SMS) object);
                 DeviceTab deviceTab = getDeviceTab(client);
                 Application.invokeLater(() -> deviceTab.handleNewMessage(object, false, false));
-            } catch (SQLException | UnequalArraysException | NullResultSetException e) {
-                e.printStackTrace();
             } catch (NullPointerException e1) {
                 //Do nothing
             }
@@ -209,9 +207,10 @@ public class Houston {
         }
     }
 
-    public static synchronized void playNotificationSound(URL filePath) {
+    public static synchronized void playNotificationSound(URL filePath, double volume) {
         Media hit = new Media(filePath.toExternalForm());
         MediaPlayer mediaPlayer = new MediaPlayer(hit);
+        mediaPlayer.setVolume(volume);
         mediaPlayer.play();
     }
 

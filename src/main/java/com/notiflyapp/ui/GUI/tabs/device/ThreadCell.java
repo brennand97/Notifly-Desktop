@@ -7,15 +7,20 @@ package com.notiflyapp.ui.GUI.tabs.device;
 import com.notiflyapp.data.*;
 import com.notiflyapp.data.requestframework.Request;
 import com.notiflyapp.data.requestframework.RequestHandler;
+import com.notiflyapp.database.Database;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.tools.CompletionCallback;
 import com.sun.glass.ui.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +65,7 @@ public class ThreadCell {
             e.printStackTrace();
         }
         retrieveContact(callback);
+        retrievePicture();
 
         /*
         try {
@@ -99,12 +105,17 @@ public class ThreadCell {
         return messages.toArray(msgs);
     }
 
-    public void callForMessages(long time, int count) {
+    public void callForMessages(long time, int count, boolean old) {
         Request request = new Request();
-        request.putBody(RequestHandler.RequestCode.RETRIEVE_PREVIOUS_SMS);
+        request.putBody(RequestHandler.RequestCode.RETRIEVE_SMS);
         request.putItem(RequestHandler.RequestCode.EXTRA_THREAD_ID, new DataString(String.valueOf(this.threadId)));
-        request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_PREVIOUS_SMS_START_TIME, new DataString(String.valueOf(time)));
-        request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_PREVIOUS_SMS_MESSAGE_COUNT, new DataString(String.valueOf(count)));
+        request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_START_TIME, new DataString(String.valueOf(time)));
+        request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_MESSAGE_COUNT, new DataString(String.valueOf(count)));
+        if(old) {
+            request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_OLD, new DataString("true"));
+        } else {
+            request.putItem(RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_NEW, new DataString("true"));
+        }
         RequestHandler.getInstance().sendRequest(client, request, null);
     }
 
@@ -157,13 +168,13 @@ public class ThreadCell {
     private void retrieveContact(CompletionCallback<ThreadCell> compCall) {
         Request request = new Request();
         request.putBody(RequestHandler.RequestCode.CONTACT_BY_THREAD_ID);
-        request.putExtra(UUID.randomUUID());
-        request.putRequestValue(String.valueOf(threadId));
+        request.putItem(RequestHandler.RequestCode.EXTRA_THREAD_ID, new DataString(String.valueOf(threadId)));
         RequestHandler.ResponseCallback callback = (request1, response) -> {
             thread = (ConversationThread) response.getItem(RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD);
             this.updateContact();
             if(compCall != null) {
                 compCall.complete(ThreadCell.this);
+                retrievePicture();
             }
         };
         RequestHandler.getInstance().sendRequest(client, request, callback);
@@ -204,6 +215,43 @@ public class ThreadCell {
             nameLabel.setText(getName());
             house.updateCurrentNameLabel();
         });
+    }
+
+    private void retrievePicture() {
+        //TODO implement request
+        String buterfly = "/com/notiflyapp/ui/black-butterfly-shape.png";
+
+        Contact[] contacts = getContacts();
+        if(contacts != null && contacts.length == 1) {
+            Request request = new Request();
+            request.putBody(RequestHandler.RequestCode.RETRIEVE_CONTACT_PICTURE);
+            request.putItem(RequestHandler.RequestCode.EXTRA_CONTACT_ID, new DataString(String.valueOf(contacts[0].getContactId())));
+            RequestHandler.ResponseCallback callback = (request1, response) -> {
+                DataByteArray dba = (DataByteArray) response.getItem(RequestHandler.RequestCode.EXTRA_PICTURE_BYTE_ARRAY);
+                if(dba != null) {
+                    byte[] photoBytes = dba.getByteArray();
+                    if(photoBytes != null && photoBytes.length > 0) {
+                        InputStream photoStream = new ByteArrayInputStream(photoBytes);
+                        Image image = new Image(photoStream);
+                        imageView.setImage(image);
+                        Circle clip = new Circle((imageView.getFitWidth() / 2) - 1, imageView.getFitHeight() / 2, Math.min((imageView.getFitWidth() / 2) - 1, (imageView.getFitHeight() / 2) - 1));
+                        imageView.setClip(clip);
+                    }
+                }
+                Image image = new Image(buterfly);
+                imageView.setImage(image);
+                Circle clip = new Circle((imageView.getFitWidth() / 2) - 1, imageView.getFitHeight() / 2, Math.min((imageView.getFitWidth() / 2) - 1, (imageView.getFitHeight() / 2) - 1));
+                imageView.setClip(clip);
+            };
+            RequestHandler.getInstance().sendRequest(client, request, callback);
+        } else {
+            Image image = new Image(buterfly);
+            imageView.setImage(image);
+            Circle clip = new Circle((imageView.getFitWidth() / 2) - 1, imageView.getFitHeight() / 2, Math.min((imageView.getFitWidth() / 2) - 1, (imageView.getFitHeight() / 2) - 1));
+            imageView.setClip(clip);
+        }
+
+
     }
 
     String contactAddresses(Contact[] contacts) {

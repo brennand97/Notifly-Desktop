@@ -146,18 +146,22 @@
 
 
 
-/* SCROLL BAR */
+/* SCROLL BAR / Slider */
 
-.scroll-bar {
+.scroll-bar, .slider {
     -fx-background-color: transparent;
 }
 
+.slider > .track,
 .scroll-bar > .track {
     -fx-background-color: transparent;
+    -fx-background-radius: 0;
 }
 
+.slider > .track-background,
 .scroll-bar > .track-background {
     -fx-background-color: transparent;
+    -fx-background-radius: 0;
 }
 
 .scroll-bar > .increment-button,
@@ -167,6 +171,7 @@
     -fx-border-width: 0px;
 }
 
+.slider > .thumb,
 .scroll-bar > .thumb {
     -fx-background-color: derive(#404040, +50%);
     -fx-background-radius: 0em;
@@ -174,15 +179,15 @@
     -fx-border-width: 0em;
 }
 
+.slider > .thumb:hover,
 .scroll-bar > .thumb:hover {
     -fx-background-color: derive(#404040, +55%);
 }
 
+.slider > .thumb:pressed,
 .scroll-bar > .thumb:pressed {
     -fx-background-color: derive(#404040, +60%);
 }
-
-
 
 /* OPTION MENU (CONTEXT MENU) */
 
@@ -203,6 +208,10 @@
     -fx-font-size: 14px;
     -fx-font-family: Verdana, Tahoma;
     -fx-text-fill: whitesmoke;
+}
+
+.menu-item .slider > .track {
+    -fx-background-color: derive(#404040, -20%);
 }
 
 .menu-item:hover {

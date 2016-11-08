@@ -52,7 +52,7 @@
              </AnchorPane>
             <SplitPane id="split_pane_1" dividerPositions="0.1" styleClass="message-capend" VBox.vgrow="SOMETIMES">
               <items>
-                <AnchorPane id="thread_anchor_pane" styleClass="message-capend">
+                <AnchorPane id="thread_anchor_pane" styleClass="message-capend" SplitPane.resizableWithParent="false">
                      <children>
                         <ListView id="thread_list_view" minWidth="220.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>

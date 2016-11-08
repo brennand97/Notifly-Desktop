@@ -23,14 +23,12 @@ public class RequestDeserializer implements JsonDeserializer {
 
         final String body = jsonObject.get("body").getAsString();
         final UUID extra = UUID.fromString(jsonObject.get("extra").getAsString());
-        final String requestValue = jsonObject.get("requestValue").getAsString();
 
         final HashMap<String, DataObject> hashMap = jsonDeserializationContext.deserialize(jsonObject.get("hashMap"), new TypeToken<HashMap<String, DataObject>>(){}.getType());
 
         final Request request = new Request();
         request.putBody(body);
         request.putExtra(extra);
-        request.putRequestValue(requestValue);
         request.putHashMap(hashMap);
 
         return request;

@@ -5,7 +5,6 @@
 package com.notiflyapp.data.requestframework;
 
 import com.notiflyapp.controlcenter.Houston;
-import com.notiflyapp.data.ConversationThread;
 import com.notiflyapp.servers.bluetooth.BluetoothClient;
 import com.notiflyapp.ui.GUI.tabs.device.DeviceTab;
 
@@ -19,6 +18,7 @@ public class RequestHandler {
     public final static class RequestCode {
 
         public final static String EXTRA_THREAD_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA__THREAD_ID";
+        public final static String EXTRA_CONTACT_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_ID";
 
         public final static String CONTACT_BY_THREAD_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.CONTACT_BY_THREAD_ID";
             public final static String EXTRA_CONTACT_BY_THREAD_ID_THREAD = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_CONTACT_BY_THREAD_ID_THREAD";
@@ -28,13 +28,19 @@ public class RequestHandler {
             public final static String CONFIRMATION_SEND_SMS_SENT = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_SENT";
             public final static String CONFIRMATION_SEND_SMS_FAILED = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.CONFIRMATION_SEND_SMS_FAILED";
 
-        public final static String RETRIEVE_PREVIOUS_SMS = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.RETRIEVE_PREVIOUS_SMS";
-            public final static String EXTRA_RETRIEVE_PREVIOUS_SMS_START_TIME = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_RETRIEVE_PREVIOUS_SMS_START_TIME";
-            public final static String EXTRA_RETRIEVE_PREVIOUS_SMS_MESSAGE_COUNT = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_RETRIEVE_PREVIOUS_SMS_MESSAGE_COUNT";
+        public final static String RETRIEVE_SMS = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.RETRIEVE_SMS";
+            public final static String EXTRA_RETRIEVE_SMS_START_TIME = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_START_TIME";
+            public final static String EXTRA_RETRIEVE_SMS_MESSAGE_COUNT = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_MESSAGE_COUNT";
+            public final static String EXTRA_RETRIEVE_SMS_OLD = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_OLD";
+            public final static String EXTRA_RETRIEVE_SMS_NEW = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_RETRIEVE_SMS_NEW";
             //EXTRA_THREAD_ID
 
         public final static String PUSH_THREAD_ID = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.PUSH_THREAD_ID";
             //EXTRA_THREAD_ID
+
+        public final static String RETRIEVE_CONTACT_PICTURE = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.RETRIEVE_CONTACT_PICTURE";
+            public final static String EXTRA_PICTURE_BYTE_ARRAY = "com.notiflyapp.data.requestframework.RequestHandler.RequestCode.EXTRA_PICTURE_BYTE_ARRAY";
+            //EXTRA_CONTACT_ID
     }
 
     private HashMap<String, Request> requestHashMap = new HashMap<>();              //String is the UUID of the request in string form and the Request object is the request itself
